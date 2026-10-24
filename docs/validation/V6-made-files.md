@@ -79,6 +79,7 @@ CSP の画面で各レイヤーに合成モードを 1 つずつ設定して保�
 
 - 修正: 新しい ID を TEXT で入れる（`clip.rs` の `update_external_index`）。単体テスト `new_external_ids_are_indexed_as_text`
 - 自己検査: `ContainerReport.external_ids_text`（全行が TEXT であること）を `ok()` の条件に加えた。修正前の変種 B はこの検査で不合格になる
+- コーパスでの裏付け: V1 の 719 件で `ExternalChunk.ExternalID` 63,448 行がすべて TEXT、`Offscreen.BlockData` 286,168 行がすべて BLOB（`tools/corpus` と同じ方法で数えた。BLOB の ID を持つファイル 0 件）
 
 **原因 2: ファイル ID（`Head` チャンクの 16 バイト）。** B2 は破損表示こそ出ないが、開いた直後のキャンバスに元のファイルの絵（変更前）が出て、
 レイヤーの表示を切り替えるなどして再描画すると正しい絵になった。CSP は「別名で保存」のたびにファイル ID を新しくする。
