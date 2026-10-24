@@ -1,0 +1,7 @@
+/target
+__pycache__/
+*.pyc
+# Real artwork never goes into the repository.
+*.clip
+*.cmc
+*.sut
