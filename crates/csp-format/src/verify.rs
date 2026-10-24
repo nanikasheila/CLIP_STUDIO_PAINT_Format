@@ -120,6 +120,21 @@ pub struct TextReport {
     pub first_error: Option<String>,
 }
 
+/// Layer effect settings (`LayerEffectInfo`) round trips.
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct EffectReport {
+    pub blobs: usize,
+    /// Layers with `LayerEffectAttached`.
+    pub attached: usize,
+    /// Switched-on effects of attached layers, by section name.
+    pub enabled: BTreeMap<String, usize>,
+    /// Section names and how often they occur.
+    pub sections: BTreeMap<String, usize>,
+    pub parse_errors: usize,
+    pub round_trip_failures: usize,
+    pub first_error: Option<String>,
+}
+
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ClipReport {
     pub container: ContainerReport,
@@ -129,6 +144,7 @@ pub struct ClipReport {
     pub references: ReferenceReport,
     pub vectors: VectorReport,
     pub texts: TextReport,
+    pub effects: EffectReport,
     pub preview: Option<(u32, u32)>,
     pub preview_error: Option<String>,
     pub unchanged_save_identical: bool,
@@ -160,6 +176,8 @@ impl ClipReport {
             && self.vectors.round_trip_failures == 0
             && self.texts.parse_errors == 0
             && self.texts.round_trip_failures == 0
+            && self.effects.parse_errors == 0
+            && self.effects.round_trip_failures == 0
             && self.preview_error.is_none()
             && self.unchanged_save_identical
     }
@@ -201,6 +219,9 @@ pub fn check_clip(data: Vec<u8>, options: CheckOptions) -> ClipReport {
     }
     if let Err(error) = check_texts(&file, &mut report.texts) {
         report.errors.push(format!("texts: {error}"));
+    }
+    if let Err(error) = check_effects(&file, &mut report.effects) {
+        report.errors.push(format!("effects: {error}"));
     }
     match file.preview() {
         Ok(Some(image)) => report.preview = Some((image.width, image.height)),
@@ -437,6 +458,37 @@ fn check_vectors(file: &ClipFile, report: &mut VectorReport) -> Result<()> {
             Err(error) => {
                 report.parse_errors += 1;
                 report.first_error.get_or_insert_with(|| format!("{id}: {error}"));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn check_effects(file: &ClipFile, report: &mut EffectReport) -> Result<()> {
+    if !database::has_column(file.database(), "Layer", "LayerEffectInfo")? {
+        return Ok(());
+    }
+    for layer in &file.layers.layers {
+        let Some(blob) = layer.row.blob("LayerEffectInfo") else { continue };
+        report.blobs += 1;
+        match crate::effect::LayerEffects::parse(blob) {
+            Ok(effects) => {
+                for (name, _) in &effects.sections {
+                    *report.sections.entry(name.clone()).or_default() += 1;
+                }
+                if layer.row.truthy("LayerEffectAttached") {
+                    report.attached += 1;
+                    for name in effects.enabled() {
+                        *report.enabled.entry(name.to_owned()).or_default() += 1;
+                    }
+                }
+                if effects.to_bytes() != blob {
+                    report.round_trip_failures += 1;
+                }
+            }
+            Err(error) => {
+                report.parse_errors += 1;
+                report.first_error.get_or_insert_with(|| format!("layer {}: {error}", layer.main_id));
             }
         }
     }

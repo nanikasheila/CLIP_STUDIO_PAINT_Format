@@ -11,6 +11,7 @@ pub mod cmc;
 pub mod container;
 pub mod database;
 pub mod edit;
+pub mod effect;
 pub mod error;
 pub mod image;
 pub mod model;

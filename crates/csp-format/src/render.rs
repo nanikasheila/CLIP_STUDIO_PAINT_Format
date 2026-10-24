@@ -15,6 +15,7 @@
 use std::collections::BTreeMap;
 
 use crate::clip::ClipFile;
+use crate::effect::{Border, LayerEffects, draw_border};
 use crate::error::Result;
 use crate::image::{GrayImage, RgbaImage};
 use crate::model::{Layer, LayerKind, LayerNode};
@@ -342,6 +343,10 @@ pub struct RenderReport {
     pub blend_modes: BTreeMap<i64, usize>,
     pub clipped: usize,
     pub masked: usize,
+    /// Layer effects drawn, by section name (`EffectEdge`, …).
+    pub effects: BTreeMap<String, usize>,
+    /// Switched-on effects not drawn yet (tone, watercolour edge, line extraction).
+    pub effects_skipped: BTreeMap<String, usize>,
 }
 
 struct Renderer<'a> {
@@ -501,10 +506,9 @@ impl Renderer<'_> {
     /// layers only the full size), so levels without data are passed over;
     /// when none has data the full-size level is returned (its init colour
     /// still applies). Returns the offscreen and the level's scale.
-    fn level(&self, mipmap: i64) -> Result<Option<(Offscreen, f64)>> {
+    fn level(&self, mipmap: i64, scale: f64) -> Result<Option<(Offscreen, f64)>> {
         let Some(mipmap) = self.file.mipmap(mipmap)? else { return Ok(None) };
-        let mut levels: Vec<_> =
-            mipmap.levels.iter().filter(|level| level.scale / 100.0 + 1e-9 >= self.scale).collect();
+        let mut levels: Vec<_> = mipmap.levels.iter().filter(|level| level.scale / 100.0 + 1e-9 >= scale).collect();
         levels.sort_by(|a, b| a.scale.total_cmp(&b.scale));
         for level in levels {
             if let Some(offscreen) = self.file.offscreen(level.offscreen)?
@@ -560,16 +564,45 @@ impl Renderer<'_> {
         buffer
     }
 
-    fn pixels(&self, layer: &Layer) -> Result<Option<Buffer>> {
+    fn pixels(&mut self, layer: &Layer) -> Result<Option<Buffer>> {
         if layer.render_mipmap == 0 {
             return Ok(None);
         }
-        let Some((offscreen, level_scale)) = self.level(layer.render_mipmap)? else { return Ok(None) };
+        let border = self.effects(layer);
+        // A border is drawn at full size (its width is in canvas pixels),
+        // then scaled with the layer.
+        let scale = if border.is_some() { 1.0 } else { self.scale };
+        let Some((offscreen, level_scale)) = self.level(layer.render_mipmap, scale)? else { return Ok(None) };
         if offscreen.data.is_none() {
             return Ok(None);
         }
-        let image = offscreen.to_rgba()?;
-        Ok(Some(self.place(&image, layer.pixel_origin(), level_scale)))
+        let mut image = offscreen.to_rgba()?;
+        let mut origin = layer.pixel_origin();
+        if let Some((border, apply_opacity)) = border {
+            let scaled = Border { width: border.width * level_scale, ..border };
+            let (bordered, margin) = draw_border(&image, &scaled, apply_opacity);
+            image = bordered;
+            let shift = (margin as f64 / level_scale).round() as i64;
+            origin = (origin.0 - shift, origin.1 - shift);
+        }
+        Ok(Some(self.place(&image, origin, level_scale)))
+    }
+
+    /// The layer's switched-on effects: returns the border to draw and
+    /// counts the others (not drawn yet) in the report.
+    fn effects(&mut self, layer: &Layer) -> Option<(Border, bool)> {
+        if !layer.row.truthy("LayerEffectAttached") {
+            return None;
+        }
+        let effects = LayerEffects::parse(layer.row.blob("LayerEffectInfo")?).ok()?;
+        for name in effects.enabled() {
+            if name != "EffectEdge" {
+                *self.report.effects_skipped.entry(name.to_owned()).or_default() += 1;
+            }
+        }
+        let border = effects.border().filter(|border| border.enabled && border.width > 0.0)?;
+        *self.report.effects.entry("EffectEdge".to_owned()).or_default() += 1;
+        Some((border, effects.apply_opacity()))
     }
 
     /// The mask as coverage 0..1 per output pixel (outside the mask image:
@@ -578,7 +611,7 @@ impl Renderer<'_> {
         if layer.mask_mipmap == 0 {
             return Ok(None);
         }
-        let Some((offscreen, level_scale)) = self.level(layer.mask_mipmap)? else { return Ok(None) };
+        let Some((offscreen, level_scale)) = self.level(layer.mask_mipmap, self.scale)? else { return Ok(None) };
         let outside = offscreen.attribute.init_color().map(|init| (init.alpha & 0xff) as f32 / 255.0).unwrap_or(0.0);
         let image = gray_to_rgba(&offscreen.to_alpha()?);
         // Inside the placed image alpha is 1 (fractional on resampled edges).
