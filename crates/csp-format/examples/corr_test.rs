@@ -3,12 +3,12 @@
 //! Input: a CSP-made file with raster layers and one layer of each kind
 //! (tone curve, hue/saturation/value, brightness/contrast, posterize,
 //! invert, levels, colour balance, threshold, gradient map, a gradient and
-//! fill layers; see `docs/validation/V7-generated-layers.md`). For every
+//! fill layers; see `docs/validation/V6b-generated-layers.md`). For every
 //! variant, the bottom raster layer gets a hue × lightness backdrop with a
 //! transparent strip, every other raster and generated layer is hidden,
 //! and one generated layer is shown with the variant's settings.
 //!
-//! Usage: corr_test TEMPLATE.clip OUT_DIR [VARIANT…]
+//! Usage: corr_test TEMPLATE.clip OUT_DIR [round2|round3|round4] [VARIANT…]
 
 use csp_format::{ClipFile, LayerKind, Result, RgbaImage};
 use rusqlite::types::Value;
@@ -341,15 +341,109 @@ fn variants2() -> Vec<Variant> {
     ]
 }
 
+/// Third round, over a grid where red runs down and blue across (green
+/// halfway between), so every (max, min) pair appears: saturation, colour
+/// balance at more values, and opaque gradients in every mixing mode.
+fn variants3() -> Vec<Variant> {
+    let v = |name, target, blob| Variant { name, target, blob, opacity: None, hide_backdrop: false };
+    let on_paper = |name, blob| Variant { name, target: 0, blob, opacity: None, hide_backdrop: true };
+    let balance = |values: [i32; 10]| filter(5, &values);
+    let across = [100.0, 100.0, 0.0, 0.0, 256.0, 512.0, 256.0];
+    let red_blue = [([0xffff, 0, 0, 0xffff], 0.0), ([0, 0, 0xffff, 0xffff], 1.0)];
+    let black_white = [([0, 0, 0, 0xffff], 0.0), ([0xffff, 0xffff, 0xffff, 0xffff], 1.0)];
+    let grad = |mode, correction, stops: &[([u16; 4], f64)]| {
+        gradation_fill_with(gradation_data_full(Some((mode, correction)), stops, &[]), 0, across, None)
+    };
+    let gmap = |mode| {
+        let mut data = words(&[9]);
+        let body = gradation_data_full(Some((mode, 3)), &red_blue, &[]);
+        data.extend((body.len() as u32).to_be_bytes());
+        data.extend(body);
+        data
+    };
+    vec![
+        v("g_s25", 4, filter(4, &[0, 25, 0])),
+        v("g_s50", 4, filter(4, &[0, 50, 0])),
+        v("g_s100", 4, filter(4, &[0, 100, 0])),
+        v("g_sm100", 4, filter(4, &[0, -100, 0])),
+        v("g_v65", 4, filter(4, &[0, 0, 65])),
+        v("g_hsv_a", 4, filter(4, &[20, 30, -30])),
+        v("g_hsv_b", 4, filter(4, &[0, 100, -50])),
+        v("g_hsv_c", 4, filter(4, &[-20, -40, 40])),
+        v("g_bal_s50", 5, balance([0, 50, 0, 0, 0, 0, 0, 0, 0, 0])),
+        v("g_bal_sm50", 5, balance([0, -50, 0, 0, 0, 0, 0, 0, 0, 0])),
+        v("g_bal_m50", 5, balance([0, 0, 0, 0, 50, 0, 0, 0, 0, 0])),
+        v("g_bal_mm100", 5, balance([0, 0, 0, 0, -100, 0, 0, 0, 0, 0])),
+        v("g_bal_hm100", 5, balance([0, 0, 0, 0, 0, 0, 0, -100, 0, 0])),
+        v("g_bal_hm50", 5, balance([0, 0, 0, 0, 0, 0, 0, -50, 0, 0])),
+        v("g_bal_mix", 5, balance([0, 50, 0, 0, -50, 0, 0, 50, 0, 0])),
+        v("g_bal_pres_s", 5, balance([1, 50, 0, 0, 0, 0, 0, 0, 0, 0])),
+        v("g_bc_c100", 1, filter(1, &[-18, 100])),
+        v("g_gmap_m1", 9, gmap(1)),
+        on_paper("gp_m0", grad(0, 3, &red_blue)),
+        on_paper("gp_m1", grad(1, 3, &red_blue)),
+        on_paper("gp_m1_lc0", grad(1, 0, &red_blue)),
+        on_paper("gp_m2", grad(2, 3, &red_blue)),
+        on_paper("gp_m3", grad(3, 3, &red_blue)),
+        on_paper("gp_m1_bw", grad(1, 3, &black_white)),
+    ]
+}
+
+/// Fourth round: 知覚的 gradients, preserve luminosity, ellipse sizes and
+/// a transparent stop (over the round-3 grid; gradients over the paper).
+fn variants4() -> Vec<Variant> {
+    let v = |name, target, blob| Variant { name, target, blob, opacity: None, hide_backdrop: false };
+    let on_paper = |name, blob| Variant { name, target: 0, blob, opacity: None, hide_backdrop: true };
+    let balance = |values: [i32; 10]| filter(5, &values);
+    let across = [100.0, 100.0, 0.0, 0.0, 256.0, 512.0, 256.0];
+    let opaque = |c: [u16; 3]| [c[0], c[1], c[2], 0xffff];
+    let (black, white) = (opaque([0, 0, 0]), opaque([0xffff; 3]));
+    let (red, green) = (opaque([0xffff, 0, 0]), opaque([0, 0xffff, 0]));
+    let grad = |mode, correction, from: [u16; 4], to: [u16; 4]| {
+        gradation_fill_with(
+            gradation_data_full(Some((mode, correction)), &[(from, 0.0), (to, 1.0)], &[]),
+            0,
+            across,
+            None,
+        )
+    };
+    let ellipse = |geometry| {
+        gradation_fill_with(gradation_data_full(Some((0, 3)), &[(white, 0.0), (black, 1.0)], &[]), 1, geometry, None)
+    };
+    vec![
+        v("h_pres_m50", 5, balance([1, 0, 0, 0, 50, 0, 0, 0, 0, 0])),
+        v("h_pres_sm50", 5, balance([1, -50, 0, 0, 0, 0, 0, 0, 0, 0])),
+        v("h_pres_h50", 5, balance([1, 0, 0, 0, 0, 0, 0, 50, 0, 0])),
+        v("h_pres_m50g", 5, balance([1, 0, 0, 0, 0, 50, 0, 0, 0, 0])),
+        on_paper("h_p_bw0", grad(1, 0, black, white)),
+        on_paper("h_p_bw1", grad(1, 1, black, white)),
+        on_paper("h_p_bw2", grad(1, 2, black, white)),
+        on_paper("h_p_wb3", grad(1, 3, white, black)),
+        on_paper("h_p_rg0", grad(1, 0, red, green)),
+        on_paper("h_p_rg3", grad(1, 3, red, green)),
+        on_paper("h_e1", ellipse([300.0, 100.0, 0.0, 256.0, 256.0, 406.0, 256.0])),
+        on_paper("h_e2", ellipse([300.0, 100.0, 45.0, 256.0, 256.0, 362.066, 362.066])),
+        on_paper("h_clear", grad(0, 3, red, [0, 0, 0xffff, 0])),
+    ]
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let (Some(template), Some(out_dir)) = (args.first(), args.get(1)) else {
-        eprintln!("usage: corr_test TEMPLATE.clip OUT_DIR [VARIANT…]");
+        eprintln!("usage: corr_test TEMPLATE.clip OUT_DIR [round2|round3|round4] [VARIANT…]");
         std::process::exit(2);
     };
-    let round2 = args.get(2).is_some_and(|a| a == "round2");
-    let only: Vec<&String> = args[2..].iter().filter(|a| *a != "round2").collect();
-    for variant in if round2 { variants2() } else { variants() } {
+    let round = args.get(2).filter(|a| a.starts_with("round")).cloned().unwrap_or_default();
+    let round2 = round == "round2";
+    let round3 = round == "round3" || round == "round4";
+    let only: Vec<&String> = args[2..].iter().filter(|a| !a.starts_with("round")).collect();
+    let all = match round.as_str() {
+        "round2" => variants2(),
+        "round3" => variants3(),
+        "round4" => variants4(),
+        _ => variants(),
+    };
+    for variant in all {
         if !only.is_empty() && !only.iter().any(|name| *name == variant.name) {
             continue;
         }
@@ -363,7 +457,15 @@ fn main() -> Result<()> {
                 let [r, g, b] = hsl(x as f64 / width as f64 * 360.0, 0.8, 0.05 + 0.9 * y as f64 / height as f64);
                 // A transparent strip and a half-transparent strip on the right.
                 let [r, g, b] = if round2 && y < 32 { [(x * 255 / (width - 1)) as u8; 3] } else { [r, g, b] };
-                let alpha = if x >= width - 32 {
+                let [r, g, b] = if round3 {
+                    let (red, blue) = ((y * 255 / (height - 1)) as u8, (x * 255 / (width - 1)) as u8);
+                    [red, ((red as u16 + blue as u16) / 2) as u8, blue]
+                } else {
+                    [r, g, b]
+                };
+                let alpha = if round3 {
+                    255
+                } else if x >= width - 32 {
                     0
                 } else if x >= width - 64 {
                     128

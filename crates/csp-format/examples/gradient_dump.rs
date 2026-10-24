@@ -29,7 +29,8 @@ fn main() -> Result<()> {
         match Gradient::parse(data) {
             Ok(g) => {
                 println!("  shape {:?} ellipse {:?} start {:?} end {:?}", g.shape, g.ellipse, g.start, g.end);
-                for stop in &g.stops {
+                println!("  mixing {:?} correction {} fill {}", g.ramp.mixing, g.ramp.correction, g.fill);
+                for stop in &g.ramp.stops {
                     println!(
                         "  stop {:.4} flags {:#x} rgba {:?} curve {:?}",
                         stop.position,

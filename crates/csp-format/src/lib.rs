@@ -9,6 +9,8 @@ pub mod binary;
 pub mod clip;
 pub mod cmc;
 pub mod container;
+pub mod correction;
+pub mod curve;
 pub mod database;
 pub mod edit;
 pub mod effect;

@@ -2,9 +2,9 @@
 //!
 //! The layers are drawn bottom to top (the first child of a folder is its
 //! bottom layer) with visibility, opacity, blending mode, clipping, layer
-//! masks and folders. Layers whose pixels CSP computes when it opens a file
-//! (vector, text, 3D, correction layers without stored pixels) are skipped
-//! and counted in the report.
+//! masks and folders. Vector, gradient and correction layers, which CSP
+//! draws when it opens a file, are drawn from their settings; text and 3D
+//! layers without stored pixels are skipped and counted in the report.
 //!
 //! Rendering uses the mipmap level nearest above the wanted scale, so a
 //! render at the size of `CanvasPreview` decodes only that level. Colours
@@ -15,6 +15,7 @@
 use std::collections::BTreeMap;
 
 use crate::clip::ClipFile;
+use crate::correction::Correction;
 use crate::effect::{Border, LayerEffects, draw_border};
 use crate::error::Result;
 use crate::gradient::Gradient;
@@ -351,8 +352,14 @@ pub struct RenderReport {
     pub effects_skipped: BTreeMap<String, usize>,
     /// Vector layers drawn from their vector data (see [`crate::stroke`]).
     pub vector_layers: usize,
-    /// Gradient layers drawn from `GradationFillInfo` (see [`crate::gradient`]).
+    /// Gradient layers drawn from `GradationFillInfo` (see [`crate::gradient`]),
+    /// and how many of them only approximately (the 知覚的 mix).
     pub gradient_layers: usize,
+    pub gradients_approximate: usize,
+    /// Correction layers applied (see [`crate::correction`]), and how many
+    /// of them only approximately.
+    pub correction_layers: usize,
+    pub corrections_approximate: usize,
 }
 
 struct Renderer<'a> {
@@ -498,6 +505,27 @@ impl Renderer<'_> {
             buffer.data.fill(pixel);
             return Ok(Some(Content { buffer, mode: Some(mode) }));
         }
+        if layer.kind == LayerKind::Correction
+            && let Some(correction) = layer.row.blob("FilterLayerInfo").and_then(|data| Correction::parse(data).ok())
+        {
+            // The corrected backdrop, mixed in by opacity and mask like a
+            // pass-through folder.
+            self.report.correction_layers += 1;
+            self.report.corrections_approximate += usize::from(correction.is_approximate());
+            let filter = correction.filter();
+            let mut buffer = backdrop.clone();
+            for pixel in &mut buffer.data {
+                let a = pixel[3];
+                if a <= 0.0 {
+                    continue;
+                }
+                let out = filter.apply([0, 1, 2].map(|c| pixel[c] / a * 255.0));
+                for c in 0..3 {
+                    pixel[c] = out[c] / 255.0 * a;
+                }
+            }
+            return Ok(Some(Content { buffer, mode: None }));
+        }
         if let Some(buffer) = self.pixels(layer)? {
             return Ok(Some(Content { buffer, mode: Some(mode) }));
         }
@@ -511,6 +539,7 @@ impl Renderer<'_> {
             && let Some(gradient) = layer.row.blob("GradationFillInfo").and_then(|data| Gradient::parse(data).ok())
         {
             self.report.gradient_layers += 1;
+            self.report.gradients_approximate += usize::from(gradient.is_approximate());
             let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
             return Ok(Some(Content { buffer: self.place(&image, (0, 0), self.scale), mode: Some(mode) }));
         }

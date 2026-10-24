@@ -188,7 +188,7 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R7 ベクター | V1 | 済 | [V1](validation/V1-corpus.md): 4,819 個すべて一致 |
 | R8 テキスト | V1 | 済 | [V1](validation/V1-corpus.md): 8,344 ブロックすべて一致 |
 | R9 プレビュー | V1 | 一部 | [V1](validation/V1-corpus.md): CanvasPreview は全件。LayerThumbnail・.cmc サムネイルは未 |
-| R10 合成描画 | V3 V6 | 一部 | [V6](validation/V6-made-files.md): 28 モードを CSP の書き出しと照合、全体で最大差 7/255。プレビューとの比較（V3）は全画素レイヤーのファイルで 63〜66 dB、コーパス全体の集計は未 |
+| R10 合成描画 | V3 V6 | 一部 | [V6](validation/V6-made-files.md): 28 モードを CSP の書き出しと照合、全体で最大差 7/255。[V6b](validation/V6b-generated-layers.md): 色調補正・グラデーション・べた塗りを生成した 83 組で照合し、71 組が差 5/255 以内（知覚的の混色は近似）。プレビューとの比較（V3）は全画素レイヤーのファイルで 63〜66 dB、コーパス全体の集計は未 |
 | R11 書き戻し | V1 | 済 | [V1](validation/V1-corpus.md): 全件バイト一致 |
 | R12 編集 | V4 V6 | 一部 | [V6](validation/V6-made-files.md): 画素の差し替え・名前・プレビュー・ファイル ID の更新を CSP で確認。属性変更の CSP 確認とレイヤーの追加・削除は未 |
 | R13 新規作成 | V4 V6 | 未 | |
