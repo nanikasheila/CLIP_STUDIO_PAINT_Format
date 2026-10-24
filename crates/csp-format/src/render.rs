@@ -17,9 +17,11 @@ use std::collections::BTreeMap;
 use crate::clip::ClipFile;
 use crate::effect::{Border, LayerEffects, draw_border};
 use crate::error::Result;
+use crate::gradient::Gradient;
 use crate::image::{GrayImage, RgbaImage};
 use crate::model::{Layer, LayerKind, LayerNode};
 use crate::offscreen::Offscreen;
+use crate::stroke::draw_layer;
 
 /// Blending modes, numbered as in `LayerComposite`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
@@ -347,6 +349,10 @@ pub struct RenderReport {
     pub effects: BTreeMap<String, usize>,
     /// Switched-on effects not drawn yet (tone, watercolour edge, line extraction).
     pub effects_skipped: BTreeMap<String, usize>,
+    /// Vector layers drawn from their vector data (see [`crate::stroke`]).
+    pub vector_layers: usize,
+    /// Gradient layers drawn from `GradationFillInfo` (see [`crate::gradient`]).
+    pub gradient_layers: usize,
 }
 
 struct Renderer<'a> {
@@ -492,13 +498,24 @@ impl Renderer<'_> {
             buffer.data.fill(pixel);
             return Ok(Some(Content { buffer, mode: Some(mode) }));
         }
-        match self.pixels(layer)? {
-            Some(buffer) => Ok(Some(Content { buffer, mode: Some(mode) })),
-            None => {
-                *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
-                Ok(None)
-            }
+        if let Some(buffer) = self.pixels(layer)? {
+            return Ok(Some(Content { buffer, mode: Some(mode) }));
         }
+        if layer.kind == LayerKind::Vector
+            && let Some(image) = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?
+        {
+            self.report.vector_layers += 1;
+            return Ok(Some(Content { buffer: self.place(&image, (0, 0), self.scale), mode: Some(mode) }));
+        }
+        if layer.kind == LayerKind::Gradient
+            && let Some(gradient) = layer.row.blob("GradationFillInfo").and_then(|data| Gradient::parse(data).ok())
+        {
+            self.report.gradient_layers += 1;
+            let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
+            return Ok(Some(Content { buffer: self.place(&image, (0, 0), self.scale), mode: Some(mode) }));
+        }
+        *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
+        Ok(None)
     }
 
     /// The mipmap level to read for the output scale: the smallest stored
