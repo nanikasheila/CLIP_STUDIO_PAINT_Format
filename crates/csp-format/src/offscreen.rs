@@ -652,6 +652,54 @@ impl Offscreen {
         Ok(image)
     }
 
+    /// [`Offscreen::to_rgba`] halved `halvings` times with
+    /// [`RgbaImage::halve`], one block at a time, so a large offscreen read
+    /// at a small scale never exists at full size. Blocks are 256 pixels and
+    /// aligned, so up to 8 halvings give exactly the result of halving the
+    /// whole image; more are done on the reduced image.
+    pub fn to_rgba_halved(&self, halvings: u32) -> Result<RgbaImage> {
+        self.halved(halvings, false)
+    }
+
+    /// The mask plane as opaque grey pixels (`v, v, v, 255`), halved like
+    /// [`Offscreen::to_rgba_halved`].
+    pub fn to_mask_rgba_halved(&self, halvings: u32) -> Result<RgbaImage> {
+        self.halved(halvings, true)
+    }
+
+    fn halved(&self, halvings: u32, mask: bool) -> Result<RgbaImage> {
+        let p = self.parameter;
+        let within = halvings.min(BLOCK_SIZE.trailing_zeros());
+        let reduce = |mut v: u32| {
+            for _ in 0..within {
+                v = (v / 2).max(1);
+            }
+            v
+        };
+        let mut image = RgbaImage::new(reduce(p.width), reduce(p.height));
+        let init = self.attribute.init_color().filter(|init| init.do_initialize).map(|init| (init.alpha & 0xff) as u8);
+        match (init, mask) {
+            (Some(alpha), false) => image.fill([255, 255, 255, alpha]),
+            (alpha, true) => image.fill([alpha.unwrap_or(0), alpha.unwrap_or(0), alpha.unwrap_or(0), 255]),
+            (None, false) => {}
+        }
+        self.for_each_block(|index, raw| {
+            let (left, top) = p.block_origin(index);
+            let (width, height) = (BLOCK_SIZE.min(p.width - left), BLOCK_SIZE.min(p.height - top));
+            let mut tile =
+                if mask { block_to_mask(&p, width, height, raw) } else { block_to_rgba(&p, width, height, raw) };
+            for _ in 0..within {
+                tile = tile.halve();
+            }
+            image.paste(&tile, (left >> within) as i64, (top >> within) as i64);
+            Ok(())
+        })?;
+        for _ in within..halvings {
+            image = image.halve();
+        }
+        Ok(image)
+    }
+
     /// The first plane as an 8-bit image (masks: 0 = hidden, 255 = shown).
     pub fn to_alpha(&self) -> Result<GrayImage> {
         let p = self.parameter;
@@ -695,6 +743,43 @@ impl Offscreen {
         }
         Ok((same_bytes, same_pixels, stored))
     }
+}
+
+/// One decompressed block (`width × height` of it) as an image.
+fn block_to_rgba(p: &Parameter, width: u32, height: u32, raw: &[u8]) -> RgbaImage {
+    let kind = p.kind();
+    let mut image = RgbaImage::new(width, height);
+    for y in 0..height as usize {
+        let row = image.row_mut(y as u32);
+        for x in 0..width as usize {
+            let rgb = match kind {
+                PixelKind::Color => {
+                    let at = p.image_offset as usize + y * p.image_row_bytes as usize + x * 4;
+                    [raw[at + 2], raw[at + 1], raw[at]]
+                }
+                PixelKind::Gray | PixelKind::Monochrome => {
+                    [plane_value(raw, p.image_offset as usize, p.image_row_bytes, x, y); 3]
+                }
+                _ => [0, 0, 0],
+            };
+            row[x * 4..x * 4 + 3].copy_from_slice(&rgb);
+            row[x * 4 + 3] = plane_value(raw, 0, p.alpha_row_bytes, x, y);
+        }
+    }
+    image
+}
+
+/// The first plane of a block as opaque grey pixels.
+fn block_to_mask(p: &Parameter, width: u32, height: u32, raw: &[u8]) -> RgbaImage {
+    let mut image = RgbaImage::new(width, height);
+    for y in 0..height as usize {
+        let row = image.row_mut(y as u32);
+        for x in 0..width as usize {
+            let v = plane_value(raw, 0, p.alpha_row_bytes, x, y);
+            row[x * 4..x * 4 + 4].copy_from_slice(&[v, v, v, 255]);
+        }
+    }
+    image
 }
 
 /// Value of pixel (x, y) of a plane starting at `offset`: 8-bit planes
@@ -793,6 +878,29 @@ mod tests {
         let data = encode(&parameter, None, Some(&mask)).unwrap();
         let offscreen = Offscreen { attribute: Attribute::new(&parameter, None), parameter, data: Some(data) };
         assert_eq!(offscreen.to_alpha().unwrap().pixels, mask.pixels);
+    }
+
+    #[test]
+    fn halving_by_blocks_equals_halving_the_image() {
+        let (width, height) = (601, 300);
+        let mut image = RgbaImage::new(width, height);
+        for y in 0..height {
+            for x in 0..width {
+                let v = (x * 7 + y * 13) as u8;
+                let alpha = if (x / 37 + y / 23) % 3 == 0 { 0 } else { v / 2 + 100 };
+                image.set_pixel(x, y, [v, 255 - v, (x ^ y) as u8, alpha]);
+            }
+        }
+        let parameter = Parameter::new(PixelKind::Color, width, height);
+        let data = encode(&parameter, Some(&image), None).unwrap();
+        let mut attribute = Attribute::new(&parameter, None);
+        attribute.set_block_sizes(&data.record_sizes());
+        let offscreen = Offscreen::parse(&attribute.to_bytes(), Some(&data.to_bytes())).unwrap();
+        let mut expected = offscreen.to_rgba().unwrap();
+        for halvings in 1..=10 {
+            expected = expected.halve();
+            assert_eq!(offscreen.to_rgba_halved(halvings).unwrap(), expected, "{halvings}");
+        }
     }
 
     #[test]

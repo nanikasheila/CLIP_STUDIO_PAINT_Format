@@ -21,6 +21,13 @@ USAGE:
   cspf schema FILE                  CSP's schema registry (ParamScheme) as JSON
   cspf check FILE...                self-check (.clip: container, database, pixels, vectors,
                                     text, references; .cmc: page list and page files)
+  cspf verify FILE...               the same as check
+  cspf roundtrip FILE OUT           save FILE unchanged to OUT and confirm the bytes are equal
+  cspf new OUT.clip [--size WxH] [--dpi D] [--paper RRGGBB|none] [--image PNG]
+                                    a new file: paper and one raster layer (with PNG's pixels)
+  cspf add-layer FILE PNG OUT [--name NAME] [--at X,Y]
+                                    add a raster layer on top holding PNG at canvas X,Y
+  cspf remove-layer FILE ID OUT     remove a layer (a folder with its contents)
   cspf extract FILE OUT_DIR         stored layer pixels and masks as PNG
   cspf preview FILE OUT.png         the preview CSP saved in the file
   cspf render FILE OUT.png [--scale S]
@@ -42,7 +49,11 @@ fn main() -> ExitCode {
         "inspect" => one_file(rest).and_then(inspect),
         "layers" => one_file(rest).and_then(layers),
         "schema" => one_file(rest).and_then(schema),
-        "check" => check(rest),
+        "check" | "verify" => check(rest),
+        "roundtrip" => two(rest).and_then(|(file, out)| roundtrip(&file, &out)),
+        "new" => new_file(rest),
+        "add-layer" => add_layer(rest),
+        "remove-layer" => remove_layer(rest),
         "extract" => two(rest).and_then(|(file, out)| extract(&file, &out)),
         "preview" => two(rest).and_then(|(file, out)| preview(&file, &out)),
         "corpus" => corpus(rest),
@@ -176,6 +187,108 @@ fn check(args: &[String]) -> Result<bool> {
         print_json(&json!({"file": path, "ok": ok, "report": report}));
     }
     Ok(all_ok)
+}
+
+fn roundtrip(path: &Path, out: &Path) -> Result<bool> {
+    let original = std::fs::read(path)?;
+    let file = ClipFile::from_bytes(original.clone())?;
+    let saved = file.to_bytes()?;
+    std::fs::write(out, &saved)?;
+    let same = saved == original;
+    print_json(&json!({"file": path, "out": out, "bytes": saved.len(), "identical": same}));
+    Ok(same)
+}
+
+/// Options `--name value` and the remaining positional arguments.
+fn options<'a>(args: &'a [String], names: &[&str]) -> (Vec<(&'a str, &'a str)>, Vec<&'a str>) {
+    let (mut found, mut positional) = (Vec::new(), Vec::new());
+    let mut iter = args.iter();
+    while let Some(arg) = iter.next() {
+        if names.contains(&arg.as_str()) {
+            found.push((arg.as_str(), iter.next().map(String::as_str).unwrap_or("")));
+        } else {
+            positional.push(arg.as_str());
+        }
+    }
+    (found, positional)
+}
+
+fn bad(message: impl std::fmt::Display) -> csp_format::Error {
+    csp_format::Error::format(format!("{message}\n\n{USAGE}"))
+}
+
+fn read_png(path: &str) -> Result<csp_format::RgbaImage> {
+    csp_format::image::decode_png(&std::fs::read(path)?)
+}
+
+fn new_file(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--size", "--dpi", "--paper", "--image"]);
+    let [out] = positional.as_slice() else { return Err(bad("expected OUT.clip")) };
+    let mut canvas = csp_format::NewCanvas::default();
+    let mut image = None;
+    for (name, value) in found {
+        match name {
+            "--size" => {
+                let (w, h) = value.split_once('x').ok_or_else(|| bad("--size is WxH"))?;
+                canvas.width = w.parse().map_err(|_| bad("--size is WxH"))?;
+                canvas.height = h.parse().map_err(|_| bad("--size is WxH"))?;
+            }
+            "--dpi" => canvas.resolution = value.parse().map_err(|_| bad("--dpi is a number"))?,
+            "--paper" if value == "none" => canvas.paper = None,
+            "--paper" => {
+                let rgb =
+                    u32::from_str_radix(value.trim_start_matches('#'), 16).map_err(|_| bad("--paper is RRGGBB"))?;
+                canvas.paper = Some([(rgb >> 16) as u8, (rgb >> 8) as u8, rgb as u8]);
+            }
+            _ => image = Some(read_png(value)?),
+        }
+    }
+    let mut file = ClipFile::create(&canvas)?;
+    if let Some(image) = image {
+        let raster = file.canvas.row.int("CanvasCurrentLayer");
+        file.set_layer_pixels(raster, &image, (0, 0))?;
+        file.update_preview()?;
+    }
+    file.save(out)?;
+    print_json(
+        &json!({"file": out, "width": canvas.width, "height": canvas.height, "layers": file.layers.layers.len()}),
+    );
+    Ok(true)
+}
+
+fn add_layer(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--name", "--at"]);
+    let [file, png, out] = positional.as_slice() else { return Err(bad("expected FILE PNG OUT")) };
+    let mut name = "レイヤー".to_owned();
+    let mut at = (0, 0);
+    for (option, value) in found {
+        match option {
+            "--name" => name = value.to_owned(),
+            _ => {
+                let (x, y) = value.split_once(',').ok_or_else(|| bad("--at is X,Y"))?;
+                at = (x.parse().map_err(|_| bad("--at is X,Y"))?, y.parse().map_err(|_| bad("--at is X,Y"))?);
+            }
+        }
+    }
+    let mut clip = ClipFile::open(file)?;
+    let id = clip.add_raster_layer(&name, &read_png(png)?, at)?;
+    clip.update_preview()?;
+    clip.renew_file_id();
+    clip.save(out)?;
+    print_json(&json!({"file": out, "layer": id}));
+    Ok(true)
+}
+
+fn remove_layer(args: &[String]) -> Result<bool> {
+    let [file, id, out] = args else { return Err(bad("expected FILE ID OUT")) };
+    let id: i64 = id.parse().map_err(|_| bad("ID is a layer id (see inspect)"))?;
+    let mut clip = ClipFile::open(file)?;
+    clip.remove_layer(id)?;
+    clip.update_preview()?;
+    clip.renew_file_id();
+    clip.save(out)?;
+    print_json(&json!({"file": out, "removed": id}));
+    Ok(true)
 }
 
 fn extract(path: &Path, out: &Path) -> Result<bool> {

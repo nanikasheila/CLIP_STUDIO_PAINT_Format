@@ -10,6 +10,7 @@ pub mod clip;
 pub mod cmc;
 pub mod container;
 pub mod correction;
+pub mod create;
 pub mod curve;
 pub mod database;
 pub mod edit;
@@ -29,6 +30,7 @@ pub mod zlib;
 
 pub use clip::ClipFile;
 pub use cmc::CmcFile;
+pub use create::NewCanvas;
 pub use error::{Error, Result};
 pub use image::{GrayImage, RgbaImage};
 pub use model::{Canvas, Layer, LayerKind, LayerTree};

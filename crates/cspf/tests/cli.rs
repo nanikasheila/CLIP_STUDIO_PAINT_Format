@@ -1,0 +1,124 @@
+//! The commands on synthetic files made by `cspf new` (R15, V5).
+
+use std::path::Path;
+use std::process::{Command, Output};
+
+fn cspf(args: &[&str]) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_cspf")).args(args).output().expect("run cspf")
+}
+
+fn ok(args: &[&str]) -> String {
+    let output = cspf(args);
+    assert!(output.status.success(), "cspf {args:?}: {}", String::from_utf8_lossy(&output.stderr));
+    String::from_utf8(output.stdout).expect("UTF-8")
+}
+
+fn path(dir: &Path, name: &str) -> String {
+    dir.join(name).to_string_lossy().into_owned()
+}
+
+/// A 64 × 48 PNG with a red square.
+fn red_square(dir: &Path) -> String {
+    let mut image = csp_format::RgbaImage::new(64, 48);
+    for y in 8..24 {
+        for x in 8..24 {
+            image.set_pixel(x, y, [220, 20, 30, 255]);
+        }
+    }
+    let png = path(dir, "square.png");
+    std::fs::write(&png, image.to_png().unwrap()).unwrap();
+    png
+}
+
+#[test]
+fn new_inspect_check_render_and_roundtrip() {
+    let dir = tempfile::tempdir().unwrap();
+    let png = red_square(dir.path());
+    let clip = path(dir.path(), "new.clip");
+    ok(&["new", &clip, "--size", "64x48", "--dpi", "300", "--image", &png]);
+
+    let inspect: serde_json::Value = serde_json::from_str(&ok(&["inspect", &clip])).unwrap();
+    assert_eq!(inspect["layers"].as_array().unwrap().len(), 3);
+    let kinds: Vec<&str> = inspect["layers"].as_array().unwrap().iter().map(|l| l["kind"].as_str().unwrap()).collect();
+    assert_eq!(kinds, ["root", "paper", "raster"]);
+    assert!(ok(&["layers", &clip]).contains("[raster]"));
+
+    for command in ["check", "verify"] {
+        let report: serde_json::Value = serde_json::from_str(&ok(&[command, &clip])).unwrap();
+        assert_eq!(report["ok"], true, "{report}");
+    }
+    let schema: serde_json::Value = serde_json::from_str(&ok(&["schema", &clip])).unwrap();
+    assert!(schema.to_string().contains("Offscreen"));
+
+    let rendered = path(dir.path(), "render.png");
+    ok(&["render", &clip, &rendered]);
+    let image = csp_format::image::decode_png(&std::fs::read(&rendered).unwrap()).unwrap();
+    assert_eq!((image.width, image.height), (64, 48));
+    assert_eq!(image.pixel(10, 10), [220, 20, 30, 255]);
+    assert_eq!(image.pixel(40, 40), [255, 255, 255, 255]);
+
+    let preview = path(dir.path(), "preview.png");
+    ok(&["preview", &clip, &preview]);
+    let compare: serde_json::Value = serde_json::from_str(ok(&["compare", &clip]).trim()).unwrap();
+    assert!(compare["psnr"].as_f64().unwrap() > 60.0, "{compare}");
+
+    let extracted = dir.path().join("layers");
+    ok(&["extract", &clip, &extracted.to_string_lossy()]);
+    assert!(std::fs::read_dir(&extracted).unwrap().count() >= 1);
+
+    let copy = path(dir.path(), "copy.clip");
+    let roundtrip: serde_json::Value = serde_json::from_str(&ok(&["roundtrip", &clip, &copy])).unwrap();
+    assert_eq!(roundtrip["identical"], true);
+    assert_eq!(std::fs::read(&clip).unwrap(), std::fs::read(&copy).unwrap());
+}
+
+#[test]
+fn add_and_remove_layers() {
+    let dir = tempfile::tempdir().unwrap();
+    let png = red_square(dir.path());
+    let clip = path(dir.path(), "new.clip");
+    ok(&["new", &clip, "--size", "64x48", "--paper", "none"]);
+    let added = path(dir.path(), "added.clip");
+    let result: serde_json::Value =
+        serde_json::from_str(&ok(&["add-layer", &clip, &png, &added, "--name", "top", "--at", "4,2"])).unwrap();
+    let id = result["layer"].as_i64().unwrap().to_string();
+    let report: serde_json::Value = serde_json::from_str(&ok(&["check", &added])).unwrap();
+    assert_eq!(report["ok"], true, "{report}");
+    assert!(ok(&["layers", &added]).contains("top [raster]"));
+    let rendered = path(dir.path(), "added.png");
+    ok(&["render", &added, &rendered]);
+    let image = csp_format::image::decode_png(&std::fs::read(&rendered).unwrap()).unwrap();
+    assert_eq!(image.pixel(12, 10), [220, 20, 30, 255]);
+
+    let removed = path(dir.path(), "removed.clip");
+    ok(&["remove-layer", &added, &id, &removed]);
+    let report: serde_json::Value = serde_json::from_str(&ok(&["check", &removed])).unwrap();
+    assert_eq!(report["ok"], true, "{report}");
+    assert!(!ok(&["layers", &removed]).contains("top [raster]"));
+}
+
+#[test]
+fn corpus_checks_a_folder_and_resumes() {
+    let dir = tempfile::tempdir().unwrap();
+    let files = dir.path().join("files");
+    std::fs::create_dir(&files).unwrap();
+    for name in ["a.clip", "b.clip"] {
+        ok(&["new", &path(&files, name), "--size", "32x32"]);
+    }
+    let out = path(dir.path(), "corpus.jsonl");
+    ok(&["corpus", &files.to_string_lossy(), &out]);
+    let lines = std::fs::read_to_string(&out).unwrap();
+    assert_eq!(lines.lines().count(), 2);
+    assert!(lines.lines().all(|line| line.contains("\"ok\":true")), "{lines}");
+    // A second run finds both done.
+    let again = cspf(&["corpus", &files.to_string_lossy(), &out]);
+    assert!(String::from_utf8_lossy(&again.stderr).contains("2 already done"));
+    assert_eq!(std::fs::read_to_string(&out).unwrap().lines().count(), 2);
+}
+
+#[test]
+fn bad_arguments_fail_cleanly() {
+    assert_eq!(cspf(&["nonsense"]).status.code(), Some(2));
+    assert_eq!(cspf(&["inspect"]).status.code(), Some(1));
+    assert_eq!(cspf(&["new", "x.clip", "--size", "big"]).status.code(), Some(1));
+}

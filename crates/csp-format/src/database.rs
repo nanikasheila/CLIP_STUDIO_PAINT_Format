@@ -187,6 +187,15 @@ pub fn has_column(connection: &Connection, table: &str, column: &str) -> Result<
     Ok(columns(connection, table)?.iter().any(|(name, _)| name == column))
 }
 
+pub fn has_table(connection: &Connection, table: &str) -> Result<bool> {
+    let count: i64 = connection.query_row(
+        "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?1",
+        [table],
+        |row| row.get(0),
+    )?;
+    Ok(count > 0)
+}
+
 /// Quote an identifier for SQL.
 pub fn quote(identifier: &str) -> String {
     format!("\"{}\"", identifier.replace('"', "\"\""))

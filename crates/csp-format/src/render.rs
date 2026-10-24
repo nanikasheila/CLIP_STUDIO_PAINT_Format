@@ -533,7 +533,7 @@ impl Renderer<'_> {
             && let Some(image) = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?
         {
             self.report.vector_layers += 1;
-            return Ok(Some(Content { buffer: self.place(&image, (0, 0), self.scale), mode: Some(mode) }));
+            return Ok(Some(Content { buffer: self.place(image, (0, 0), self.scale), mode: Some(mode) }));
         }
         if layer.kind == LayerKind::Gradient
             && let Some(gradient) = layer.row.blob("GradationFillInfo").and_then(|data| Gradient::parse(data).ok())
@@ -541,7 +541,7 @@ impl Renderer<'_> {
             self.report.gradient_layers += 1;
             self.report.gradients_approximate += usize::from(gradient.is_approximate());
             let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
-            return Ok(Some(Content { buffer: self.place(&image, (0, 0), self.scale), mode: Some(mode) }));
+            return Ok(Some(Content { buffer: self.place(image, (0, 0), self.scale), mode: Some(mode) }));
         }
         *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
         Ok(None)
@@ -569,17 +569,17 @@ impl Renderer<'_> {
 
     /// Place an image read at `level_scale` with its top-left at canvas
     /// `origin` into an output-sized buffer.
-    fn place(&self, image: &RgbaImage, origin: (i64, i64), level_scale: f64) -> Buffer {
+    fn place(&self, image: RgbaImage, origin: (i64, i64), level_scale: f64) -> Buffer {
         let factor = self.scale / level_scale;
-        let halvings = (1.0 / factor).log2().round();
+        let halvings = exact_halvings(factor);
         let image = if (factor - 1.0).abs() < 1e-9 {
-            image.clone()
-        } else if halvings >= 1.0 && ((1.0 / factor) / 2f64.powf(halvings) - 1.0).abs() < 0.005 {
+            image
+        } else if halvings > 0 {
             // CSP's mipmap levels: each halves the one above with a 2×2 box
             // (sizes rounded down). Following the same steps keeps the
             // pixel grid of the stored lower levels.
-            let mut image = image.clone();
-            for _ in 0..halvings as u32 {
+            let mut image = image;
+            for _ in 0..halvings {
                 image = image.halve();
             }
             image
@@ -622,7 +622,14 @@ impl Renderer<'_> {
         if offscreen.data.is_none() {
             return Ok(None);
         }
-        let mut image = offscreen.to_rgba()?;
+        // Halve block by block when the wanted scale is a power of two
+        // below the level (large canvases read for a preview).
+        let halvings = if border.is_none() { exact_halvings(self.scale / level_scale) } else { 0 };
+        let (mut image, level_scale) = if halvings > 0 {
+            (offscreen.to_rgba_halved(halvings)?, level_scale / 2f64.powi(halvings as i32))
+        } else {
+            (offscreen.to_rgba()?, level_scale)
+        };
         let mut origin = layer.pixel_origin();
         if let Some((border, apply_opacity)) = border {
             let scaled = Border { width: border.width * level_scale, ..border };
@@ -631,7 +638,7 @@ impl Renderer<'_> {
             let shift = (margin as f64 / level_scale).round() as i64;
             origin = (origin.0 - shift, origin.1 - shift);
         }
-        Ok(Some(self.place(&image, origin, level_scale)))
+        Ok(Some(self.place(image, origin, level_scale)))
     }
 
     /// The layer's switched-on effects: returns the border to draw and
@@ -659,11 +666,22 @@ impl Renderer<'_> {
         }
         let Some((offscreen, level_scale)) = self.level(layer.mask_mipmap, self.scale)? else { return Ok(None) };
         let outside = offscreen.attribute.init_color().map(|init| (init.alpha & 0xff) as f32 / 255.0).unwrap_or(0.0);
-        let image = gray_to_rgba(&offscreen.to_alpha()?);
+        let halvings = exact_halvings(self.scale / level_scale);
+        let (image, level_scale) = if halvings > 0 {
+            (offscreen.to_mask_rgba_halved(halvings)?, level_scale / 2f64.powi(halvings as i32))
+        } else {
+            (gray_to_rgba(&offscreen.to_alpha()?), level_scale)
+        };
         // Inside the placed image alpha is 1 (fractional on resampled edges).
-        let placed = self.place(&image, layer.mask_origin(), level_scale);
+        let placed = self.place(image, layer.mask_origin(), level_scale);
         Ok(Some(placed.data.iter().map(|p| p[0] + outside * (1.0 - p[3])).collect()))
     }
+}
+
+/// `n` when `factor` is 1/2ⁿ (n ≥ 1), else 0.
+fn exact_halvings(factor: f64) -> u32 {
+    let halvings = (1.0 / factor).log2().round();
+    if halvings >= 1.0 && ((1.0 / factor) / 2f64.powf(halvings) - 1.0).abs() < 0.005 { halvings as u32 } else { 0 }
 }
 
 struct Content {
