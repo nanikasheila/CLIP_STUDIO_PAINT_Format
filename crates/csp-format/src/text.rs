@@ -1,0 +1,228 @@
+//! Text layers: `TextLayerString` (UTF-8) and its attributes.
+//!
+//! `TextLayerAttributes` is a little-endian list of records `u32 id, u32
+//! length, bytes` (spec: `docs/spec/06-text.md`). A layer with several text
+//! blocks (balloons) keeps them in `TextLayerStringArray` /
+//! `TextLayerAttributesArray`: `u32le length` + string / attribute list per
+//! block. Records whose ids this module does not decode are kept as bytes,
+//! so the attributes are written back unchanged.
+
+use crate::binary::{Reader, Writer};
+use crate::error::{Result, bail};
+
+/// Record ids whose meaning is known (see the spec for the confidence of each).
+pub mod ids {
+    /// Character runs with a font size (u32 count, then runs).
+    pub const RUN_FONT_SIZE: u32 = 11;
+    /// Font size × 100 in points (u32).
+    pub const FONT_SIZE: u32 = 32;
+    /// Text block bounding box, layer pixels (i32 × 4: x0, y0, x1, y1).
+    pub const BBOX: u32 = 42;
+    /// Id of the offscreen CSP rendered the text into (u32; 0 = render again).
+    pub const RENDER_OFFSCREEN: u32 = 50;
+    /// Font (u16 ?, u16 length, UTF-8 name, u16 length, PostScript name).
+    pub const FONT: u32 = 57;
+    /// Text block width and height in pixels (i32 × 2).
+    pub const BLOCK_SIZE: u32 = 63;
+    /// Four corners in 1/100 px relative to the anchor (i32 × 8).
+    pub const QUAD: u32 = 64;
+}
+
+/// One attribute record.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Record {
+    pub id: u32,
+    pub data: Vec<u8>,
+}
+
+/// A parsed attribute list.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Attributes {
+    pub records: Vec<Record>,
+}
+
+/// Font name pair of record 57.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct Font {
+    pub lead: u16,
+    pub name: String,
+    pub postscript_name: String,
+}
+
+impl Attributes {
+    pub fn parse(blob: &[u8]) -> Result<Self> {
+        let mut reader = Reader::new(blob);
+        let mut records = Vec::new();
+        while !reader.is_empty() {
+            let id = reader.le_u32()?;
+            let length = reader.le_u32()? as usize;
+            if length > reader.remaining() {
+                bail!("Text attribute {id} says {length} bytes, {} remain", reader.remaining());
+            }
+            records.push(Record { id, data: reader.bytes(length)?.to_vec() });
+        }
+        Ok(Attributes { records })
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        let mut writer = Writer::new();
+        for record in &self.records {
+            writer.le_u32(record.id).le_u32(record.data.len() as u32).bytes(&record.data);
+        }
+        writer.into_inner()
+    }
+
+    pub fn get(&self, id: u32) -> Option<&[u8]> {
+        self.records.iter().find(|record| record.id == id).map(|record| record.data.as_slice())
+    }
+
+    pub fn set(&mut self, id: u32, data: Vec<u8>) {
+        match self.records.iter_mut().find(|record| record.id == id) {
+            Some(record) => record.data = data,
+            None => self.records.push(Record { id, data }),
+        }
+    }
+
+    fn i32s(&self, id: u32) -> Option<Vec<i32>> {
+        let data = self.get(id)?;
+        Some(data.chunks_exact(4).map(|b| i32::from_le_bytes(b.try_into().expect("4"))).collect())
+    }
+
+    fn set_i32s(&mut self, id: u32, values: &[i32]) {
+        self.set(id, values.iter().flat_map(|value| value.to_le_bytes()).collect());
+    }
+
+    /// Font size in points.
+    pub fn font_size(&self) -> Option<f64> {
+        self.i32s(ids::FONT_SIZE)?.first().map(|value| *value as f64 / 100.0)
+    }
+
+    pub fn bbox(&self) -> Option<[i32; 4]> {
+        self.i32s(ids::BBOX)?.try_into().ok()
+    }
+
+    pub fn set_bbox(&mut self, bbox: [i32; 4]) {
+        self.set_i32s(ids::BBOX, &bbox);
+    }
+
+    pub fn block_size(&self) -> Option<[i32; 2]> {
+        self.i32s(ids::BLOCK_SIZE)?.try_into().ok()
+    }
+
+    pub fn quad(&self) -> Option<[i32; 8]> {
+        self.i32s(ids::QUAD)?.try_into().ok()
+    }
+
+    pub fn render_offscreen(&self) -> Option<u32> {
+        self.i32s(ids::RENDER_OFFSCREEN)?.first().map(|value| *value as u32)
+    }
+
+    /// Make CSP render the text again on opening (needed after changing it).
+    pub fn clear_render_offscreen(&mut self) {
+        if self.get(ids::RENDER_OFFSCREEN).is_some() {
+            self.set_i32s(ids::RENDER_OFFSCREEN, &[0]);
+        }
+    }
+
+    pub fn font(&self) -> Option<Font> {
+        let data = self.get(ids::FONT)?;
+        let mut reader = Reader::new(data);
+        let lead = reader.le_u16().ok()?;
+        let length = reader.le_u16().ok()? as usize;
+        let name = String::from_utf8_lossy(reader.bytes(length).ok()?).into_owned();
+        let length = reader.le_u16().ok()? as usize;
+        let postscript_name = String::from_utf8_lossy(reader.bytes(length).ok()?).into_owned();
+        Some(Font { lead, name, postscript_name })
+    }
+
+    /// Move and scale the geometry records (bbox, block size, quad).
+    pub fn transform(&mut self, scale: f64, dx: f64, dy: f64) {
+        if let Some(b) = self.bbox() {
+            self.set_bbox([
+                (b[0] as f64 * scale + dx).floor() as i32,
+                (b[1] as f64 * scale + dy).floor() as i32,
+                (b[2] as f64 * scale + dx).ceil() as i32,
+                (b[3] as f64 * scale + dy).ceil() as i32,
+            ]);
+        }
+        if let Some(size) = self.block_size() {
+            self.set_i32s(ids::BLOCK_SIZE, &size.map(|v| (v as f64 * scale).round() as i32));
+        }
+        if let Some(quad) = self.quad() {
+            self.set_i32s(ids::QUAD, &quad.map(|v| (v as f64 * scale).round() as i32));
+        }
+    }
+}
+
+/// Split a `…Array` column: `u32le length` + bytes, repeated.
+pub fn split_array(blob: &[u8]) -> Result<Vec<&[u8]>> {
+    let mut reader = Reader::new(blob);
+    let mut parts = Vec::new();
+    while !reader.is_empty() {
+        let length = reader.le_u32()? as usize;
+        if length > reader.remaining() {
+            bail!("Array entry of {length} bytes, {} remain", reader.remaining());
+        }
+        parts.push(reader.bytes(length)?);
+    }
+    Ok(parts)
+}
+
+pub fn join_array<T: AsRef<[u8]>>(parts: &[T]) -> Vec<u8> {
+    let mut writer = Writer::new();
+    for part in parts {
+        writer.le_u32(part.as_ref().len() as u32).bytes(part.as_ref());
+    }
+    writer.into_inner()
+}
+
+/// One text block of a text layer.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TextBlock {
+    pub text: String,
+    pub attributes: Attributes,
+}
+
+/// The text blocks of a layer: from the arrays when present, else the
+/// single string and attributes.
+pub fn read_blocks(row: &crate::database::Row) -> Result<Vec<TextBlock>> {
+    if let (Some(strings), Some(attributes)) = (row.blob("TextLayerStringArray"), row.blob("TextLayerAttributesArray"))
+    {
+        let strings = split_array(strings)?;
+        let attributes = split_array(attributes)?;
+        return strings
+            .iter()
+            .zip(attributes.iter().map(|blob| Attributes::parse(blob)))
+            .map(|(text, attributes)| {
+                Ok(TextBlock { text: String::from_utf8_lossy(text).into_owned(), attributes: attributes? })
+            })
+            .collect();
+    }
+    let Some(text) = row.blob("TextLayerString") else { return Ok(Vec::new()) };
+    let attributes = match row.blob("TextLayerAttributes") {
+        Some(blob) => Attributes::parse(blob)?,
+        None => Attributes::default(),
+    };
+    Ok(vec![TextBlock { text: String::from_utf8_lossy(text).into_owned(), attributes }])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn attributes_round_trip_and_decode() {
+        let mut attributes = Attributes::default();
+        attributes.set(ids::FONT_SIZE, 600i32.to_le_bytes().to_vec());
+        attributes.set_bbox([1, 2, 30, 40]);
+        attributes.set(99, vec![1, 2, 3]);
+        let bytes = attributes.to_bytes();
+        let parsed = Attributes::parse(&bytes).unwrap();
+        assert_eq!(parsed, attributes);
+        assert_eq!(parsed.font_size(), Some(6.0));
+        assert_eq!(parsed.bbox(), Some([1, 2, 30, 40]));
+        assert!(Attributes::parse(&bytes[..bytes.len() - 1]).is_err());
+        let array = join_array(&[bytes.clone(), vec![]]);
+        assert_eq!(split_array(&array).unwrap(), vec![bytes.as_slice(), &[][..]]);
+    }
+}
