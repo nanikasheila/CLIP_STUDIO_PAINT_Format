@@ -49,6 +49,8 @@ pub struct ClipFile {
     changes_at_open: u64,
     externals: Vec<(String, External)>,
     externals_changed: bool,
+    /// Replaces the container's file id on save (see [`ClipFile::set_file_id`]).
+    file_id: Option<[u8; FILE_ID_LENGTH]>,
     pub project: Project,
     pub canvas: Canvas,
     pub layers: LayerTree,
@@ -92,6 +94,7 @@ impl ClipFile {
             changes_at_open,
             externals,
             externals_changed: false,
+            file_id: None,
             project,
             canvas,
             layers,
@@ -249,9 +252,32 @@ impl ClipFile {
         Ok(result)
     }
 
+    /// The 16-byte file id in the `Head` chunk.
+    pub fn file_id(&self) -> [u8; FILE_ID_LENGTH] {
+        self.file_id.unwrap_or_else(|| {
+            self.container
+                .head
+                .as_ref()
+                .and_then(|head| head.file_id.as_slice().try_into().ok())
+                .unwrap_or([0; FILE_ID_LENGTH])
+        })
+    }
+
+    /// Give the saved file another id. CSP gives every "Save As" copy a new
+    /// id and treats files with the same id as the same document: a copy
+    /// opened while the original is open shows the original's cached
+    /// canvas until something is redrawn. Edited copies should get a new id.
+    pub fn set_file_id(&mut self, id: [u8; FILE_ID_LENGTH]) {
+        self.file_id = Some(id);
+    }
+
     /// Whether anything was changed since the file was opened.
     pub fn is_modified(&self) -> bool {
-        self.externals_changed || self.database.total_changes() != self.changes_at_open
+        self.externals_changed
+            || self
+                .file_id
+                .is_some_and(|id| Some(id.as_slice()) != self.container.head.as_ref().map(|h| h.file_id.as_slice()))
+            || self.database.total_changes() != self.changes_at_open
     }
 
     /// The file's bytes. Unchanged files are returned as read.
@@ -259,13 +285,7 @@ impl ClipFile {
         if !self.is_modified() {
             return Ok(self.container.bytes().to_vec());
         }
-        let file_id: [u8; FILE_ID_LENGTH] = self
-            .container
-            .head
-            .as_ref()
-            .and_then(|head| head.file_id.as_slice().try_into().ok())
-            .unwrap_or([0; FILE_ID_LENGTH]);
-        let mut writer = ContainerWriter::new(file_id);
+        let mut writer = ContainerWriter::new(self.file_id());
         for (id, data) in &self.externals {
             let payload = match data {
                 External::Original(range) => &self.container.bytes()[range.clone()],
@@ -312,11 +332,34 @@ fn update_external_index(database: &Connection, offsets: &HashMap<String, u64>) 
     }
     let mut missing: Vec<(&String, &u64)> = offsets.iter().filter(|(id, _)| !present.contains(*id)).collect();
     missing.sort_by_key(|(_, offset)| **offset);
+    // CSP stores ExternalID as TEXT (the column is declared BLOB) and looks
+    // chunks up by text, so a BLOB id is never found: the layer then loads
+    // as "broken".
     for (id, offset) in missing {
-        database.execute(
-            "INSERT INTO ExternalChunk(ExternalID, Offset) VALUES (?1, ?2)",
-            (rusqlite::types::Value::Blob(id.as_bytes().to_vec()), *offset as i64),
-        )?;
+        database
+            .execute("INSERT INTO ExternalChunk(ExternalID, Offset) VALUES (?1, ?2)", (id.as_str(), *offset as i64))?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_external_ids_are_indexed_as_text() {
+        let database = Connection::open_in_memory().unwrap();
+        database.execute("CREATE TABLE ExternalChunk(ExternalID BLOB, Offset INTEGER)", []).unwrap();
+        database.execute("INSERT INTO ExternalChunk VALUES ('extrnlidOLD', 10), ('extrnlidGONE', 20)", []).unwrap();
+        let offsets = HashMap::from([("extrnlidOLD".to_owned(), 30), ("extrnlidNEW".to_owned(), 40)]);
+        update_external_index(&database, &offsets).unwrap();
+        let rows: Vec<(String, String, i64)> = database
+            .prepare("SELECT ExternalID, typeof(ExternalID), Offset FROM ExternalChunk ORDER BY Offset")
+            .unwrap()
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))
+            .unwrap()
+            .collect::<std::result::Result<_, _>>()
+            .unwrap();
+        assert_eq!(rows, [("extrnlidOLD".into(), "text".into(), 30), ("extrnlidNEW".into(), "text".into(), 40)]);
+    }
 }

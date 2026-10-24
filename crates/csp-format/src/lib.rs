@@ -10,6 +10,7 @@ pub mod clip;
 pub mod cmc;
 pub mod container;
 pub mod database;
+pub mod edit;
 pub mod error;
 pub mod image;
 pub mod model;

@@ -57,6 +57,11 @@ pub enum BlendMode {
 
 impl BlendMode {
     /// The mode of a `LayerComposite` value (None for unknown values).
+    ///
+    /// Confirmed with a file made in CSP EX that has one layer per mode
+    /// (`docs/validation/V6-made-files.md`). The numbers do not follow the
+    /// order of CSP's mode list: darker / lighter colour, difference,
+    /// exclusion and divide were added later.
     pub fn from_code(code: i64) -> Option<Self> {
         use BlendMode::*;
         Some(match code {
@@ -77,20 +82,30 @@ impl BlendMode {
             14 => Overlay,
             15 => SoftLight,
             16 => HardLight,
-            17 => Difference,
-            18 => Exclusion,
-            19 => VividLight,
-            20 => LinearLight,
-            21 => PinLight,
-            22 => HardMix,
+            17 => VividLight,
+            18 => LinearLight,
+            19 => PinLight,
+            20 => HardMix,
+            21 => Difference,
+            22 => Exclusion,
             23 => Hue,
             24 => Saturation,
             25 => Color,
             26 => Brightness,
-            27 => Divide,
             30 => PassThrough,
+            36 => Divide,
             _ => return None,
         })
+    }
+
+    /// The `LayerComposite` value of the mode.
+    pub fn code(self) -> i64 {
+        (0..=36).find(|code| Self::from_code(*code) == Some(self)).unwrap_or(0)
+    }
+
+    /// 覆い焼き(発光) and 加算(発光).
+    fn is_glow(self) -> bool {
+        matches!(self, BlendMode::GlowDodge | BlendMode::AddGlow)
     }
 
     /// Separable blend of one channel (backdrop `b`, source `s`, both 0..1).
@@ -149,11 +164,10 @@ impl BlendMode {
                 }
             }
             HardMix => {
-                if b + s >= 1.0 {
-                    1.0
-                } else {
-                    0.0
-                }
+                // In 8-bit units: b + s > 255, and at exactly 255 only when
+                // s < 128 (measured in CSP, docs/validation/V6-made-files.md).
+                let (b8, s8) = ((b * 255.0).round(), (s * 255.0).round());
+                if b8 + s8 > 255.0 || (b8 + s8 == 255.0 && s8 < 128.0) { 1.0 } else { 0.0 }
             }
             Divide => {
                 if s <= 0.0 {
@@ -171,14 +185,14 @@ impl BlendMode {
         use BlendMode::*;
         match self {
             DarkerColor => {
-                if sum(s) < sum(b) {
+                if lum8(s) <= lum8(b) {
                     s
                 } else {
                     b
                 }
             }
             LighterColor => {
-                if sum(s) > sum(b) {
+                if lum8(s) >= lum8(b) {
                     s
                 } else {
                     b
@@ -193,8 +207,10 @@ impl BlendMode {
     }
 }
 
-fn sum(c: [f32; 3]) -> f32 {
-    c[0] + c[1] + c[2]
+/// The luminance darker / lighter colour compare: 0.3 R + 0.59 G + 0.11 B
+/// rounded to 8 bits, ties going to the source (exact on CSP's output).
+fn lum8(c: [f32; 3]) -> f32 {
+    (lum(c) * 255.0).round()
 }
 
 fn lum(c: [f32; 3]) -> f32 {
@@ -272,12 +288,21 @@ impl Buffer {
             let ba = b[3];
             let sc = [s[0] / s[3], s[1] / s[3], s[2] / s[3]];
             let bc = if ba > 0.0 { [b[0] / ba, b[1] / ba, b[2] / ba] } else { [0.0; 3] };
-            let mixed = mode.blend(bc, sc);
             let oa = sa + ba * (1.0 - sa);
             let mut out = [0.0; 4];
-            for c in 0..3 {
-                // W3C compositing: source over, with the blended colour where both exist.
-                out[c] = sa * (1.0 - ba) * sc[c] + sa * ba * mixed[c] + (1.0 - sa) * b[c];
+            if mode.is_glow() {
+                // Glow modes blend the backdrop with the source colour times
+                // its alpha and are not then mixed by alpha (measured in CSP).
+                let mixed = mode.blend(bc, sc.map(|v| v * sa));
+                for c in 0..3 {
+                    out[c] = sa * (1.0 - ba) * sc[c] + ba * mixed[c];
+                }
+            } else {
+                let mixed = mode.blend(bc, sc);
+                for c in 0..3 {
+                    // W3C compositing: source over, with the blended colour where both exist.
+                    out[c] = sa * (1.0 - ba) * sc[c] + sa * ba * mixed[c] + (1.0 - sa) * b[c];
+                }
             }
             out[3] = oa;
             self.data[i] = out;
@@ -441,9 +466,9 @@ impl Renderer<'_> {
             BlendMode::Normal
         });
         if layer.kind.is_folder() {
-            // CSP's new folders are pass-through; `LayerComposite` 0 on a
-            // folder is treated as pass-through (see the spec for the evidence).
-            if matches!(mode, BlendMode::PassThrough | BlendMode::Normal) {
+            // Pass-through (30) folders blend their children with what is
+            // below; any other mode makes the folder an isolated group.
+            if mode == BlendMode::PassThrough {
                 let mut buffer = backdrop.clone();
                 self.children(node, &mut buffer)?;
                 return Ok(Some(Content { buffer, mode: None }));
@@ -505,7 +530,7 @@ impl Renderer<'_> {
             // pixel grid of the stored lower levels.
             let mut image = image.clone();
             for _ in 0..halvings as u32 {
-                image = halve(&image);
+                image = image.halve();
             }
             image
         } else {
@@ -567,35 +592,6 @@ struct Content {
     mode: Option<BlendMode>,
 }
 
-/// Halve with a 2×2 box on premultiplied colour (width and height rounded down).
-fn halve(image: &RgbaImage) -> RgbaImage {
-    let (w, h) = ((image.width / 2).max(1), (image.height / 2).max(1));
-    let mut out = RgbaImage::new(w, h);
-    for y in 0..h {
-        for x in 0..w {
-            let mut sum = [0u32; 4];
-            for (dx, dy) in [(0, 0), (1, 0), (0, 1), (1, 1)] {
-                let p = image.pixel((2 * x + dx).min(image.width - 1), (2 * y + dy).min(image.height - 1));
-                let a = p[3] as u32;
-                sum[0] += p[0] as u32 * a;
-                sum[1] += p[1] as u32 * a;
-                sum[2] += p[2] as u32 * a;
-                sum[3] += a;
-            }
-            // All colour sums are 0 when the alpha sum is, so `max(1)` only avoids 0 / 0.
-            let total = sum[3].max(1);
-            let pixel = [
-                ((sum[0] + total / 2) / total) as u8,
-                ((sum[1] + total / 2) / total) as u8,
-                ((sum[2] + total / 2) / total) as u8,
-                ((sum[3] + 2) / 4) as u8,
-            ];
-            out.set_pixel(x, y, pixel);
-        }
-    }
-    out
-}
-
 fn gray_to_rgba(gray: &GrayImage) -> RgbaImage {
     let mut image = RgbaImage::new(gray.width, gray.height);
     for (i, v) in gray.pixels.iter().enumerate() {
@@ -637,6 +633,8 @@ mod tests {
         assert_eq!(BlendMode::Brightness.blend([1.0, 0.0, 0.0], [0.5, 0.5, 0.5]), set_lum([1.0, 0.0, 0.0], 0.5));
         assert_eq!(BlendMode::from_code(2), Some(BlendMode::Multiply));
         assert_eq!(BlendMode::from_code(99), None);
+        assert_eq!(BlendMode::from_code(36), Some(BlendMode::Divide));
+        assert_eq!(BlendMode::Divide.code(), 36);
     }
 
     #[test]

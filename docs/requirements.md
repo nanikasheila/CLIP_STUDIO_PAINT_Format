@@ -188,9 +188,9 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R7 ベクター | V1 | 済 | [V1](validation/V1-corpus.md): 4,819 個すべて一致 |
 | R8 テキスト | V1 | 済 | [V1](validation/V1-corpus.md): 8,344 ブロックすべて一致 |
 | R9 プレビュー | V1 | 一部 | [V1](validation/V1-corpus.md): CanvasPreview は全件。LayerThumbnail・.cmc サムネイルは未 |
-| R10 合成描画 | V3 | 未 | |
+| R10 合成描画 | V3 V6 | 一部 | [V6](validation/V6-made-files.md): 28 モードを CSP の書き出しと照合、全体で最大差 7/255。プレビューとの比較（V3）は全画素レイヤーのファイルで 63〜66 dB、コーパス全体の集計は未 |
 | R11 書き戻し | V1 | 済 | [V1](validation/V1-corpus.md): 全件バイト一致 |
-| R12 編集 | V4 V6 | 未 | |
+| R12 編集 | V4 V6 | 一部 | [V6](validation/V6-made-files.md): 画素の差し替え・名前・プレビュー・ファイル ID の更新を CSP で確認。属性変更の CSP 確認とレイヤーの追加・削除は未 |
 | R13 新規作成 | V4 V6 | 未 | |
 | R14 .cmc | V1 V6 | 一部 | [V1](validation/V1-corpus.md): 42 件合格。CSP での確認（V6）は未 |
 | R15 CLI | V5 | 未 | |

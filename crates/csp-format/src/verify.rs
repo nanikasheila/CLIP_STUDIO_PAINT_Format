@@ -37,6 +37,9 @@ pub struct ContainerReport {
     pub writer_reproduces: bool,
     pub external_chunks: usize,
     pub external_offsets_match: bool,
+    /// Every `ExternalChunk.ExternalID` is stored as TEXT. CSP looks chunks
+    /// up by text, so a BLOB id makes the layer load as broken.
+    pub external_ids_text: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
@@ -140,6 +143,7 @@ impl ClipReport {
             && self.container.reassembles
             && self.container.writer_reproduces
             && self.container.external_offsets_match
+            && self.container.external_ids_text
             && self.database.unreadable_tables.is_empty()
             && self.layers.unreachable == 0
             && self.layers.tree_error.is_none()
@@ -231,6 +235,8 @@ fn check_container(container: &Container, report: &mut ContainerReport) {
         let connection = database::open_bytes(container.sqlite()?)?;
         let rows = select_all(&connection, "ExternalChunk")?;
         let mut matched = 0;
+        report.external_ids_text =
+            rows.iter().all(|row| matches!(row.get("ExternalID"), Some(rusqlite::types::Value::Text(_))));
         for row in &rows {
             let id = row.get("ExternalID").and_then(value_as_text).unwrap_or_default();
             let chunk = container.external_chunk(&id);

@@ -105,6 +105,54 @@ impl RgbaImage {
         result
     }
 
+    /// Halve with a 2×2 box on premultiplied colour (width and height rounded down).
+    pub fn halve(&self) -> RgbaImage {
+        let image = self;
+        let (w, h) = ((image.width / 2).max(1), (image.height / 2).max(1));
+        let mut out = RgbaImage::new(w, h);
+        for y in 0..h {
+            for x in 0..w {
+                let mut sum = [0u32; 4];
+                for (dx, dy) in [(0, 0), (1, 0), (0, 1), (1, 1)] {
+                    let p = image.pixel((2 * x + dx).min(image.width - 1), (2 * y + dy).min(image.height - 1));
+                    let a = p[3] as u32;
+                    sum[0] += p[0] as u32 * a;
+                    sum[1] += p[1] as u32 * a;
+                    sum[2] += p[2] as u32 * a;
+                    sum[3] += a;
+                }
+                // All colour sums are 0 when the alpha sum is, so `max(1)` only avoids 0 / 0.
+                let total = sum[3].max(1);
+                let pixel = [
+                    ((sum[0] + total / 2) / total) as u8,
+                    ((sum[1] + total / 2) / total) as u8,
+                    ((sum[2] + total / 2) / total) as u8,
+                    ((sum[3] + 2) / 4) as u8,
+                ];
+                out.set_pixel(x, y, pixel);
+            }
+        }
+        out
+    }
+
+    /// Copy `other` onto self with its top-left at (x, y), replacing pixels
+    /// (no blending); parts outside are dropped.
+    pub fn paste(&mut self, other: &RgbaImage, x: i64, y: i64) {
+        for sy in 0..other.height as i64 {
+            let ty = y + sy;
+            if ty < 0 || ty >= self.height as i64 {
+                continue;
+            }
+            for sx in 0..other.width as i64 {
+                let tx = x + sx;
+                if tx < 0 || tx >= self.width as i64 {
+                    continue;
+                }
+                self.set_pixel(tx as u32, ty as u32, other.pixel(sx as u32, sy as u32));
+            }
+        }
+    }
+
     pub fn to_png(&self) -> Result<Vec<u8>> {
         encode_png(self.width, self.height, png::ColorType::Rgba, &self.pixels)
     }
