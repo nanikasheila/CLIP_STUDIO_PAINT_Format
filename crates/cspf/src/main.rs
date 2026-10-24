@@ -23,8 +23,12 @@ USAGE:
                                     text, references; .cmc: page list and page files)
   cspf extract FILE OUT_DIR         stored layer pixels and masks as PNG
   cspf preview FILE OUT.png         the preview CSP saved in the file
-  cspf corpus ROOT OUT.jsonl [--seconds N] [--no-reencode] [--shard K/N] [--list PATHS.txt]
-                                    check every .clip / .cmc under ROOT (resumable)
+  cspf render FILE OUT.png [--scale S]
+                                    composite the layers (default: the preview's size)
+  cspf compare FILE...              render at the preview's size and report PSNR (dB)
+  cspf corpus ROOT OUT.jsonl [--seconds N] [--no-reencode] [--shard K/N] [--list PATHS.txt] [--render]
+                                    check every .clip / .cmc under ROOT (resumable);
+                                    --render compares renders with the stored previews instead
 ";
 
 fn main() -> ExitCode {
@@ -42,6 +46,8 @@ fn main() -> ExitCode {
         "extract" => two(rest).and_then(|(file, out)| extract(&file, &out)),
         "preview" => two(rest).and_then(|(file, out)| preview(&file, &out)),
         "corpus" => corpus(rest),
+        "render" => render(rest),
+        "compare" => compare(rest),
         "-h" | "--help" | "help" => {
             print!("{USAGE}");
             Ok(true)
@@ -207,6 +213,44 @@ fn preview(path: &Path, out: &Path) -> Result<bool> {
     }
 }
 
+fn render(args: &[String]) -> Result<bool> {
+    let mut positional = Vec::new();
+    let mut scale = None;
+    let mut iter = args.iter();
+    while let Some(arg) = iter.next() {
+        match arg.as_str() {
+            "--scale" => scale = iter.next().and_then(|s| s.parse::<f64>().ok()),
+            _ => positional.push(arg.clone()),
+        }
+    }
+    let (file, out) = two(&positional)?;
+    let clip = ClipFile::open(&file)?;
+    let (image, report) = match scale {
+        Some(scale) => csp_format::render::render(&clip, csp_format::render::RenderOptions { scale, size: None })?,
+        None => match csp_format::render::render_like_preview(&clip)? {
+            Some((image, report, _)) => (image, report),
+            None => csp_format::render::render(&clip, Default::default())?,
+        },
+    };
+    std::fs::write(out, image.to_png()?)?;
+    print_json(&serde_json::to_value(&report).expect("JSON"));
+    Ok(true)
+}
+
+fn compare(args: &[String]) -> Result<bool> {
+    for path in args {
+        let clip = ClipFile::open(path)?;
+        let result = match csp_format::render::render_like_preview(&clip)? {
+            Some((image, report, preview)) => {
+                json!({"file": path, "psnr": csp_format::render::psnr(&image, &preview), "report": report})
+            }
+            None => json!({"file": path, "psnr": null}),
+        };
+        println!("{}", serde_json::to_string(&result).expect("JSON"));
+    }
+    Ok(true)
+}
+
 /// Stable short key of a path relative to the corpus root (FNV-1a).
 fn key_of(relative: &str) -> String {
     let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
@@ -238,11 +282,13 @@ fn corpus(args: &[String]) -> Result<bool> {
     let mut options = CheckOptions::default();
     let mut shard: (usize, usize) = (0, 1);
     let mut list: Option<String> = None;
+    let mut render_mode = false;
     let mut iter = args.iter();
     while let Some(arg) = iter.next() {
         match arg.as_str() {
             "--seconds" => seconds = iter.next().and_then(|s| s.parse().ok()).unwrap_or(0.0),
             "--no-reencode" => options.reencode_pixels = false,
+            "--render" => render_mode = true,
             "--list" => list = iter.next().cloned(),
             "--shard" => {
                 let text = iter.next().cloned().unwrap_or_default();
@@ -299,6 +345,22 @@ fn corpus(args: &[String]) -> Result<bool> {
         }
         let file_started = Instant::now();
         let (size, ok, report) = match std::fs::read(path) {
+            Ok(_) if render_mode && is_cmc(path) => continue,
+            Ok(data) if render_mode => {
+                let size = data.len();
+                let result = ClipFile::from_bytes(data).and_then(|clip| {
+                    Ok(match csp_format::render::render_like_preview(&clip)? {
+                        Some((image, report, preview)) => {
+                            json!({"psnr": csp_format::render::psnr(&image, &preview), "render": report})
+                        }
+                        None => json!({"psnr": null}),
+                    })
+                });
+                match result {
+                    Ok(value) => (size, true, value),
+                    Err(error) => (size, false, json!({"errors": [error.to_string()]})),
+                }
+            }
             Ok(data) if is_cmc(path) => {
                 let size = data.len();
                 let report = check_cmc(data, path.parent());

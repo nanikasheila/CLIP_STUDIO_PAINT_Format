@@ -14,6 +14,7 @@ pub mod error;
 pub mod image;
 pub mod model;
 pub mod offscreen;
+pub mod render;
 pub mod schema;
 pub mod text;
 pub mod vector;
