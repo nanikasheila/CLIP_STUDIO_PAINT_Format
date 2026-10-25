@@ -357,7 +357,7 @@ pub fn value_map_bytes(entries: &[MapEntry]) -> Vec<u8> {
 fn utf16(reader: &mut Reader) -> Result<String> {
     let units = reader.be_u32()? as usize;
     let bytes = reader.bytes(units.checked_mul(2).ok_or_else(|| Error::format("UTF-16 length"))?)?;
-    let units: Vec<u16> = bytes.chunks_exact(2).map(|c| u16::from_be_bytes([c[0], c[1]])).collect();
+    let units: Vec<u16> = bytes.as_chunks::<2>().0.iter().map(|c| u16::from_be_bytes(*c)).collect();
     Ok(String::from_utf16_lossy(&units))
 }
 
