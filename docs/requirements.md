@@ -194,4 +194,4 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R13 新規作成 | V4 V6 | 済 | [V6](validation/V6-made-files.md) 5.1: 大きさ・解像度・用紙の色（なしを含む）を変えた 3 件が自己検査を通り、CSP で開けて書き出しと全画素一致。CSP で保存し直したファイルとの構造差分を記録 |
 | R14 .cmc | V1 V6 | 済 | [V1](validation/V1-corpus.md): 42 件合格。[V6](validation/V6-made-files.md) 8 章: ページの削除・追加・並べ替えをした作品を CSP EX で開き、書いた順に並ぶことを確認 |
 | R15 CLI | V5 | 済 | `crates/cspf/tests/cli.rs`: 各コマンドを `cspf new` で作ったファイルで実行（CI） |
-| R16 Python | V7 | 未 | |
+| R16 Python | V7 V5 | 済 | `python/csp_format`（標準ライブラリだけ）。[V7](validation/V7-python.md): 719 件・27,986 レイヤーで Rust と全項目一致、csp-name-splitter の読み取りとの比較（標本 24 件）は 21 件が全項目一致、残りは csp_format が正しい差（用紙の初期色、表のないファイル）。比較で見つけたテキストの読み落としは両実装で修正。`python/tests`（CI） |

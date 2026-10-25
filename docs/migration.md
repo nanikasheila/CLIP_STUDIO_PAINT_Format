@@ -93,7 +93,7 @@ csp-format の判定順は `03-canvas-and-layers.md` の通りで、clip-core �
 - clip-core の `other` は csp-format では `gradient`, `correction`, `image_material`, `3d` に分かれ、何も描いていないベクターレイヤー（`LayerType` 0、`VectorNormalStrokeIndex` あり）は `vector` になる。
 - `match` を書いている箇所は、`other` 扱いだった種別をどう扱うか決めてから移す。ネームの分割で「画素として運ぶ」対象は `layer_pixels` が `Some` を返すレイヤーと考えるのが安全（グラデーション・画像素材も描画済みの画素を持つ）。
 
-V7 の比較で、旧実装と種別が違ったレイヤーの数を [V7-python.md](validation/V7-python.md) に載せている。
+csp-name-splitter の読み取りと種別が違ったレイヤーの数（標本 24 件）は [V7-python.md](validation/V7-python.md) 2 章にある。
 
 ### 3.4 取りこぼしていた形式
 
