@@ -25,8 +25,10 @@
 //!   control); past the last point's x it continues as `y × x / x_last`.
 //! - The edge: no anti-aliasing (`AntiAlias` 0) fills the pixels whose
 //!   centre is within the radius; otherwise the ink across a stroke is
-//!   `2 × radius − 0.65 / 1.1 / 1.4` (weak / medium / strong) over a ramp
-//!   of about one pixel, and about `radius` for strokes under 2 px wide.
+//!   `2 × radius` less a loss that depends on the level and the radius
+//!   (radius 20: 0.65 / 1.1 / 1.4 for weak / medium / strong; radius 2–3:
+//!   1.1 / 1.5 / 1.6) over a ramp of about one pixel, and about `radius`
+//!   for strokes under 2 px wide.
 //! - Effector flag 0x40 follows the velocity, point value 2 (0..1): the
 //!   factor is `1 − (1 − min) × v`, `min` the word after the pressure's.
 //!   Flag 0x80 is a random factor per dab down to its minimum (drawn as a
@@ -387,27 +389,39 @@ pub fn draw_objects(image: &mut RgbaImage, objects: &[VectorObject], brushes: &H
 /// How the edge of a stroke is drawn, by `BrushStyle.AntiAlias`.
 #[derive(Clone, Copy)]
 struct Edge {
-    /// Ink lost on each side, in pixels (None: no anti-aliasing).
-    loss: Option<f64>,
+    /// Ink lost across the stroke, in pixels, at the radii of `RADII`
+    /// (None: no anti-aliasing).
+    loss: Option<[f64; 8]>,
 }
 
 impl Edge {
+    /// Radii at which the loss was measured (V6 section 7).
+    const RADII: [f64; 8] = [1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 10.0, 20.0];
+
     fn of(anti_alias: i64) -> Self {
         let loss = match anti_alias {
             ..=0 => None,
-            1 => Some(0.33),
-            2 => Some(0.55),
-            _ => Some(0.7),
+            1 => Some([1.05, 1.25, 1.13, 1.05, 0.91, 0.91, 0.82, 0.65]),
+            2 => Some([1.05, 1.25, 1.45, 1.49, 1.31, 1.18, 1.15, 1.09]),
+            _ => Some([1.05, 1.25, 1.45, 1.71, 1.68, 1.47, 1.44, 1.42]),
         };
         Edge { loss }
+    }
+
+    /// The ink lost across a stroke of `radius` (linear between the measured radii).
+    fn loss_at(table: &[f64; 8], radius: f64) -> f64 {
+        let r = radius.clamp(Self::RADII[0], Self::RADII[7]);
+        let i = Self::RADII.iter().rposition(|&k| k <= r).unwrap_or(0).min(6);
+        let t = (r - Self::RADII[i]) / (Self::RADII[i + 1] - Self::RADII[i]);
+        table[i] + t * (table[i + 1] - table[i])
     }
 
     /// Coverage of a pixel whose centre is `distance` from the spine of a
     /// stroke of `radius`.
     fn coverage(self, radius: f64, distance: f64, loss_factor: f64) -> f64 {
-        let Some(loss) = self.loss else { return if distance <= radius { 1.0 } else { 0.0 } };
+        let Some(table) = self.loss else { return if distance <= radius { 1.0 } else { 0.0 } };
         // The ink across the stroke; thin strokes keep about their radius.
-        let ink = (2.0 * (radius - loss * loss_factor)).max(radius);
+        let ink = (2.0 * radius - Self::loss_at(&table, radius) * loss_factor).max(radius);
         if ink >= 1.0 { (ink / 2.0 - distance + 0.5).clamp(0.0, 1.0) } else { ink * (1.0 - distance).clamp(0.0, 1.0) }
     }
 }
@@ -655,6 +669,9 @@ mod tests {
         assert!((width(1, 20.0) - 39.35).abs() < 0.1);
         assert!((width(2, 20.0) - 38.91).abs() < 0.1);
         assert!((width(3, 20.0) - 38.58).abs() < 0.2);
+        // Thin strokes lose more (CSP radius 3: 4.91–4.99 px; radius 2.5: 3.48 px).
+        assert!((width(1, 3.0) - 4.95).abs() < 0.15);
+        assert!((width(2, 2.5) - 3.48).abs() < 0.15);
         // A thin stroke keeps about its radius of ink (CSP 0.5 at 0.5).
         assert!((width(2, 0.5) - 0.5).abs() < 0.1);
     }
