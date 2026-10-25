@@ -49,7 +49,7 @@ CSP が書き出した `.sut` から、`cspf asset sut-extract` で同じサブ�
 | `Variant` | 2 行とも全値一致。列は CSP の 127 列に対して 126 列（CSP は値が全行 NULL の `BrushSprayFixedPointArray` 列も残していた） |
 | `MaterialFile` | 2 行とも全列一致。`FileData`（素材の tar）はバイト一致 |
 
-CSP がどの基準で値のない列を残すかは未解明。CSP での読み込み（W3）で影響がないかを確かめる。
+CSP がどの基準で値のない列を残すかは未解明。[W3](W3-csp.md) で、値のない列がある `.sut` も CSP が読み込み、既定値で補うことを確かめた。
 
 ## 再現の手順
 

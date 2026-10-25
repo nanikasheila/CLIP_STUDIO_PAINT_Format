@@ -25,7 +25,7 @@ LABELS = {
     "CompositeMode": ("インク", "合成モード", "CSP のレイヤー合成モード番号（.clip の LayerComposite と同じ表）"),
     "FlickerReduction": ("補正", "手ブレ補正", "0–100"),
     "FlickerReductionBySpeed": ("補正", "速度による手ブレ補正", "0/1"),
-    "FlickerReductionBySpeedType": ("補正", "速度による手ブレ補正の方式", ""),
+    "FlickerReductionBySpeedType": ("補正", "補正タイプ（速度による手ブレ補正）", "1 左のボタン（既定）, 0 右のボタン"),
     "Stickness": ("補正", "ポストスムージング", "0–10"),
     "VariantID": ("（内部）", "設定行の ID", "Node.NodeVariantID / NodeInitVariantID から参照"),
     "_PW_ID": ("（内部）", "行番号", ""),
@@ -33,7 +33,7 @@ LABELS = {
     "VariantShowSeparator": ("（内部）", "ツールプロパティの区切り線", ""),
     # ブラシサイズ
     "BrushSize": ("ブラシサイズ", "ブラシサイズ", "半径ではなく直径の値（px は BrushSizeUnit 0）"),
-    "BrushSizeSyncViewScale": ("ブラシサイズ", "表示倍率に連動", "0/1"),
+    "BrushSizeSyncViewScale": ("ブラシサイズ", "画面上のサイズで指定", "0/1"),
     "BrushAtLeast1Pixel": ("ブラシサイズ", "最小値を 1 ピクセルにする", "0/1"),
     "SyncDualBrushSize": ("デュアルブラシ", "ブラシサイズを連動", "0/1"),
     # インク
@@ -46,7 +46,7 @@ LABELS = {
     # ブラシ先端
     "BrushHardness": ("ブラシ先端", "硬さ", "1–100（円形の先端）"),
     "BrushThickness": ("ブラシ先端", "厚さ", "%"),
-    "BrushVerticalThicknes": ("ブラシ先端", "厚さの向き（縦）", "0 横, 1 縦"),
+    "BrushVerticalThicknes": ("ブラシ先端", "厚さの適用方向", "0 水平, 1 垂直"),
     "BrushRotation": ("ブラシ先端", "ブラシ先端の向き", "度"),
     "BrushRotationEffector": ("ブラシ先端", "向きの影響元", "ビット: 筆圧・傾き・進行方向・ランダムなど（.clip 側の RotationEffector と同じ）"),
     "BrushRotationRandomScale": ("ブラシ先端", "向きのランダムの幅", "%"),
@@ -61,7 +61,7 @@ LABELS = {
     "BrushBlendPatternByDarken": ("ブラシ先端", "比較(暗)で重ねる", "0/1"),
     "BrushRibbon": ("ストローク", "リボン", "0/1"),
     "BrushInterval": ("ストローク", "間隔", "% (先端の直径に対する)"),
-    "BrushAutoIntervalType": ("ストローク", "間隔の種類", "0 狭い, 1 普通, 2 広い, 3 固定（推測）"),
+    "BrushAutoIntervalType": ("ストローク", "間隔", "0 固定, 1 広い（推測）, 2 普通, 3 狭い（推測）"),
     "BrushContinuousPlot": ("ストローク", "連続吹き付け", "0/1"),
     # 紙質
     "TextureImage": ("紙質", "紙質の素材", "素材の参照の列"),
@@ -135,7 +135,7 @@ LABELS = {
     "BrushRevisionBySpeed": ("補正", "速度で補正", "0/1"),
     "BrushRevisionByViewScale": ("補正", "表示倍率で補正", "0/1"),
     "BrushRevisionBezier": ("補正", "ベジェ曲線で補正", "0/1"),
-    "BrushSharpenCorner": ("補正", "角を鋭く", "0/1"),
+    "BrushSharpenCorner": ("補正", "角をとがらせる", "0/1"),
     "BrushAdjustVelocity": ("補正", "速度の調整", "0/1"),
     "BrushEnableSnap": ("補正", "スナップ可能", "0/1"),
     "BrushUseVectorMagnet": ("補正", "ベクター吸着", "0/1"),
@@ -205,8 +205,27 @@ PREFIX_GROUPS = [
     ("Zoom", "虫めがね"), ("TimeLine", "タイムライン"), ("Stamp", "コピースタンプ"), ("EnableSnap", "対称定規"),
 ]
 
-# Checked in CSP (column → evidence); filled from W3/W4.
-CONFIRMED: dict[str, str] = {}
+# Checked in CSP (column → evidence); see docs/assets/validation/W3-csp.md.
+CONFIRMED: dict[str, str] = {
+    "BrushSize": "確認済み（W3 表示、W4）",
+    "Opacity": "確認済み（W3 表示・書き出し、W4）",
+    "AntiAlias": "確認済み（W3 表示: 1 弱、2 中）",
+    "CompositeMode": "確認済み（W4: ハードミックス 20）",
+    "BrushSizeSyncViewScale": "確認済み（W4）",
+    "BrushMixColor": "確認済み（W3 表示）",
+    "BrushMixAlpha": "確認済み（W3 表示）",
+    "BrushSharpenCorner": "確認済み（W4）",
+    "FlickerReduction": "確認済み（W4）",
+    "FlickerReductionBySpeedType": "確認済み（W4）",
+    "BrushFlow": "確認済み（W4）",
+    "BrushHardness": "確認済み（W4）",
+    "BrushRotation": "確認済み（W4）",
+    "BrushThickness": "確認済み（W4）",
+    "BrushUseVectorMagnet": "確認済み（W4）",
+    "BrushVerticalThicknes": "確認済み（W4）",
+    "BrushAutoIntervalType": "確認済み（W4: 固定 0、普通 2）",
+    "BrushContinuousPlot": "確認済み（W4）",
+}
 
 
 # Words of the remaining names, for a literal reading of items not in LABELS.

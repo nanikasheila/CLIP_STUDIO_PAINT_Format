@@ -178,12 +178,12 @@ SQLite 系の全形式について、表・列・型・行数・観察された�
 | A2 SQLite の目録 | W1 | 一部 | [W1](validation/W1-samples.md): 全件読める。列ごとの目録は未作成 |
 | A3 サブツールの構造 | W1 W2 | 済 | [W1](validation/W1-samples.md)、`subtool::tests` |
 | A4 サブツールのバイナリ列 | W1 | 済 | [W1](validation/W1-samples.md): 41,056 件バイト一致 |
-| A5 サブツール設定の意味 | W4 | 未 | |
-| A6 サブツールの書き出し | W2 W3 | 一部 | [W1](validation/W1-samples.md) の抽出の再現、`cspf/tests/asset.rs`。CSP での読み込み（W3）は未 |
+| A5 サブツール設定の意味 | W4 | 一部 | [目録](spec/subtool-columns.tsv) は全 530 列に記述と確度あり。[W4](validation/W3-csp.md) で 18 列を確認済み、残りのペン・ブラシの列は推測 |
+| A6 サブツールの書き出し | W2 W3 | 済 | [W1](validation/W1-samples.md) の抽出の再現、`cspf/tests/asset.rs`、[W3](validation/W3-csp.md): 書いた `.sut` 3 件を CSP で読み込み、変えた値を確認 |
 | A7 型付き直列化 | W1 W2 | 済 | [W1](validation/W1-samples.md)、`serial::tests` |
 | A8 オートアクション | W1 W3 | 一部 | W1 合格。種類の一覧と W3 は未 |
 | A9 グラデーションセット | W1 W3 | 一部 | W1 合格。W3 は未 |
-| A10 カラーセット | W1 W3 | 一部 | W1 合格。W3 は未 |
+| A10 カラーセット | W1 W3 | 済 | W1 合格。[W3](validation/W3-csp.md): CSP で読み込み、書き出し直すとバイト一致 |
 | A11 素材の目録 | W1 | 済 | [W1](validation/W1-samples.md) |
 | A12 ワークスペースなど | W1 | 未 | |
 | A13 CLI | W2 | 済 | `crates/cspf/tests/asset.rs` |
