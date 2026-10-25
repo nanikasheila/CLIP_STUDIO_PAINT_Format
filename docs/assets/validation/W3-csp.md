@@ -52,11 +52,29 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 3 | ブラシ先端: ブラシ濃度 88 | `BrushFlow` 100 → 88 |
 | 4 | ストローク: 間隔 固定 | `BrushAutoIntervalType` 2（普通）→ 0（固定） |
 | 4 | ストローク: 連続吹き付け オン | `BrushContinuousPlot` 0 → 1 |
+| 5 | 散布効果: オン | `BrushUseSpray` 0 → 1 |
+| 5 | 散布効果: 粒子サイズ 7 | `BrushSpraySize` 2.0 → 7.0 |
+| 5 | 散布効果: 粒子密度（バーで 2 段目） | `BrushSprayDensity` 5 → 2 |
+| 5 | 散布効果: 散布偏向（バーで 4 段目） | `BrushSprayBias` 0 → 50 |
+| 5 | 散布効果: 粒子の向き 41 | `BrushRotationInSpray` 0.0 → 41.0 |
+| 6 | 紙質: なし → インパスト | `TextureImage` に素材の参照 1 件（種類 2）。素材のファイルも `.sut` に入り、37 KB → 590 KB |
+| 7 | 紙質: 紙質濃度 37 | `TextureDensity` 50 → 37 |
+| 7 | 紙質: 濃度反転 オン | `TextureReverseDensity` 0 → 1 |
+| 7 | 紙質: 拡大率 150 | `TextureScale2` 100 → 150 |
+| 7 | 紙質: 回転角 23 | `TextureRotate` 0 → 23 |
+| 7 | 紙質: 明るさ 11 | `TextureBrightness` 0 → 11 |
+| 7 | 紙質: コントラスト 19 | `TextureContrast` 0 → 19 |
+| 7 | 紙質: 紙質適用方法 比較 | `TextureCompositeMode` 0 → 3（一覧の 4 番目。通常, 乗算, 減算, 比較, 輪郭, オーバーレイ, 覆い焼きカラー, 焼き込みカラー, ハードミックス, 高さ） |
+| 7 | 紙質: 描点ごとに適用 オン | `TextureForPlot` 0 → 1 |
+| 8 | 入り抜き: 影響先 ブラシサイズと厚さ | `BrushInOutTarget` の項目 1001 と 1051 の「有効」が 0 → 1（最小値は 0 のまま） |
+| 8 | 入り抜き: 入り 13、抜き 31（長さ指定） | `BrushInLength` 20 → 13、`BrushOutLength` 20 → 31 |
+| 8 | 入り抜き: 速度による入り抜き オフ | `BrushInOutBySpeed` 1 → 0 |
+| 8 | 入り抜き: 指定方法 パーセント指定 | `BrushInOutType` 0 → 1。表示は `BrushInRatio` / `BrushOutRatio` の 30.0 |
 
-2〜4 回目ではほかの列は変わらなかった。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜8 回目ではほかの列は変わらなかった。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 18 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 39 列）。
 
 ## 残り
 
-- W4 の続き（入り抜き、散布効果、紙質、水彩境界、色の変化と、ペン以外のツール）
+- W4 の続き（水彩境界、色の変化、デュアルブラシ、影響元設定と、ペン以外のツール）
