@@ -182,7 +182,7 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R1 コンテナ | V1 | 済 | [V1](validation/V1-corpus.md): 719 件 |
 | R2 DB 読み取り | V1 | 済 | [V1](validation/V1-corpus.md): 読めないテーブル 0 |
 | R3 スキーマ目録 | V2 | 済 | [スキーマ目録](spec/schema-catalog.md): コーパスの和集合 65 表・1,385 列すべてに型・リンク・使用・値の範囲・状態を記載。コア 618 列は確認済み 242・推測 376・未解明 0。全体の未解明 238 列は、コーパスのどのファイルにもない表（3D モデル・アニメーション・音声など）の列。生成は `tools/corpus/schema_doc.py` |
-| R4 モデル | V1 V5 | 一部 | [V1](validation/V1-corpus.md): ツリーは全件で閉じる。種類 other 140 個の理由が未調査 |
+| R4 モデル | V1 V5 | 済 | [V1](validation/V1-corpus.md): ツリーは全件で閉じる。種類は全レイヤーで付く（other 0。以前の 140 個は何も描いていないベクターレイヤー） |
 | R5 画素復号 | V1 | 済 | [V1](validation/V1-corpus.md): 186 万ブロック、不一致 0 |
 | R6 画素符号化 | V1 | 済 | [V1](validation/V1-corpus.md): 再圧縮のバイト一致 100% |
 | R7 ベクター | V1 | 済 | [V1](validation/V1-corpus.md): 4,819 個すべて一致 |

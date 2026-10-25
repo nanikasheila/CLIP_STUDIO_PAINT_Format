@@ -47,14 +47,17 @@ memLevel 9 は zlib の既定（8）と違い、Rust の zlib 実装（miniz_oxi
 | 種類 | 個数 | 種類 | 個数 |
 |---|---|---|---|
 | raster | 12,244 | text | 1,527 |
-| vector | 3,953 | story_info | 874 |
+| vector | 4,093 | story_info | 874 |
 | folder | 3,873 | paper | 699 |
 | gradient | 3,249 | frame_folder | 273 |
 | root | 719 | image_material | 223 |
 | correction | 201 | 3d | 11 |
-| other | 140 | | |
+| other | 0 | | |
 
-`other`（140 個）は判定規則に当たらなかったもの。理由の調査は残課題（R4 の「不明は理由付きで報告」）。
+最初の判定では 140 個が `other`（判定規則に当たらないもの）だった。調べると（2026-10-25、531 件の 101 個）、すべて `LayerType` 0・フォルダーでない・
+`VectorObjectList` に行がない・`VectorNormalStrokeIndex` などのベクターの列は 0 で入っている・画素は全面透明で、何も描いていないベクターレイヤーだった
+（101 個のうち 61 個は `VectorObjectList` の表自体がないファイル）。`LayerType` 0 でベクターの列があるレイヤーをベクターとする規則を足し、719 件で `other` は 0 になった
+（`examples/zz_kinds.rs` 相当の集計。種類ごとの数は上表）。
 
 ### 画素の種類
 

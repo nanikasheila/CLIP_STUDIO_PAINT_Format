@@ -290,7 +290,35 @@ fn classify(row: &Row, main_id: i64, layer_type: i64, folder: i64, vector_layers
     if layer_type & LAYER_TYPE_RASTER != 0 {
         return LayerKind::Raster;
     }
+    // A vector layer nothing was drawn on: no `VectorObjectList` row, but
+    // the vector index columns are there (all 101 such layers in the corpus
+    // had `LayerType` 0 and blank pixels).
+    if layer_type == 0 && row.is_set("VectorNormalStrokeIndex") {
+        return LayerKind::Vector;
+    }
     LayerKind::Other
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rusqlite::types::Value;
+
+    #[test]
+    fn empty_vector_layers_are_vector() {
+        let row = |columns: &[(&str, Value)]| {
+            Row::new(
+                columns.iter().map(|(c, _)| c.to_string()).collect(),
+                columns.iter().map(|(_, v)| v.clone()).collect(),
+            )
+        };
+        let none = HashSet::new();
+        let empty = row(&[("VectorNormalStrokeIndex", Value::Integer(0))]);
+        assert_eq!(classify(&empty, 5, 0, 0, &none), LayerKind::Vector);
+        let raster = row(&[("VectorNormalStrokeIndex", Value::Null)]);
+        assert_eq!(classify(&raster, 5, 1, 0, &none), LayerKind::Raster);
+        assert_eq!(classify(&raster, 5, 0, 0, &none), LayerKind::Other);
+    }
 }
 
 /// A layer and its children (bottom to top).
