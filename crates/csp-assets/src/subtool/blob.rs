@@ -27,8 +27,10 @@ fn word(data: &[u8], at: usize) -> Result<u32> {
         .ok_or_else(|| Error::format(format!("sub tool blob: 4 bytes needed at {at:#x} of {}", data.len())))
 }
 
-/// Fixed-size records with a 12-byte header.
-#[derive(Debug, Clone, PartialEq, Serialize)]
+/// Fixed-size records with a 12-byte header. As JSON: 16-byte records as
+/// `[x, y]` points, 4-, 8- and 12-byte records as lists of words,
+/// anything else as `{"recordSize", "hex"}`.
+#[derive(Debug, Clone, PartialEq)]
 pub struct Records {
     pub record_size: u32,
     pub records: Vec<Vec<u8>>,
@@ -90,6 +92,25 @@ impl Records {
             record_size: size,
             records: rows.iter().map(|r| r.iter().flat_map(|w| w.to_be_bytes()).collect()).collect(),
         }
+    }
+}
+
+impl Records {
+    fn json(&self, as_points: bool) -> serde_json::Value {
+        match self.record_size {
+            16 if as_points => serde_json::json!(self.points()),
+            4 | 8 | 12 => serde_json::json!(self.words()),
+            _ => serde_json::json!({
+                "recordSize": self.record_size,
+                "hex": self.records.iter().map(|x| crate::serial::hex(x)).collect::<Vec<_>>(),
+            }),
+        }
+    }
+}
+
+impl Serialize for Records {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
+        self.json(true).serialize(serializer)
     }
 }
 
@@ -433,14 +454,16 @@ pub fn round_trips(column: &str, data: &[u8]) -> Result<bool> {
 /// A readable form of a blob for reports and `cspf asset inspect`.
 pub fn to_json(column: &str, data: &[u8]) -> serde_json::Value {
     let parsed = match kind_of_column(column) {
-        BlobKind::Records => Records::parse(data).map(|r| match r.record_size {
-            4 | 8 | 12 => serde_json::json!(r.words()),
-            16 if column != "IncludeFillColor" => serde_json::json!(r.points()),
-            _ => serde_json::json!({ "recordSize": r.record_size, "hex": r.records.iter().map(|x| crate::serial::hex(x)).collect::<Vec<_>>() }),
-        }),
-        BlobKind::Effector => Effector::parse(data).and_then(|e| serde_json::to_value(e).map_err(|e| Error::format(e.to_string()))),
-        BlobKind::MaterialList => MaterialList::parse(data).and_then(|m| serde_json::to_value(m).map_err(|e| Error::format(e.to_string()))),
-        BlobKind::Gradation => crate::gradient::GradientData::parse(data).and_then(|g| serde_json::to_value(g).map_err(|e| Error::format(e.to_string()))),
+        // IncludeFillColor's 16-byte records are not points.
+        BlobKind::Records => Records::parse(data).map(|r| r.json(column != "IncludeFillColor")),
+        BlobKind::Effector => {
+            Effector::parse(data).and_then(|e| serde_json::to_value(e).map_err(|e| Error::format(e.to_string())))
+        }
+        BlobKind::MaterialList => {
+            MaterialList::parse(data).and_then(|m| serde_json::to_value(m).map_err(|e| Error::format(e.to_string())))
+        }
+        BlobKind::Gradation => crate::gradient::GradientData::parse(data)
+            .and_then(|g| serde_json::to_value(g).map_err(|e| Error::format(e.to_string()))),
         BlobKind::Unknown => Err(Error::format("unknown")),
     };
     parsed.unwrap_or_else(|_| serde_json::json!({ "hex": crate::serial::hex(data) }))

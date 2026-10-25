@@ -187,4 +187,4 @@ SQLite 系の全形式について、表・列・型・行数・観察された�
 | A11 素材の目録 | W1 | 済 | [W1](validation/W1-samples.md) |
 | A12 ワークスペースなど | W1 | 未 | |
 | A13 CLI | W2 | 済 | `crates/cspf/tests/asset.rs` |
-| A14 Python | W5 | 未 | |
+| A14 Python | W5 | 済 | [W5](validation/W5-python.md): 158 件で違い 0、CI で合成ファイルを毎回照合 |

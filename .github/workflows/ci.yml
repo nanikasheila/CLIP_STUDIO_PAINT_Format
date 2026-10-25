@@ -22,7 +22,7 @@ jobs:
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --all
       - name: Python tools compile
-        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py tools/corpus/value_census.py tools/corpus/schema_doc.py tools/validation/python_reader_check.py tools/validation/name_splitter_check.py
+        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py tools/corpus/value_census.py tools/corpus/schema_doc.py tools/validation/python_reader_check.py tools/validation/name_splitter_check.py tools/validation/assets_python_check.py
       - name: Python reader tests
         run: python -m unittest discover -s python/tests -v
       - name: Python reader matches the Rust crate (V7, fixture)
@@ -31,3 +31,9 @@ jobs:
           cargo build --example layer_digest -p csp-format
           python tools/validation/python_reader_check.py python/tests/data python/tests/data/files.txt v7.jsonl --digest target/debug/examples/layer_digest
           python -c "import json, sys; r = [json.loads(l) for l in open('v7.jsonl')]; print(r); sys.exit(0 if r and all(x['ok'] for x in r) else 1)"
+      - name: Python asset reader matches the Rust crate (W5, synthetic files)
+        shell: bash
+        run: |
+          cargo build --example asset_fixtures --example asset_digest -p csp-assets
+          target/debug/examples/asset_fixtures w5-fixtures
+          python tools/validation/assets_python_check.py w5-fixtures w5.jsonl --digest target/debug/examples/asset_digest
