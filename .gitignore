@@ -5,3 +5,5 @@ __pycache__/
 *.clip
 *.cmc
 *.sut
+# Synthetic test files made by the tools (see python/tests/test_reader.py).
+!python/tests/data/*.clip
