@@ -27,8 +27,13 @@
 //!   centre is within the radius; otherwise the ink across a stroke is
 //!   `2 × radius − 0.65 / 1.1 / 1.4` (weak / medium / strong) over a ramp
 //!   of about one pixel, and about `radius` for strokes under 2 px wide.
-//! - Flags 0x40, 0x80 and 0x100 of the effector do not change straight
-//!   strokes of constant pressure (they follow other inputs).
+//! - Effector flag 0x40 follows the velocity, point value 2 (0..1): the
+//!   factor is `1 − (1 − min) × v`, `min` the word after the pressure's.
+//!   Flag 0x80 is a random factor per dab down to its minimum (drawn as a
+//!   fixed factor); 0x100 does not change straight strokes.
+//! - Header 88 objects (freehand strokes) are a cubic spline through
+//!   their points; header 92 objects are drawn straight from point to point
+//!   and without velocity.
 //! - The tip is an ellipse: `ThicknessBase` (times `ThicknessEffector`,
 //!   read like the size) is the ratio of its minor to its major axis, and
 //!   the major semi-axis is the radius. The minor axis points at
@@ -119,33 +124,63 @@ impl Curve {
     }
 }
 
-/// How one brush setting follows the pen pressure.
+/// How one brush setting follows the pen: the flags, each followed by its
+/// words in this order.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Effector {
-    /// `(minimum, curve)` when the setting follows the pressure.
+    /// Flag 0x10: `(minimum, curve)`, following the pressure.
     pub pressure: Option<(f64, Curve)>,
+    /// Flag 0x40: the minimum at full speed (point value 2).
+    pub velocity: Option<f64>,
+    /// Flag 0x80: the minimum of a random factor per dab.
+    pub random: Option<f64>,
 }
 
 impl Effector {
     const PRESSURE: u32 = 0x10;
+    const TILT: u32 = 0x20;
+    const VELOCITY: u32 = 0x40;
+    const RANDOM: u32 = 0x80;
 
     pub fn parse(data: &[u8], curves: &HashMap<i64, Curve>) -> Self {
         let word = |i: usize| data.get(i * 4..i * 4 + 4).map(|b| u32::from_be_bytes(b.try_into().expect("4")));
+        let real = |i: usize| (word(i).map(f32::from_bits).unwrap_or(0.0) as f64).clamp(0.0, 1.0);
         let Some(flags) = word(0) else { return Effector::default() };
-        if flags & Self::PRESSURE == 0 {
-            return Effector::default();
+        let mut effector = Effector::default();
+        let mut next = 1;
+        if flags & Self::PRESSURE != 0 {
+            let curve = word(next + 1).and_then(|id| curves.get(&(id as i64)).cloned()).unwrap_or_default();
+            effector.pressure = Some((real(next), curve));
+            next += 2;
         }
-        let minimum = word(1).map(f32::from_bits).unwrap_or(0.0) as f64;
-        let curve = word(2).and_then(|id| curves.get(&(id as i64)).cloned()).unwrap_or_default();
-        Effector { pressure: Some((minimum.clamp(0.0, 1.0), curve)) }
+        if flags & Self::TILT != 0 {
+            next += 1;
+        }
+        if flags & Self::VELOCITY != 0 {
+            effector.velocity = Some(real(next));
+            next += 1;
+        }
+        if flags & Self::RANDOM != 0 {
+            effector.random = Some(real(next));
+        }
+        effector
     }
 
-    /// The factor (0..1) at `pressure`.
-    pub fn factor(&self, pressure: f64) -> f64 {
-        match &self.pressure {
+    /// The factor (0..1) at `pressure` and `velocity` (point values 0 and 2).
+    /// Velocity v takes `1 − (1 − min) × v`; a random factor is drawn as a
+    /// fixed `1 − 0.15 × (1 − min)` (the union of dabs of random sizes).
+    pub fn factor(&self, pressure: f64, velocity: f64) -> f64 {
+        let mut factor = match &self.pressure {
             Some((minimum, curve)) => minimum + (1.0 - minimum) * curve.at(pressure).clamp(0.0, 1.0),
             None => 1.0,
+        };
+        if let Some(minimum) = self.velocity {
+            factor *= 1.0 - (1.0 - minimum) * velocity.clamp(0.0, 1.0);
         }
+        if let Some(minimum) = self.random {
+            factor *= 1.0 - 0.15 * (1.0 - minimum);
+        }
+        factor
     }
 }
 
@@ -224,12 +259,12 @@ impl Tip {
     const RANDOM: i64 = 0x80;
 
     fn round(&self) -> bool {
-        self.thickness >= 1.0 && self.thickness_effector.pressure.is_none()
+        self.thickness >= 1.0 && self.thickness_effector == Effector::default()
     }
 
-    /// The thickness at `pressure`.
-    fn thickness_at(&self, pressure: f64) -> f64 {
-        (self.thickness.min(1.0) * self.thickness_effector.factor(pressure)).max(0.0)
+    /// The thickness at `pressure` and `velocity`.
+    fn thickness_at(&self, pressure: f64, velocity: f64) -> f64 {
+        (self.thickness.min(1.0) * self.thickness_effector.factor(pressure, velocity)).max(0.0)
     }
 
     /// The direction of the minor axis (radians, y down) on a line going along `u`.
@@ -377,27 +412,94 @@ impl Edge {
     }
 }
 
+#[derive(Clone, Copy)]
 struct Stamp {
     x: f64,
     y: f64,
     radius: f64,
     thickness: f64,
     alpha: f64,
+    /// Point flag 0x2: the stroke turns sharply here.
+    corner: bool,
+}
+
+/// The points of a stroke joined by a cubic spline through them (header
+/// 88 objects; CSP draws the others with straight lines), cut into pieces
+/// that stay within a fifth of a pixel of the curve; the other values
+/// change linearly along each span. Measured on CSP's exports (V6 section
+/// 7): the tangent at a point is 0.7 × (next − previous), at an open end
+/// 0.55 × (neighbour − end), and none at a corner (point flag 0x2).
+fn smooth(points: &[Stamp], closed: bool) -> Vec<Stamp> {
+    let n = points.len();
+    if n < 3 {
+        return points.to_vec();
+    }
+    // A closed stroke repeats its first point at the end.
+    let unique = if closed { n - 1 } else { n };
+    let tangent = |i: usize| -> (f64, f64) {
+        let p = &points[i % unique];
+        if p.corner {
+            return (0.0, 0.0);
+        }
+        let (prev, next) = if closed {
+            (&points[(i + unique - 1) % unique], &points[(i + 1) % unique])
+        } else if i == 0 {
+            return (0.55 * (points[1].x - p.x), 0.55 * (points[1].y - p.y));
+        } else if i == n - 1 {
+            return (0.55 * (p.x - points[n - 2].x), 0.55 * (p.y - points[n - 2].y));
+        } else {
+            (&points[i - 1], &points[i + 1])
+        };
+        (0.7 * (next.x - prev.x), 0.7 * (next.y - prev.y))
+    };
+    let mut out = vec![points[0]];
+    for i in 0..n - 1 {
+        let (p1, p2) = (&points[i], &points[i + 1]);
+        let (t1, t2) = (tangent(i), tangent(i + 1));
+        // Bézier control points of the span.
+        let b1 = (p1.x + t1.0 / 3.0, p1.y + t1.1 / 3.0);
+        let b2 = (p2.x - t2.0 / 3.0, p2.y - t2.1 / 3.0);
+        let (cx, cy) = (p2.x - p1.x, p2.y - p1.y);
+        let chord = cx.hypot(cy).max(1e-9);
+        let off = |b: (f64, f64)| ((b.0 - p1.x) * cy - (b.1 - p1.y) * cx).abs() / chord;
+        let pieces = ((off(b1).max(off(b2)) / 0.2).sqrt().ceil() as usize).clamp(1, 64);
+        for k in 1..=pieces {
+            let t = k as f64 / pieces as f64;
+            let u = 1.0 - t;
+            let bezier = |a: f64, b: f64, c: f64, d: f64| {
+                u * u * u * a + 3.0 * u * u * t * b + 3.0 * u * t * t * c + t * t * t * d
+            };
+            let mix = |a: f64, b: f64| a + t * (b - a);
+            out.push(Stamp {
+                x: bezier(p1.x, b1.0, b2.0, p2.x),
+                y: bezier(p1.y, b1.1, b2.1, p2.y),
+                radius: mix(p1.radius, p2.radius),
+                thickness: mix(p1.thickness, p2.thickness),
+                alpha: mix(p1.alpha, p2.alpha),
+                corner: false,
+            });
+        }
+    }
+    out
 }
 
 fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: Placement) {
     let size = object.brush_size().unwrap_or(1.0).max(0.0) * at.scale;
     let opacity = object.opacity().clamp(0.0, 1.0);
+    let freehand = object.header.len() == 88;
     let mut stamps: Vec<Stamp> = (0..object.points.len())
         .filter_map(|index| object.point(index))
         .map(|point| {
+            // Header 92 objects draw as if at rest (CSP draws them straight too).
+            let velocity = if freehand { point.values[2] as f64 } else { 0.0 };
             let pressure = point.values[0] as f64;
             Stamp {
                 x: (point.x + at.offset.0) * at.scale,
                 y: (point.y + at.offset.1) * at.scale,
-                radius: size * brush.size.factor(pressure),
-                thickness: brush.tip.thickness_at(pressure),
-                alpha: opacity * brush.opacity.factor(pressure),
+                radius: size * brush.size.factor(pressure, velocity),
+                thickness: brush.tip.thickness_at(pressure, velocity),
+                corner: point.flags & 0x2 != 0,
+                alpha: opacity * brush.opacity.factor(pressure, velocity),
             }
         })
         .collect();
@@ -405,15 +507,9 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
         return;
     }
     if object.is_closed() && stamps.len() > 2 {
-        let first = &stamps[0];
-        stamps.push(Stamp {
-            x: first.x,
-            y: first.y,
-            radius: first.radius,
-            thickness: first.thickness,
-            alpha: first.alpha,
-        });
+        stamps.push(stamps[0]);
     }
+    let stamps = if freehand { smooth(&stamps, object.is_closed() && stamps.len() > 3) } else { stamps };
     // Coverage of the whole object (the union of its segments), then one
     // blend: a pen stroke does not darken where it overlaps itself.
     let margin = stamps.iter().map(|s| s.radius).fold(0.0, f64::max) + 2.0;
@@ -589,10 +685,29 @@ mod tests {
         curves.insert(1, Curve { points: vec![(0.0, 0.0), (1.0, 1.0)] });
         let effector = [0x11u32, 0, 1].iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<_>>();
         let follows = Tip { thickness_effector: Effector::parse(&effector, &curves), ..Tip::default() };
-        let thickness = follows.thickness_at(0.5);
+        let thickness = follows.thickness_at(0.5, 0.0);
         assert!((width(&follows, 20.0, thickness, 0.0) - 37.9).abs() < 0.5);
         assert!((width(&follows, 20.0, thickness, 90.0) - 19.2).abs() < 0.5);
-        assert!((width(&follows, 20.0, follows.thickness_at(1.0), 90.0) - 38.9).abs() < 0.5);
+        assert!((width(&follows, 20.0, follows.thickness_at(1.0, 0.0), 90.0) - 38.9).abs() < 0.5);
+    }
+
+    #[test]
+    fn freehand_strokes_are_a_spline_through_their_points() {
+        let stamp = |x: f64, y: f64| Stamp { x, y, radius: 4.0, thickness: 1.0, alpha: 1.0, corner: false };
+        let v = smooth(&[stamp(60.0, 60.0), stamp(340.0, 340.0), stamp(620.0, 60.0)], false);
+        // The centre of CSP's stroke through these points (V6 section 7).
+        let y_at = |x: f64| {
+            let w = v.windows(2).find(|w| w[0].x <= x && x <= w[1].x).unwrap();
+            w[0].y + (w[1].y - w[0].y) * (x - w[0].x) / (w[1].x - w[0].x)
+        };
+        for (x, csp) in [(150.0, 188.1), (200.0, 256.1), (250.0, 305.5), (300.0, 333.2)] {
+            assert!((y_at(x) - csp).abs() < 4.0, "{x}: {} vs {csp}", y_at(x));
+        }
+        // A corner (point flag 0x2) keeps the lines straight.
+        let mut corner = stamp(340.0, 340.0);
+        corner.corner = true;
+        let straight = smooth(&[stamp(60.0, 60.0), corner, stamp(620.0, 60.0)], false);
+        assert!(straight.iter().all(|s| (s.y - if s.x <= 340.0 { s.x } else { 680.0 - s.x }).abs() < 1e-6));
     }
 
     #[test]
@@ -601,8 +716,14 @@ mod tests {
         curves.insert(4, Curve { points: vec![(0.0, 0.0), (1.0, 1.0)] });
         let data = [0x11u32, 0.5f32.to_bits(), 4].iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<_>>();
         let effector = Effector::parse(&data, &curves);
-        assert_eq!(effector.factor(0.0), 0.5);
-        assert_eq!(effector.factor(1.0), 1.0);
-        assert_eq!(Effector::parse(&1u32.to_be_bytes(), &curves).factor(0.0), 1.0);
+        assert_eq!(effector.factor(0.0, 0.0), 0.5);
+        assert_eq!(effector.factor(1.0, 0.0), 1.0);
+        assert_eq!(Effector::parse(&1u32.to_be_bytes(), &curves).factor(0.0, 0.0), 1.0);
+        // Pressure and velocity (CSP: minimum 0.6 → 0.8 at velocity 0.5,
+        // minimum 0.2 → 0.4 at 0.75).
+        let both = [0x51u32, 0, 4, 0.6f32.to_bits()].iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<_>>();
+        assert!((Effector::parse(&both, &curves).factor(1.0, 0.5) - 0.8).abs() < 1e-6);
+        let velocity = [0x41u32, 0.2f32.to_bits()].iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<_>>();
+        assert!((Effector::parse(&velocity, &curves).factor(1.0, 0.75) - 0.4).abs() < 1e-6);
     }
 }

@@ -123,7 +123,12 @@ fn effector(round: &str) -> Option<(Vec<u8>, Option<Vec<f64>>)> {
         "h" => (vec![0x41, 0.6f32.to_bits()], None),
         "i" => (vec![0x11, 0, 1], Some(vec![0.0, 0.0, 0.2, 0.6, 0.5, 0.3, 0.8, 0.9, 1.0, 1.0])),
         "j" => (vec![0x11, 0, 1], Some(vec![0.0, 0.0, 0.3, 0.0, 0.6, 1.0, 1.0, 1.0])),
-        "k" | "l" | "m" => (vec![0x11, 0, 1], linear),
+        "k" | "l" | "m" | "s" | "u" => (vec![0x11, 0, 1], linear),
+        "va" => (vec![0x41, 0.6f32.to_bits()], None),
+        "vb" => (vec![0x41, 0.2f32.to_bits()], None),
+        "vc" => (vec![0x51, 0, 1, 0.6f32.to_bits()], linear),
+        "vd" => (vec![0x81, 0.2f32.to_bits()], None),
+        "ve" => (vec![0x101, 0.2f32.to_bits()], None),
         _ => panic!("unknown round {round}"),
     };
     Some((words.iter().flat_map(|w| w.to_be_bytes()).collect(), curve))
@@ -179,6 +184,46 @@ impl Parts<'_> {
             (x0 + length + reach).ceil() as i32,
             (y + reach).ceil() as i32,
         ]);
+        object
+    }
+
+    /// A stroke through `points` (x, y, pressure), value 10 set to 0.
+    fn path(&self, points: &[(f64, f64, f32)], size: f64) -> VectorObject {
+        self.path_with(points, size, 0.0)
+    }
+
+    /// A stroke through `points` (x, y, pressure) with value 10 at every point.
+    fn path_with(&self, points: &[(f64, f64, f32)], size: f64, value10: f32) -> VectorObject {
+        let mut object = self.prototype.clone();
+        object.set_brush_size(size);
+        let reach = size + 2.0;
+        let count = points.len();
+        let mut all = [f64::MAX, f64::MAX, f64::MIN, f64::MIN];
+        object.points = points
+            .iter()
+            .enumerate()
+            .map(|(i, &(x, y, pressure))| {
+                let mut raw = match i {
+                    0 => self.first.to_vec(),
+                    _ if i == count - 1 => self.last.to_vec(),
+                    _ => self.middle.to_vec(),
+                };
+                let (nx, ny, _) = points.get(i + 1).copied().unwrap_or((x, y, pressure));
+                put(&mut raw, 0, &x.to_be_bytes());
+                put(&mut raw, 8, &y.to_be_bytes());
+                put(&mut raw, 36, &pressure.to_be_bytes());
+                put(&mut raw, 76, &value10.to_be_bytes());
+                let bbox = [x.min(nx) - reach, y.min(ny) - reach, x.max(nx) + reach, y.max(ny) + reach];
+                for (k, v) in bbox.iter().enumerate() {
+                    let v = if k < 2 { v.floor() } else { v.ceil() };
+                    put(&mut raw, 16 + 4 * k, &(v as i32).to_be_bytes());
+                }
+                all = [all[0].min(bbox[0]), all[1].min(bbox[1]), all[2].max(bbox[2]), all[3].max(bbox[3])];
+                raw
+            })
+            .collect();
+        put(&mut object.header, 16, &(count as u32).to_be_bytes());
+        object.set_bbox([all[0].floor() as i32, all[1].floor() as i32, all[2].ceil() as i32, all[3].ceil() as i32]);
         object
     }
 }
@@ -242,6 +287,40 @@ fn main() -> Result<()> {
             "UPDATE BrushEffectorGraphData SET ControlPoints = ?1, ControlNumber = 3",
             [Value::Blob(points)],
         )?;
+    } else if round == "s" {
+        // How CSP joins points: a V, a zigzag and an open square (size 4,
+        // pressure 1); pressure between points (size 20, linear curve).
+        objects.push(parts.path(&[(60.0, 60.0, 1.0), (340.0, 340.0, 1.0), (620.0, 60.0, 1.0)], 4.0));
+        let zigzag: Vec<(f64, f64, f32)> =
+            (0..5).map(|i| (760.0 + 140.0 * i as f64, if i % 2 == 0 { 60.0 } else { 340.0 }, 1.0)).collect();
+        objects.push(parts.path(&zigzag, 4.0));
+        objects
+            .push(parts.path(&[(60.0, 460.0, 1.0), (600.0, 460.0, 1.0), (600.0, 780.0, 1.0), (60.0, 780.0, 1.0)], 4.0));
+        objects.push(parts.path(&[(760.0, 520.0, 0.1), (1320.0, 520.0, 1.0)], 20.0));
+        objects.push(parts.path(&[(760.0, 700.0, 1.0), (1040.0, 700.0, 0.1), (1320.0, 700.0, 1.0)], 20.0));
+        println!("V, zigzag, square (size 4); pressure 0.1 → 1 and 1, 0.1, 1 (size 20)");
+    } else if round.starts_with('v') {
+        // Value 2 (velocity) on straight lines: rows 0, 0.1, 0.25, 0.5,
+        // 0.75, 1; columns size 20 and 8 (pressure 1).
+        for (row, value2) in [0.0f32, 0.1, 0.25, 0.5, 0.75, 1.0].into_iter().enumerate() {
+            for (column, size) in [20.0, 8.0].into_iter().enumerate() {
+                let (x0, y) = (60.0 + 660.0 * column as f64, 60.0 + 130.0 * row as f64);
+                let mut object = parts.path(&[(x0, y, 1.0), (x0 + 300.0, y, 1.0), (x0 + 600.0, y, 1.0)], size);
+                for raw in &mut object.points {
+                    put(raw, 44, &value2.to_be_bytes());
+                }
+                objects.push(object);
+            }
+        }
+        println!("value 2 rows 0, 0.1, 0.25, 0.5, 0.75, 1; sizes 20, 8");
+    } else if round == "u" {
+        // Value 10 on a V: 0.3, 1, 2, 4 (size 4, pressure 1).
+        for (k, value10) in [0.3f32, 1.0, 2.0, 4.0].into_iter().enumerate() {
+            let (ox, oy) = ((k % 2) as f64 * 700.0, (k / 2) as f64 * 410.0);
+            let v = [(ox + 60.0, oy + 40.0, 1.0), (ox + 340.0, oy + 360.0, 1.0), (ox + 620.0, oy + 40.0, 1.0)];
+            objects.push(parts.path_with(&v, 4.0, value10));
+        }
+        println!("V with value 10 = 0.3, 1, 2, 4");
     } else if round == "z" {
         // Rows of differently built lines (size 10, pressure 1), to see
         // which point fields CSP needs.
@@ -308,6 +387,13 @@ fn main() -> Result<()> {
                 (Value::Blob(points), (curve.len() / 2) as i64),
             )?;
         }
+    }
+    // Velocity rounds: a round tip, so that only the size changes.
+    if round.starts_with('v') {
+        file.database().execute(
+            "UPDATE BrushStyle SET ThicknessBase = 1, ThicknessEffector = ?1, RotationEffector = 0",
+            [Value::Blob(1u32.to_be_bytes().to_vec())],
+        )?;
     }
     // Rounds k, l and m: round b with anti-aliasing none, weak and strong.
     if let Some(level) = ["k", "l", "m"].iter().position(|r| r == round) {

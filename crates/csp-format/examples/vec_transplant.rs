@@ -187,6 +187,14 @@ fn main() -> Result<()> {
         }
     }
     println!("settings copied faithfully: {faithful}");
+    // `VT_SIZE_EFFECTOR=hex` replaces the size effector (to see what its
+    // flags do on real strokes).
+    if let Ok(hex) = std::env::var("VT_SIZE_EFFECTOR") {
+        let blob: Vec<u8> =
+            (0..hex.len() / 2).filter_map(|i| u8::from_str_radix(&hex[2 * i..2 * i + 2], 16).ok()).collect();
+        tmpl.database().execute("UPDATE BrushStyle SET SizeEffector = ?1", [Value::Blob(blob)])?;
+        println!("size effector {hex}");
+    }
     if let Some(curve) = size_curve {
         let (number, points): (i64, Vec<u8>) = src.database().query_row(
             "SELECT ControlNumber, ControlPoints FROM BrushEffectorGraphData WHERE MainId = ?1",
