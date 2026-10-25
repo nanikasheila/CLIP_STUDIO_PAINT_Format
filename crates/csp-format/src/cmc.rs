@@ -64,8 +64,9 @@ impl CanvasNode {
 pub struct CmcProject {
     pub version: Option<String>,
     pub root_node: i64,
-    /// `ComicBindPosition` (0 or 1; which one is right binding is not confirmed in CSP).
+    /// `ComicBindPosition`: 1 right binding (右綴じ), 0 left ([`crate::work::Binding`]).
     pub bind_position: i64,
+    /// `ComicStartPage`: 0 the first page is on the left, 1 on the right.
     pub start_page: i64,
     pub cover: bool,
     /// `DefaultPageUnit` (0 = px, 2 = mm in the samples).
@@ -156,6 +157,25 @@ impl CmcFile {
             id = node.next;
         }
         Ok(pages)
+    }
+
+    /// Each page's position in the work (pages counted from 0, a spread
+    /// counts 2) and side, from the page list: what CSP writes into the
+    /// page files' `ComicPageIndex` / `ComicIsLeftPage` when it opens them.
+    /// Works with a cover number their 表3・表4 pages differently.
+    pub fn positions(&self) -> Result<Vec<crate::work::PageSlot>> {
+        let start = crate::work::StartSide::from_code(self.project.start_page);
+        let mut position = 0;
+        let mut slots = Vec::new();
+        for page in self.pages()? {
+            slots.push(crate::work::PageSlot {
+                position,
+                spread: page.spread,
+                left: crate::work::is_left_page(position, start),
+            });
+            position += if page.spread { 2 } else { 1 };
+        }
+        Ok(slots)
     }
 
     /// Absolute path of each page file, given the .cmc's folder.
