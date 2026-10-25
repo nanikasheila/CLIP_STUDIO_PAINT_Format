@@ -444,6 +444,28 @@ tz_a では同じデータを CSP と 1.03 で描けるので、0x41 の差は�
 画像の先端（`PatternStyle` 1・2、`TexturePattern`）、紙質（`TextureFlag`・`TextureScale` など）、デュアルブラシ（`DualStyleIndex`）、ブラシ濃度の影響（`FlowEffector` 0x51）と `StyleFlag` 0x10 だけだった。
 これらは描かないもの（要求 4 章）なので、0x41 の差は近似の対象外の差とする。コーパスの 320 行では `StyleFlag` 0x10 と `PatternStyle` > 0 が完全に一致し、0x10 は画像の先端を使う印とみられる（模様の表のない試験ファイルで 0x10 を立てると CSP が落ちたことと合う）
 
+## 8. 作品（.cmc）の書き出し（2026-10-25、R14）
+
+### 作り方
+
+`examples/cmc_edit.rs SOURCE.cmc OUT_DIR`。コーパスの 27 ページの作品を読み（元のファイルは変えない）、`made/cmc1/` に新しい作品として書いた。
+
+- 先頭の 4 ページ（3 ページ目にあたる 1 つは見開き）を残し、残りの 23 ページを `remove_page` で外す
+- `add_page` で 1 ページ目の後ろにページを足す（ファイル名は `MaxCanvasFileIndex` + 1）
+- `reorder` で最後の 2 つを入れ替える
+- 書いた各ページに元の順番の数だけ黒い棒を描いたレイヤーを足し（足したページは 5 本）、プレビューを作り直し、ファイル ID を新しくする
+
+期待するページ一覧の並びは棒の本数で 1・5・2・4・3。
+
+### 結果
+
+- `cspf check`: 5 ページと .cmc がすべて合格（連結リストが閉じ、リンク先がすべてある）
+- CSP EX で .cmc を開くと、ページ管理の一覧が棒の本数 1・5・2（見開き）・4・3 の順に並び、各ページのサムネイルは書き出したプレビューのまま出た
+- 足したページを開くと、足したレイヤーを含めて正しく表示された。閉じるときに CSP が「変更されています」と保存を尋ねた。
+  保存したファイルと書き出したファイルを比べると、CSP が直したのは作品の中の位置（`ComicPageIndex` 0 → 1、`ComicIsLeftPage` 1 → 0、
+  `CropFrameOptionFlag` 2 → 4）と作品情報のレイヤーのテキスト、それに CSP が保存のたびに足す表（`LayerComp` など）だった（07 章）。.cmc は CSP が保存しても変わらなかった
+- R14 の「書いた .cmc を CSP EX で開ける」を満たす。ページのファイルの位置の列を書き直す機能はまだない（CSP が開いたときに直す）
+
 ## 再現の手順
 
 ```sh
@@ -463,6 +485,10 @@ cargo run --release --example render_compare -- attr.clip attr_csp.png
 cargo run --release --example tone_test -- effects_tmpl.clip tone_a.clip
 cargo run --release --example tone_test -- effects_tmpl.clip tone_b.clip b
 # CSP で開いて書き出し → tone_a_csp.png、tone_b_csp.png
+
+# 8 章（SOURCE は 4 ページ以上の作品。読むだけ）
+cargo run --release -p csp-format --example cmc_edit -- SOURCE.cmc made/cmc1
+# CSP で made/cmc1/*.cmc を開き、ページ一覧の棒の本数が 1 5 2 4 3 の順か見る
 
 # 7 章（vec_tmpl.clip は CSP の G ペンで線を引いたファイル）
 cargo run --release --example vec_test -- vec_tmpl.clip vec_a.clip a     # a〜m、z、ta〜tj

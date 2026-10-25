@@ -85,6 +85,31 @@ impl Placement {
         height: u32,
         scale: f64,
     ) -> Option<RgbaImage> {
+        self.draw_region(original, level_scale, offset, (0, 0, width, height), scale)
+    }
+
+    /// The output pixels the placed image can cover, `(x0, y0, x1, y1)`, at
+    /// `scale` of the canvas (not clipped to any output).
+    pub fn bounds(&self, offset: (f64, f64), scale: f64) -> (i64, i64, i64, i64) {
+        let xs = self.corners.map(|c| (c.0 + offset.0) * scale);
+        let ys = self.corners.map(|c| (c.1 + offset.1) * scale);
+        let min = |v: [f64; 4]| v.iter().copied().fold(f64::INFINITY, f64::min).floor() as i64;
+        let max = |v: [f64; 4]| v.iter().copied().fold(f64::NEG_INFINITY, f64::max).ceil() as i64;
+        (min(xs), min(ys), max(xs), max(ys))
+    }
+
+    /// [`Placement::draw`] for the part `(left, top, width, height)` of the
+    /// output only: the result is `width` × `height` with its top-left at
+    /// output pixel (`left`, `top`).
+    pub fn draw_region(
+        &self,
+        original: &RgbaImage,
+        level_scale: f64,
+        offset: (f64, f64),
+        region: (u32, u32, u32, u32),
+        scale: f64,
+    ) -> Option<RgbaImage> {
+        let (left, top, width, height) = region;
         let m = self.inverse(offset)?;
         let premultiplied: Vec<[f32; 4]> = original
             .pixels
@@ -100,17 +125,15 @@ impl Placement {
         // Inside the image, samples near its edge repeat the edge pixels.
         let texel = |x: i64, y: i64| premultiplied[(y.clamp(0, oh - 1) * ow + x.clamp(0, ow - 1)) as usize];
         // Only the outputs inside the corners' bounding box can be covered.
-        let xs = self.corners.map(|c| (c.0 + offset.0) * scale);
-        let ys = self.corners.map(|c| (c.1 + offset.1) * scale);
-        let x0 = xs.iter().copied().fold(f64::INFINITY, f64::min).floor().max(0.0) as u32;
-        let x1 = (xs.iter().copied().fold(f64::NEG_INFINITY, f64::max).ceil().max(0.0) as u32).min(width);
-        let y0 = ys.iter().copied().fold(f64::INFINITY, f64::min).floor().max(0.0) as u32;
-        let y1 = (ys.iter().copied().fold(f64::NEG_INFINITY, f64::max).ceil().max(0.0) as u32).min(height);
+        let (bx0, by0, bx1, by1) = self.bounds(offset, scale);
+        let clip = |value: i64, start: u32, size: u32| (value - start as i64).clamp(0, size as i64) as u32;
+        let (x0, x1) = (clip(bx0, left, width), clip(bx1, left, width));
+        let (y0, y1) = (clip(by0, top, height), clip(by1, top, height));
         let mut out = RgbaImage::new(width, height);
         for y in y0..y1 {
             for x in x0..x1 {
-                let cx = (x as f64 + 0.5) / scale;
-                let cy = (y as f64 + 0.5) / scale;
+                let cx = ((x + left) as f64 + 0.5) / scale;
+                let cy = ((y + top) as f64 + 0.5) / scale;
                 let d = m[6] * cx + m[7] * cy + m[8];
                 if d.abs() < 1e-12 {
                     continue;
@@ -225,5 +248,22 @@ mod tests {
         let image = placement.draw(&original, 1.0, (0.0, 0.0), 20, 10, 1.0).unwrap();
         assert_eq!(image.pixel(2, 5), [0, 0, 255, 255]);
         assert_eq!(image.pixel(17, 5), [255, 0, 0, 255]);
+    }
+
+    #[test]
+    fn a_region_is_the_same_part_of_the_whole() {
+        let mut original = RgbaImage::new(3, 3);
+        for (i, pixel) in original.pixels.chunks_mut(4).enumerate() {
+            pixel.copy_from_slice(&[i as u8 * 20, 100, 200 - i as u8 * 10, 255]);
+        }
+        let placement = Placement::parse(&blob(3, 3, [(3.5, 2.0), (15.0, 4.0), (2.0, 13.0), (14.0, 16.5)])).unwrap();
+        let whole = placement.draw(&original, 1.0, (1.0, 1.0), 24, 20, 1.0).unwrap();
+        let part = placement.draw_region(&original, 1.0, (1.0, 1.0), (5, 4, 8, 9), 1.0).unwrap();
+        for y in 0..9 {
+            for x in 0..8 {
+                assert_eq!(part.pixel(x, y), whole.pixel(x + 5, y + 4));
+            }
+        }
+        assert_eq!(placement.bounds((1.0, 1.0), 1.0), (3, 3, 16, 18));
     }
 }

@@ -192,6 +192,6 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R11 書き戻し | V1 | 済 | [V1](validation/V1-corpus.md): 全件バイト一致 |
 | R12 編集 | V4 V6 | 済 | [V6](validation/V6-made-files.md) 2・5 章: 画素の差し替え・名前・不透明度・合成モード・表示・クリッピング・プレビュー・ファイル ID の更新、ラスターレイヤーとフォルダーの追加・削除を CSP で開いて確認。書き出しとの差は 0〜2/255 |
 | R13 新規作成 | V4 V6 | 済 | [V6](validation/V6-made-files.md) 5.1: 大きさ・解像度・用紙の色（なしを含む）を変えた 3 件が自己検査を通り、CSP で開けて書き出しと全画素一致。CSP で保存し直したファイルとの構造差分を記録 |
-| R14 .cmc | V1 V6 | 一部 | [V1](validation/V1-corpus.md): 42 件合格。CSP での確認（V6）は未 |
+| R14 .cmc | V1 V6 | 済 | [V1](validation/V1-corpus.md): 42 件合格。[V6](validation/V6-made-files.md) 8 章: ページの削除・追加・並べ替えをした作品を CSP EX で開き、書いた順に並ぶことを確認 |
 | R15 CLI | V5 | 済 | `crates/cspf/tests/cli.rs`: 各コマンドを `cspf new` で作ったファイルで実行（CI） |
 | R16 Python | V7 | 未 | |

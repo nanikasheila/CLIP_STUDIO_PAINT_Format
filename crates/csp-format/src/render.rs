@@ -628,6 +628,17 @@ impl Renderer<'_> {
                 None => {}
             }
         }
+        // CSP draws an image material into the layer at the canvas's size and
+        // makes the smaller views by halving that, so drawing it straight at
+        // the preview's size samples it differently (3.7–14 dB worse on the
+        // corpus files checked, V3).
+        if layer.kind == LayerKind::ImageMaterial
+            && !full
+            && let Some((image, origin)) = self.material_at_canvas_size(layer)?
+        {
+            self.report.material_layers += 1;
+            return Ok(Some(Content { buffer: self.place(image, origin, 1.0), mode: Some(mode), masked: false }));
+        }
         let drawn = if layer.kind == LayerKind::ImageMaterial {
             self.material(layer, full)?.inspect(|_| self.report.material_layers += 1)
         } else if layer.kind == LayerKind::Vector {
@@ -711,6 +722,36 @@ impl Renderer<'_> {
         let offset = (layer.offset.0 as f64, layer.offset.1 as f64);
         let image = offscreen.to_rgba()?;
         Ok(placement.draw(&image, level_scale, offset, width, height, scale))
+    }
+
+    /// An image material drawn at the canvas's size, only over the part it
+    /// covers (a whole canvas-sized buffer per material does not fit in
+    /// memory for large sheets). The part starts on a 256-pixel boundary so
+    /// that halving it keeps the grid of the canvas-sized image.
+    fn material_at_canvas_size(&self, layer: &Layer) -> Result<Option<(RgbaImage, (i64, i64))>> {
+        let original = layer.row.int("ResizableOriginalMipmap");
+        let Some(placement) = layer.row.blob("ResizableImageInfo").and_then(|data| Placement::parse(data).ok()) else {
+            return Ok(None);
+        };
+        if original == 0 {
+            return Ok(None);
+        }
+        let (width, height) = (self.file.canvas.width_px as i64, self.file.canvas.height_px as i64);
+        let offset = (layer.offset.0 as f64, layer.offset.1 as f64);
+        let (x0, y0, x1, y1) = placement.bounds(offset, 1.0);
+        let (x0, y0) = ((x0.clamp(0, width) / 256) * 256, (y0.clamp(0, height) / 256) * 256);
+        let (x1, y1) = (x1.clamp(0, width), y1.clamp(0, height));
+        if x1 <= x0 || y1 <= y0 {
+            return Ok(None);
+        }
+        let wanted = placement.magnification().min(1.0);
+        let Some((offscreen, level_scale)) = self.level(original, wanted)? else { return Ok(None) };
+        if offscreen.data.is_none() {
+            return Ok(None);
+        }
+        let region = (x0 as u32, y0 as u32, (x1 - x0) as u32, (y1 - y0) as u32);
+        let image = offscreen.to_rgba()?;
+        Ok(placement.draw_region(&image, level_scale, offset, region, 1.0).map(|image| (image, (x0, y0))))
     }
 
     /// The mipmap level to read for the output scale: the smallest stored
