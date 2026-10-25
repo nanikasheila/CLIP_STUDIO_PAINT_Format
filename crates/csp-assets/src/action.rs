@@ -26,6 +26,52 @@ use serde_json::Value as Json;
 use crate::error::{Error, Result};
 use crate::serial::{Document, Object, Value};
 
+/// The name CSP's auto action palette shows for a command, for the kinds
+/// in `action-kinds.tsv` (W3: all of them loaded into CSP); `None` for others.
+pub fn kind_name(kind: &str) -> Option<&'static str> {
+    KIND_NAMES.iter().find(|(k, _)| *k == kind).map(|(_, name)| *name)
+}
+
+const KIND_NAMES: &[(&str, &str)] = &[
+    ("92015820-D5B9-44D4-81B6-1F674762E420", "放射ぼかし"),
+    ("FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF", "ガウスぼかし"),
+    ("adjustmentactionToneCurve", "トーンカーブ"),
+    ("adjustmentactiongradientmap", "グラデーションマップ"),
+    ("adjustmentactionhsv", "色相・彩度・明度"),
+    ("applicationactionchangecurrentcolor", "描画色の変更"),
+    ("editactionbordering", "選択範囲をフチ取り"),
+    ("editactionchangelinecolor", "線の色を描画色に変更"),
+    ("editactioncut", "切り取り"),
+    ("editactiondetailpaint", "高度な塗りつぶし"),
+    ("editactionpaint", "塗りつぶし"),
+    ("editactionpaste", "貼り付け"),
+    ("layeractionchangebelowclip", "下のレイヤーでクリッピングの変更"),
+    ("layeractionchangedraftlayer", "下描きレイヤーの設定"),
+    ("layeractionchangename", "レイヤー名の変更"),
+    ("layeractioncopy", "レイヤーを複製"),
+    ("layeractiondelete", "レイヤーを削除"),
+    ("layeractionfoldernewandinsert", "フォルダーを作成してレイヤーを挿入"),
+    ("layeractionmergealllayer", "画像を統合"),
+    ("layeractionmergelowerlayer", "下のレイヤーと結合"),
+    ("layeractionmergeselectedlayer", "選択中のレイヤーを結合"),
+    ("layeractionmergevisiblelayercopy", "表示レイヤーのコピーを結合"),
+    ("layeractionrasterdetailnew", "新規ラスターレイヤー（詳細）"),
+    ("layeractionrasterize", "ラスタライズ"),
+    ("layeractionrasternew", "新規ラスターレイヤー"),
+    ("layeractionselectcontinuouslayer", "指定したレイヤーまでを選択"),
+    ("layeractionselectlowerlayer", "下のレイヤーを編集対象にする"),
+    ("layeractionselectupperlayer", "上のレイヤーを編集対象にする"),
+    ("layeractionsetcompositemode", "合成モードの変更"),
+    ("layeractionsetcurrentlayer", "編集レイヤーの変更"),
+    ("layeractionsetopacity", "不透明度の変更"),
+    ("layeractionsetuselayercolor", "レイヤーカラー使用の変更"),
+    ("layeractionsetusetone", "トーン使用の変更"),
+    ("selectactiondeselect", "選択を解除"),
+    ("selectactionexpand", "選択範囲を拡張"),
+    ("selectactionreduce", "選択範囲を縮小"),
+    ("toolactionmovelayer", "レイヤーを移動"),
+];
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ActionItem {
     pub kind: String,
@@ -169,6 +215,8 @@ mod tests {
         assert_eq!(set.name(), "Test");
         let actions = set.actions();
         assert_eq!(actions[0].items[0].kind, "layeractionrasterdetailnew");
+        assert_eq!(kind_name("layeractionrasterdetailnew"), Some("新規ラスターレイヤー（詳細）"));
+        assert_eq!(kind_name("unknown"), None);
         assert!(actions[0].items[0].enabled);
         assert_eq!(actions[0].items[0].parameter["layername"], "下描き");
         set.set_enabled(0, 0, false).unwrap();

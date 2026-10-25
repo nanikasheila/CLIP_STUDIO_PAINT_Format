@@ -96,7 +96,11 @@ fn colour_sets_actions_gradients_and_corpus() {
     let las = path(dir.path(), "test.las");
     std::fs::write(&las, testing::action_set().to_bytes()).unwrap();
     let text = ok(&["asset", "actions", &las]);
-    assert!(text.contains("下描きレイヤーの作成") && text.contains("[x] layeractionrasterdetailnew"), "{text}");
+    assert!(
+        text.contains("下描きレイヤーの作成")
+            && text.contains("[x] layeractionrasterdetailnew  新規ラスターレイヤー（詳細）"),
+        "{text}"
+    );
     let dumped = path(dir.path(), "test.json");
     std::fs::write(&dumped, ok(&["asset", "dump", &las])).unwrap();
     let again = path(dir.path(), "again.las");

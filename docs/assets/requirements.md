@@ -181,7 +181,7 @@ SQLite 系の全形式について、表・列・型・行数・観察された�
 | A5 サブツール設定の意味 | W4 | 一部 | [目録](spec/subtool-columns.tsv) は全 530 列に記述と確度あり。[W4](validation/W3-csp.md) で 18 列を確認済み、残りのペン・ブラシの列は推測 |
 | A6 サブツールの書き出し | W2 W3 | 済 | [W1](validation/W1-samples.md) の抽出の再現、`cspf/tests/asset.rs`、[W3](validation/W3-csp.md): 書いた `.sut` 3 件を CSP で読み込み、変えた値を確認 |
 | A7 型付き直列化 | W1 W2 | 済 | [W1](validation/W1-samples.md)、`serial::tests` |
-| A8 オートアクション | W1 W3 | 一部 | W1 合格。[W3](validation/W3-csp.md): 書いた `.laf` を CSP で読み込み、名前・項目・オン・オフ・パラメーターを確認（真偽の書き方を修正）。種類の意味の一覧は未 |
+| A8 オートアクション | W1 W3 | 済 | W1 合格。[W3](validation/W3-csp.md): 書いた `.laf` を CSP で読み込み、名前・項目・オン・オフ・パラメーターを確認（真偽の書き方を修正）。サンプルの 37 種類すべての CSP での名前を確認（[一覧](spec/action-kinds.tsv)、`action::kind_name`） |
 | A9 グラデーションセット | W1 W3 | 一部 | W1 合格。CSP に `.sgs` のファイル読み込みはない（[W3](validation/W3-csp.md)）。表示との照合は未 |
 | A10 カラーセット | W1 W3 | 済 | W1 合格。[W3](validation/W3-csp.md): CSP で読み込み、書き出し直すとバイト一致 |
 | A11 素材の目録 | W1 | 済 | [W1](validation/W1-samples.md) |

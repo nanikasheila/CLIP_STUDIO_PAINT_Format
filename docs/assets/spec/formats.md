@@ -66,7 +66,7 @@ JSON の形（`cspf asset dump`）は `serial.rs` の末尾を参照。
 
 - **オートアクション**: `actionSetName`、`applicationUuid`、`actionArray`（`actionName`、`actionUuid`、`actionOpenArray`、
   `actionItemArray`（`actionItemKind`、`actionItemEnable`、`actionItemShowSettings`、`actionItemOpenParameter`、`actionItemParameter`））。
-  コマンドの一覧は [`action-kinds.tsv`](action-kinds.tsv)。
+  コマンドの一覧は [`action-kinds.tsv`](action-kinds.tsv)（CSP のパレットに出る名前は確認済み、W3）。
   CSP の「セットの書き出し」は `.laf` で書き、「セットの読み込み」も `.laf` を読む（W3）。読み込むと `actionUuid` は振り直され、
   そのほか（名前、項目、オン・オフ、パラメーター）はそのまま残る。`actionOpenArray` はパレットで開いているかどうか。
 - **グラデーションセット**: `gradationSetArray`（`gradationSetName`、`gradationItemArray`（`gradationName`、`gradationData`））。
