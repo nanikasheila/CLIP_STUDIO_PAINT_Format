@@ -46,7 +46,8 @@
 //!   the dabs of that range to the widest. `BrushStyle.StyleFlag` bit 0x40 turns the tip a further
 //!   quarter (the angle then names the major axis). A stroke is as wide as the ellipse across the line; the
 //!   anti-aliasing loss grows with how long the ellipse is across the line
-//!   against along it (× 0.4 to × 1.75).
+//!   against along it (× 0.4 to × 1.75), and a tip set to thickness 0.51
+//!   or less (`ThicknessBase`) loses as the medium level whatever the level.
 //!
 //! Not drawn: brush tips other than round, textures, rotation following
 //! pressure or tilt, spray, watercolour and other brush effects.
@@ -423,6 +424,9 @@ struct Edge {
     loss: Option<[f64; 8]>,
 }
 
+/// The middle level's loss, which a thin tip has at every level.
+const MIDDLE_LOSS: [f64; 8] = [1.05, 1.25, 1.45, 1.49, 1.31, 1.18, 1.15, 1.09];
+
 impl Edge {
     /// Radii at which the loss was measured (V6 section 7).
     const RADII: [f64; 8] = [1.0, 1.5, 2.0, 3.0, 4.0, 6.0, 10.0, 20.0];
@@ -431,7 +435,7 @@ impl Edge {
         let loss = match anti_alias {
             ..=0 => None,
             1 => Some([1.05, 1.25, 1.13, 1.05, 0.91, 0.91, 0.82, 0.65]),
-            2 => Some([1.05, 1.25, 1.45, 1.49, 1.31, 1.18, 1.15, 1.09]),
+            2 => Some(MIDDLE_LOSS),
             _ => Some([1.05, 1.25, 1.45, 1.71, 1.68, 1.47, 1.44, 1.42]),
         };
         Edge { loss }
@@ -446,11 +450,15 @@ impl Edge {
     }
 
     /// Coverage of a pixel whose centre is `distance` from the spine of a
-    /// stroke of `radius`.
-    fn coverage(self, radius: f64, distance: f64, loss_factor: f64) -> f64 {
+    /// stroke of `radius`, drawn with a tip set to `thickness`.
+    fn coverage(self, radius: f64, distance: f64, loss_factor: f64, thickness: f64) -> f64 {
         let Some(table) = self.loss else { return if distance <= radius { 1.0 } else { 0.0 } };
+        // Every level loses as the middle one with a tip of thickness 0.51
+        // or less (CSP: levels 1, 2 and 3 within 1%), and its own at 1.
+        let thin = ((1.0 - thickness) / 0.49).clamp(0.0, 1.0);
+        let loss = Self::loss_at(&table, radius) * (1.0 - thin) + Self::loss_at(&MIDDLE_LOSS, radius) * thin;
         // The ink across the stroke; thin strokes keep about their radius.
-        let ink = (2.0 * radius - Self::loss_at(&table, radius) * loss_factor).max(radius);
+        let ink = (2.0 * radius - loss * loss_factor).max(radius);
         if ink >= 1.0 { (ink / 2.0 - distance + 0.5).clamp(0.0, 1.0) } else { ink * (1.0 - distance).clamp(0.0, 1.0) }
     }
 }
@@ -567,6 +575,10 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
     let mut coverage = vec![0f32; w * h];
     let edge = Edge::of(brush.anti_alias);
     let elliptic = brush.tip.elliptic();
+    // The anti-aliasing follows the tip's set thickness, not the thickness
+    // after its effector (CSP: a brush thinned by pressure from 1.02 keeps
+    // its level).
+    let base_thickness = if elliptic { brush.tip.thickness } else { 1.0 };
     let segments: Vec<(&Stamp, &Stamp)> = if stamps.len() == 1 {
         vec![(&stamps[0], &stamps[0])]
     } else {
@@ -617,7 +629,7 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
                 let radius = half_a + t * (half_b - half_a);
                 let loss = across_a.loss + t * (across_b.loss - across_a.loss);
                 let alpha = a.alpha + t * (b.alpha - a.alpha);
-                let inside = edge.coverage(radius, distance, loss);
+                let inside = edge.coverage(radius, distance, loss, base_thickness);
                 let value = (inside * alpha) as f32;
                 let cell = &mut coverage[(py - y0) as usize * w + (px - x0) as usize];
                 if value > *cell {
@@ -693,7 +705,7 @@ mod tests {
     fn stroke_width_is_twice_the_size_less_the_anti_aliasing() {
         let width = |anti_alias: i64, radius: f64| -> f64 {
             let edge = Edge::of(anti_alias);
-            (-40..=40).map(|y| edge.coverage(radius, (y as f64 + 0.5 - 0.3).abs(), 1.0)).sum()
+            (-40..=40).map(|y| edge.coverage(radius, (y as f64 + 0.5 - 0.3).abs(), 1.0, 1.0)).sum()
         };
         // CSP: radius 20 → 40, 39.35, 38.91, 38.58 px of ink.
         assert_eq!(width(0, 20.0), 40.0);
@@ -705,6 +717,11 @@ mod tests {
         assert!((width(2, 2.5) - 3.48).abs() < 0.15);
         // A thin stroke keeps about its radius of ink (CSP 0.5 at 0.5).
         assert!((width(2, 0.5) - 0.5).abs() < 0.1);
+        // A thin tip loses as the middle level at every level.
+        let thin = |level: i64| -> f64 {
+            (-40..=40).map(|y| Edge::of(level).coverage(4.0, (y as f64 + 0.5 - 0.3).abs(), 1.0, 0.51)).sum()
+        };
+        assert!((thin(1) - thin(2)).abs() < 1e-9 && (thin(3) - thin(2)).abs() < 1e-9);
     }
 
     #[test]
@@ -713,7 +730,7 @@ mod tests {
         let width = |tip: &Tip, radius: f64, thickness: f64, degrees: f64| -> f64 {
             let u = (degrees.to_radians().cos(), degrees.to_radians().sin());
             let across = tip.across(radius, thickness, u);
-            (-60..=60).map(|y| pen.coverage(across.half, (y as f64 + 0.5 - 0.3).abs(), across.loss)).sum()
+            (-60..=60).map(|y| pen.coverage(across.half, (y as f64 + 0.5 - 0.3).abs(), across.loss, thickness)).sum()
         };
         let tip =
             |rotation: f64, rotation_flags: i64| Tip { thickness: 0.4, rotation, rotation_flags, ..Tip::default() };
