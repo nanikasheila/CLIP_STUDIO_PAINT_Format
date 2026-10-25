@@ -5,7 +5,7 @@
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use csp_assets::action::ActionSet;
+use csp_assets::action::{ActionSet, kind_name};
 use csp_assets::colorset::{Color, ColorSet};
 use csp_assets::gradient::GradientSet;
 use csp_assets::kind::{Family, detect};
@@ -362,7 +362,8 @@ fn actions(path: &Path) -> Result<bool> {
         for item in action.items {
             let mark = if item.enabled { "x" } else { " " };
             let dialog = if item.show_settings { "  (dialog)" } else { "" };
-            println!("    [{mark}] {}{dialog}", item.kind);
+            let name = kind_name(&item.kind).map(|n| format!("  {n}")).unwrap_or_default();
+            println!("    [{mark}] {}{name}{dialog}", item.kind);
         }
     }
     Ok(true)
