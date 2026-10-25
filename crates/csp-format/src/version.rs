@@ -14,9 +14,11 @@
 //!
 //! Since 1.12 CSP marks its own file format level with `Layer.Has1_0_N`
 //! columns (N = 6 … 19 so far). They are registered with lock type 4 and
-//! lock scope 2 (the canvas): a CSP that meets data it cannot use locks the
+//! lock scope 2 (the canvas): a CSP that meets a set column it does not know
+//! locks that scope, or only the layer when the alternative lock (1, 0,
+//! from `Has1_0_8` on) is registered. Without the alternative it locks the
 //! whole canvas, unless the file carries version compatibility information
-//! (Preferences > File details, since 1.13.0).
+//! (Preferences > File > Version compatibility, since 1.13.0).
 //!
 //! The generation table and the CSP versions are learnt from the corpus and
 //! CSP's release notes; see `docs/spec/08-versions.md`.
@@ -118,7 +120,9 @@ pub struct VersionInfo {
     /// of the saving CSP), if any.
     pub format_level: Option<u32>,
     /// Columns with lock type 4 and no link whose value is set in some row:
-    /// features an older CSP cannot use (it then locks the scope).
+    /// a CSP that does not know such a column locks the scope its
+    /// registration names (the canvas for scope 2), or the layer when the
+    /// alternative lock is 1 (checked in CSP 5.1.4).
     pub locking_features: Vec<String>,
     /// Highest N among set `Has1_0_N` columns: CSP needs format level N or
     /// newer to edit the file without a lock.

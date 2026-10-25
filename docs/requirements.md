@@ -202,4 +202,4 @@ CSP の新旧の版で保存したファイルを、同じように読み書き�
 | R14 .cmc | V1 V6 | 済 | [V1](validation/V1-corpus.md): 42 件合格。[V6](validation/V6-made-files.md) 8 章: ページの削除・追加・並べ替えをした作品を CSP EX で開き、書いた順に並ぶことを確認 |
 | R15 CLI | V5 | 済 | `crates/cspf/tests/cli.rs`: 各コマンドを `cspf new` で作ったファイルで実行（CI） |
 | R16 Python | V7 | 未 | |
-| R17 版の違い | V1 V8 | 一部 | [V8](validation/V8-versions.md): 761 件を 12 世代に判定（エラー 0）、7 世代の写しを編集して CSP 5.1.4 で開けた。古い版・PRO・DEBUT での確認は未（CSP がない） |
+| R17 版の違い | V1 V8 | 一部 | [V8](validation/V8-versions.md): 761 件を 12 世代に判定（エラー 0）、7 世代の写しを編集して CSP 5.1.4 で開けた。知らない列のロックの規則を CSP で確認。古い版・PRO・DEBUT での確認は未（CSP がない） |
