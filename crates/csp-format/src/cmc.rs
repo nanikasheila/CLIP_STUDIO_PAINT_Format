@@ -64,7 +64,7 @@ impl CanvasNode {
 pub struct CmcProject {
     pub version: Option<String>,
     pub root_node: i64,
-    /// `ComicBindPosition` (0 = right binding, 1 = left binding in the samples).
+    /// `ComicBindPosition` (0 or 1; which one is right binding is not confirmed in CSP).
     pub bind_position: i64,
     pub start_page: i64,
     pub cover: bool,

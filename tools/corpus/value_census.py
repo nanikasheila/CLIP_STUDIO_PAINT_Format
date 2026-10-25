@@ -9,7 +9,8 @@ How: For every table and column of each file's SQLite chunk: the rows, the
      rows that are not NULL, the rows that are not NULL / 0 / '' / empty
      blob, and for INTEGER / REAL values the distinct values (up to a limit,
      with counts). TEXT and BLOB values are never recorded, only their
-     lengths, so no names or artwork leave the machine.
+     lengths, so no names or artwork leave the machine. The minimum and
+     maximum of the numbers are kept beyond the distinct-value limit.
 
 Usage::
 
@@ -63,6 +64,8 @@ def census_file(path: str, columns: dict) -> None:
                         is_set = len(value) > 0
                     else:
                         is_set = value != 0
+                        entry["min"] = value if entry.get("min") is None else min(entry["min"], value)
+                        entry["max"] = value if entry.get("max") is None else max(entry["max"], value)
                         key = repr(value)
                         if key in entry["values"]:
                             entry["values"][key] += 1

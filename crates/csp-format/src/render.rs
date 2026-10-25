@@ -575,8 +575,16 @@ impl Renderer<'_> {
             gradient.end = (gradient.end.0 + dx, gradient.end.1 + dy);
             self.report.gradient_layers += 1;
             self.report.gradients_approximate += usize::from(gradient.is_approximate());
-            if let Some((border, apply_opacity)) = self.effects(layer) {
-                // A border needs the full-size image (see `pixels`).
+            let opaque = gradient.fill && gradient.ramp.stops.first().is_some_and(|stop| stop.color[3] >= 1.0)
+                || gradient.ramp.stops.iter().all(|stop| stop.color[3] >= 1.0);
+            let canvas_pixels = self.file.canvas.width_px as u64 * self.file.canvas.height_px as u64;
+            if let Some((border, apply_opacity)) = self.effects(layer)
+                // A border shows only where the layer has holes. It needs the
+                // full-size image (see `pixels`), which very large canvases
+                // cannot afford: those are drawn without it.
+                && (layer.mask_enabled || !opaque)
+                && canvas_pixels <= BORDER_PIXELS_MAX
+            {
                 let image = gradient.draw(self.file.canvas.width_px, self.file.canvas.height_px, 1.0);
                 let (buffer, masked) = self.bordered(layer, image, (0, 0), &border, apply_opacity)?;
                 return Ok(Some(Content { buffer, mode: Some(mode), masked }));
@@ -785,6 +793,10 @@ impl Renderer<'_> {
         Ok(Some(placed.data.iter().map(|p| p[0] + outside * (1.0 - p[3])).collect()))
     }
 }
+
+/// The largest canvas (pixels) on which a gradient layer's border is drawn
+/// (it needs several full-size buffers).
+const BORDER_PIXELS_MAX: u64 = 40_000_000;
 
 /// `n` when `factor` is 1/2ⁿ (n ≥ 1), else 0.
 fn exact_halvings(factor: f64) -> u32 {
