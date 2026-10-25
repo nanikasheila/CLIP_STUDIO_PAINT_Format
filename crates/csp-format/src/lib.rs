@@ -18,6 +18,7 @@ pub mod effect;
 pub mod error;
 pub mod gradient;
 pub mod image;
+pub mod material;
 pub mod model;
 pub mod offscreen;
 pub mod render;

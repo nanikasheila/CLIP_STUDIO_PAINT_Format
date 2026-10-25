@@ -20,9 +20,11 @@ use crate::effect::{Border, LayerEffects, draw_border};
 use crate::error::Result;
 use crate::gradient::Gradient;
 use crate::image::{GrayImage, RgbaImage};
+use crate::material::Placement;
 use crate::model::{Layer, LayerKind, LayerNode};
 use crate::offscreen::Offscreen;
 use crate::stroke::draw_layer;
+use crate::text::read_blocks;
 
 /// Blending modes, numbered as in `LayerComposite`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
@@ -364,6 +366,10 @@ pub struct RenderReport {
     pub effects_skipped: BTreeMap<String, usize>,
     /// Vector layers drawn from their vector data (see [`crate::stroke`]).
     pub vector_layers: usize,
+    /// Text layers drawn from CSP's rendered text blocks.
+    pub text_layers: usize,
+    /// Image material layers drawn from their original image (see [`crate::material`]).
+    pub material_layers: usize,
     /// Gradient layers drawn from `GradationFillInfo` (see [`crate::gradient`]),
     /// and how many of them only approximately (the 知覚的 mix).
     pub gradient_layers: usize,
@@ -599,6 +605,22 @@ impl Renderer<'_> {
         if let Some((buffer, masked)) = self.pixels(layer)? {
             return Ok(Some(Content { buffer, mode: Some(mode), masked }));
         }
+        if layer.kind == LayerKind::Text
+            && let Some(buffer) = self.text(layer)?
+        {
+            self.report.text_layers += 1;
+            return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
+        }
+        if layer.kind == LayerKind::ImageMaterial
+            && let Some(image) = self.material(layer)?
+        {
+            self.report.material_layers += 1;
+            return Ok(Some(Content {
+                buffer: self.place(image, (0, 0), self.scale),
+                mode: Some(mode),
+                masked: false,
+            }));
+        }
         if layer.kind == LayerKind::Vector
             && let Some(image) = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?
         {
@@ -611,6 +633,55 @@ impl Renderer<'_> {
         }
         *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
         Ok(None)
+    }
+
+    /// A text layer from the images CSP rendered its text blocks into
+    /// (attribute record 50, see [`crate::text`]): each is the size of the
+    /// block's bounding box and placed at its top-left (layer pixels). The
+    /// text itself is not laid out here.
+    fn text(&self, layer: &Layer) -> Result<Option<Buffer>> {
+        let mut buffer: Option<Buffer> = None;
+        let mut seen = Vec::new();
+        for block in read_blocks(&layer.row)? {
+            let (Some(id), Some(bbox)) = (block.attributes.render_offscreen(), block.attributes.bbox()) else {
+                continue;
+            };
+            if id == 0 || seen.contains(&id) {
+                continue;
+            }
+            seen.push(id);
+            let Some(offscreen) = self.file.offscreen(id as i64)? else { continue };
+            if offscreen.data.is_none() {
+                continue;
+            }
+            let origin = (layer.offset.0 + bbox[0] as i64, layer.offset.1 + bbox[1] as i64);
+            let placed = self.place(offscreen.to_rgba()?, origin, 1.0);
+            match &mut buffer {
+                Some(target) => target.composite(&placed, BlendMode::Normal, |_| 1.0),
+                None => buffer = Some(placed),
+            }
+        }
+        Ok(buffer)
+    }
+
+    /// An image material drawn from its original image and placement, at
+    /// the output size (see [`crate::material`]).
+    fn material(&self, layer: &Layer) -> Result<Option<RgbaImage>> {
+        let original = layer.row.int("ResizableOriginalMipmap");
+        let Some(placement) = layer.row.blob("ResizableImageInfo").and_then(|data| Placement::parse(data).ok()) else {
+            return Ok(None);
+        };
+        if original == 0 {
+            return Ok(None);
+        }
+        let wanted = (self.scale * placement.magnification()).min(1.0);
+        let Some((offscreen, level_scale)) = self.level(original, wanted)? else { return Ok(None) };
+        if offscreen.data.is_none() {
+            return Ok(None);
+        }
+        let offset = (layer.offset.0 as f64, layer.offset.1 as f64);
+        let image = offscreen.to_rgba()?;
+        Ok(placement.draw(&image, level_scale, offset, self.width as u32, self.height as u32, self.scale))
     }
 
     /// The mipmap level to read for the output scale: the smallest stored

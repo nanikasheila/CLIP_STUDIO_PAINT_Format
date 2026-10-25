@@ -218,6 +218,16 @@ impl Writer {
 }
 
 /// Adler-32 as used by zlib and by CSP's block checksums.
+/// The big-endian `u32` at `offset`, 0 past the end.
+pub fn be_u32_at(data: &[u8], offset: usize) -> u32 {
+    data.get(offset..offset + 4).map(|b| u32::from_be_bytes(b.try_into().expect("4"))).unwrap_or(0)
+}
+
+/// The big-endian `f64` at `offset`, 0 past the end.
+pub fn be_f64_at(data: &[u8], offset: usize) -> f64 {
+    data.get(offset..offset + 8).map(|b| f64::from_be_bytes(b.try_into().expect("8"))).unwrap_or(0.0)
+}
+
 pub fn adler32(data: &[u8]) -> u32 {
     let (mut a, mut b) = (1u32, 0u32);
     for chunk in data.chunks(5552) {

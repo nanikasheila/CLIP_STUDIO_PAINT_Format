@@ -22,7 +22,7 @@
 //! Coordinates are layer pixels; add `LayerOffsetX/Y` for the canvas. The
 //! parser keeps every byte, so unknown fields are written back unchanged.
 
-use crate::binary::{Reader, Writer};
+use crate::binary::{Reader, Writer, be_f64_at, be_u32_at};
 use crate::error::{Result, bail};
 
 pub const FLAG_CLOSED: u32 = 0x1000;
@@ -44,14 +44,6 @@ pub struct Point {
     pub flags: u32,
     /// The f32 values after the flags (meaning partly unknown, see the spec).
     pub values: [f32; 13],
-}
-
-fn be_u32_at(data: &[u8], offset: usize) -> u32 {
-    data.get(offset..offset + 4).map(|b| u32::from_be_bytes(b.try_into().expect("4"))).unwrap_or(0)
-}
-
-fn be_f64_at(data: &[u8], offset: usize) -> f64 {
-    data.get(offset..offset + 8).map(|b| f64::from_be_bytes(b.try_into().expect("8"))).unwrap_or(0.0)
 }
 
 fn put(data: &mut [u8], offset: usize, bytes: &[u8]) {
