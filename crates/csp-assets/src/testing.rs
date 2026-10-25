@@ -1,6 +1,6 @@
 //! Synthetic files for tests (no CSP data): a tool database with a pen
 //! tool holding two sub tools (one with a brush tip material), an auto
-//! action set, a gradient set and shortcut tables.
+//! action set, a gradient set, shortcut tables and modifier key settings.
 
 use rusqlite::Connection;
 
@@ -154,5 +154,27 @@ pub fn workspace_shortcuts() -> Vec<u8> {
     )
     .unwrap();
     c.execute("INSERT INTO workspaceshortcuttool(uuid, shortcut) VALUES (?1, 'P')", [uuid(2)]).unwrap();
+    csp_format::database::serialize(&c).unwrap()
+}
+
+/// A `.tomd`: common settings (Space → the pen tool of [`tool_db`]) and a
+/// pen row (Shift → operation 100), plus a row without data.
+pub fn modifier_keys() -> Vec<u8> {
+    let words = |w: &[u32]| w.iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<u8>>();
+    let mut common = words(&[8, 1, 36, 8, 2, 0, 16]);
+    common.extend(uuid(2));
+    let pen = words(&[8, 1, 16, 1, 1, 100]);
+    let c = Connection::open_in_memory().unwrap();
+    c.execute_batch(
+        "CREATE TABLE ToolModifyKey(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, Version INTEGER);
+         INSERT INTO ToolModifyKey(Version) VALUES (130);
+         CREATE TABLE ModifyKeySetting(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, InputOperation INTEGER,
+           OutputOperation INTEGER, RangeOperation INTEGER, SettingData BLOB);",
+    )
+    .unwrap();
+    let insert = "INSERT INTO ModifyKeySetting(InputOperation, OutputOperation, RangeOperation, SettingData) VALUES (?1, ?2, 0, ?3)";
+    c.execute(insert, rusqlite::params![0, 0, common]).unwrap();
+    c.execute(insert, rusqlite::params![1, 10, pen]).unwrap();
+    c.execute(insert, rusqlite::params![2, 2, None::<Vec<u8>>]).unwrap();
     csp_format::database::serialize(&c).unwrap()
 }

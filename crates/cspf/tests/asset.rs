@@ -126,3 +126,14 @@ fn shortcuts_with_tool_names() {
     let unnamed = ok(&["asset", "shortcuts", &spws]);
     assert!(unnamed.ends_with(&format!("tool:{}\tP\n", "02".repeat(16))), "{unnamed}");
 }
+
+#[test]
+fn modifier_keys_with_tool_names() {
+    let dir = tempfile::tempdir().unwrap();
+    let tomd = path(dir.path(), "DefaultToolModifyKey.tomd");
+    std::fs::write(&tomd, testing::modifier_keys()).unwrap();
+    let todb = path(dir.path(), "EditImageTool.todb");
+    std::fs::write(&todb, testing::tool_db()).unwrap();
+    let text = ok(&["asset", "modifier-keys", &tomd, "--tools", &todb]);
+    assert_eq!(text, "ops 0 0 0\n  Space\ttool:ペン\nops 1 10 0  (G-ペン)\n  Shift\toperation 100\n");
+}

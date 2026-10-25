@@ -154,6 +154,23 @@ class ShortcutTests(unittest.TestCase):
         with self.assertRaises(CspFormatError):
             shortcut.parse(tool_db())
 
+    def test_modifier_keys(self):
+        words = lambda *w: struct.pack(f">{len(w)}I", *w)  # noqa: E731
+        common = words(8, 2, 36, 10, 2, 0, 16) + b"\x07" * 16 + words(16, 6, 64, 0)
+        c = sqlite3.connect(":memory:")
+        c.executescript("CREATE TABLE ModifyKeySetting(_PW_ID INTEGER PRIMARY KEY, InputOperation INTEGER,"
+                        " OutputOperation INTEGER, RangeOperation INTEGER, SettingData BLOB);")
+        c.execute("INSERT INTO ModifyKeySetting(InputOperation, OutputOperation, RangeOperation, SettingData)"
+                  " VALUES (0, 0, 0, ?), (1, 10, 0, ?), (2, 2, 0, NULL)", (common, words(8, 1, 16, 1, 1, 100)))
+        rules = shortcut.modifier_keys(to_bytes(c))
+        self.assertEqual([r["ops"] for r in rules], [(0, 0, 0), (1, 10, 0)])
+        first, second = rules[0]["entries"]
+        self.assertEqual((first.label(), first.action), ("Ctrl+Space", ("tool", "07" * 16)))
+        self.assertEqual((second.label(), second.action), ("Ctrl+Alt", ("other", 64, "00000000")))
+        self.assertEqual(rules[1]["entries"][0].action, ("operation", 100))
+        with self.assertRaises(CspFormatError):
+            shortcut.setting_data(common[:-2])
+
 
 class MaterialTests(unittest.TestCase):
     def test_catalog_and_info(self):
