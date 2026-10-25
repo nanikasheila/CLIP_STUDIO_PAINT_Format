@@ -78,11 +78,22 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 10 | 色の変化: ブラシ先端色の変化 オン、色相 11、彩度 13、明度 17、サブ描画色混合率 19 | `BrushChangePatternColor` 0 → 1、`BrushHueChange`・`BrushSaturationChange`・`BrushValueChange`・`BrushSubColor` が同じ値 |
 | 10 | 色の変化: ストロークごとのランダム変化 オン、色相 23、彩度 29、明度 31、サブ描画色混合率 37 | `BrushChangeStrokeColor` 0 → 1、`BrushStroke{Hue,Saturation,Value}Change`・`BrushStrokeSubColor` が同じ値 |
 | 10 | 色の変化: 変化対象 サブ描画色 | `BrushChangeColorTarget` 1（メイン描画色）→ 2。一覧はメイン描画色とサブ描画色、メイン描画色、サブ描画色の順 |
+| 11 | ブラシサイズの影響元設定: 筆圧の最小値 21、筆圧のグラフに点を 1 つ（約 50%, 79%） | `BrushSizeEffector` の最小値 [0] 0 → 21、筆圧のグラフに点 (0.509, 0.791) |
+| 11 | 同: 傾き（オンのまま）の最大値 133 | ヘッダーの語 [10] 150 → 133（語 [10] は傾きの最大値 %） |
+| 11 | 同: 速度 オン・最小値 7、ランダム オン・最小値 43 | 使う入力 0x30 → 0xF0、最小値 [2] 0 → 7、[3] 0 → 43。速度のグラフ（大きさ 0）に既定の (0, 1)–(1, 0) が入る |
+| 12 | 2-ブラシ形状: オン、適用方法 スクリーン | `UseDualBrush` 0 → 1、`DualBrushCompositeMode` 1（乗算）→ 6。一覧は通常, 乗算, 加算(発光), 減算, 比較(暗), 比較(明), スクリーン, オーバーレイ, 覆い焼きカラー, 焼き込みカラー, 焼き込み(リニア), ハードミックス, 高さ(リニア) |
+| 12 | 2-ブラシ形状: RGB値に適用 オン、2-ブラシサイズ 17、メインのブラシサイズに連動 オン、2-アンチエイリアス 強 | `ChangeRGBByDual` 0 → 1、`DualSize` 30 → 17、`SyncDualBrushSize` 0 → 1、`DualAntiAlias` 2 → 3 |
+| 13 | 2-ブラシ先端: 硬さ 1 段目、厚さ 61、適用方向 垂直、向き 27 | `DualHardness` 100 → 1、`DualThickness` 100 → 61、`DualVerticalThicknes` 0 → 1、`DualRotation` 0 → 27 |
+| 13 | 2-ブラシ先端: 2-ブラシ濃度 83、間隔によるブラシ濃度調整 オフ | `DualFlow` 100 → 83、`DualAdjustFlowByInterval` 1 → 0 |
+| 14 | 2-散布効果: オン、粒子サイズ 9、ブラシサイズに連動 オン、粒子密度（3 段目）、散布偏向（2 段目）、粒子の向き 53 | `DualUseSpray` 0 → 1、`DualSpraySize` 2 → 9、`DualSpraySizeSyncBrushSize` 0 → 1、`DualSprayDensity` 1 → 4、`DualSprayBias` 0 → -50、`DualRotationInSpray` 0 → 53 |
+| 14 | 2-ストローク: 間隔 狭い、連続吹き付け オン、比較(暗)で合成 オン | `DualAutoIntervalType` 2 → 3、`DualContinuousPlot` 0 → 1、`DualBlendPatternByDarken` と `DualBlendPatternByDarken2` がともに 0 → 1 |
+| 15 | 2-紙質: インパスト、紙質濃度 44、濃度強調 オン、描点ごとに適用 オン | `DualTextureImage` が増える（素材の参照 1 件、種類 2）、`DualTextureDensity` 50 → 44、`DualTextureStressDensity` 0 → 1、`DualTextureForPlot` 0 → 1 |
+| 15 | 2-紙質: 拡大率 70、回転角 15、明るさ -9、コントラスト 29、紙質適用方法 乗算 | `DualTextureScale` 100 → 70（デュアルブラシには `Scale2` がない）、`DualTextureRotate` 0 → 15、`DualTextureBrightness` 0 → -9、`DualTextureContrast` 0 → 29、`DualTextureCompositeMode` 0 → 1 |
 
-2〜10 回目ではほかの列は変わらなかった。9 回目からは 8 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜15 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 59 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 91 列）。
 
 ## 残り
 
-- W4 の続き（デュアルブラシ、影響元設定と、ペン以外のツール）
+- W4 の続き（ブラシサイズ以外の影響元設定、入力ビット 0x100、ペン以外のツール）

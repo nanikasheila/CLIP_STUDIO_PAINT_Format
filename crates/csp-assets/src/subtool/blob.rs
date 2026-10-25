@@ -150,7 +150,7 @@ pub const INPUT_TILT: u32 = 0x20;
 pub const INPUT_VELOCITY: u32 = 0x40;
 pub const INPUT_RANDOM: u32 = 0x80;
 /// Offered on brush size, density and the like since CSP 1.x (meaning
-/// confirmed in W4; see the spec).
+/// not known yet; see the spec).
 pub const INPUT_0X100: u32 = 0x100;
 
 /// 影響元設定: how pen pressure, tilt, speed and randomness change a
@@ -160,7 +160,7 @@ pub const INPUT_0X100: u32 = 0x100;
 /// `[1]` inputs offered by this setting, `[2]` inputs in use, `[3]`..`[6]`
 /// signed values per input (pressure, tilt, velocity, random; the
 /// minimum in %), `[7]` 0, `[8]` / `[9]` byte sizes of the pressure and
-/// tilt graphs, `[10]` (44+) a value (100 or 500), `[11]` (48) byte size
+/// tilt graphs, `[10]` (44+) the maximum (%) with tilt, `[11]` (48) byte size
 /// of the velocity graph. The graphs ([`Records`] of points) follow the
 /// header in that order.
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -171,7 +171,8 @@ pub struct Effector {
     /// Minimum (%) with pressure, tilt, velocity and random.
     pub minimum: [i32; 4],
     pub word7: u32,
-    /// Header word 10 (44- and 48-byte headers).
+    /// Header word 10 (44- and 48-byte headers): the maximum (%) with tilt
+    /// (W4).
     pub word10: Option<u32>,
     pub pressure_graph: Option<Records>,
     pub tilt_graph: Option<Records>,
