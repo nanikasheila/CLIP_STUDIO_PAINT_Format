@@ -5,7 +5,7 @@ Same layout and JSON form as ``crates/csp-assets/src/serial.rs``::
     object = fields(head) fields(body)        head holds "typename"
     fields = count, (key, tag, value) * count
     number = u8 n, n bytes big endian (minimal width)
-    0x06 string, 0x07 bytes, 0x11 bool, 0x13 int (4 bytes when negative),
+    0x06 string, 0x07 bytes, 0x11 bool (always 1 byte), 0x13 int (4 bytes when negative),
     0x14 uint, 0x15 real (f64), 0x48 array (u32 length, fields, count,
     (tag value) * count), 0x49 object (u32 length, object)
 
@@ -268,7 +268,7 @@ def _value_json(value):
     number = value.as_int()
     names = {BOOL: "bool", INT: "int", UINT: "uint"}
     out = {names.get(value.tag, f"tag{value.tag:02x}"): (number != 0) if value.tag == BOOL else number}
-    canonical = value.raw == (_int_raw(number) if value.tag == INT else _minimal(number))
+    canonical = value.raw == (_int_raw(number) if value.tag == INT else (bytes([number]) if number in (0, 1) else None) if value.tag == BOOL else _minimal(number))
     if not canonical or (value.tag == BOOL and number > 1):
         out["@raw"] = value.raw.hex()
     return out
@@ -299,7 +299,9 @@ def _value_from_json(json):
     for key, tag in (("bool", BOOL), ("int", INT), ("uint", UINT)):
         if key in json:
             number = int(json[key])
-            return Value(tag, raw if raw is not None else (_int_raw(number) if tag == INT else _minimal(number)))
+            if raw is None:
+                raw = _int_raw(number) if tag == INT else bytes([number != 0]) if tag == BOOL else _minimal(number)
+            return Value(tag, raw)
     if "real" in json:
         return Value(REAL, float(json["real"]))
     if isinstance(json.get("hex"), str):

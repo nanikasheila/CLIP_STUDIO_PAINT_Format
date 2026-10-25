@@ -1,6 +1,6 @@
 //! Auto actions (オートアクション): CSP's own action sets
-//! (`Action/*.laf`) and exported ones (`.las`). Both are [`crate::serial`]
-//! documents:
+//! (`Action/*.laf`; セットの書き出し writes the same `.laf`) and `.las`.
+//! Both are [`crate::serial`] documents:
 //!
 //! ```text
 //! typeActionSet: actionSetName, applicationUuid, actionArray
@@ -13,6 +13,8 @@
 //!                     actionItemOpenParameter (bool), actionItemParameter
 //!                     (an object; members depend on the command)
 //! ```
+//!
+//! On 読み込み CSP gives every action a new `actionUuid` (W3).
 //!
 //! The command list and their parameters are in
 //! `docs/assets/spec/action-kinds.tsv`. Edits go through the document, so

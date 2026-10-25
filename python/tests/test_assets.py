@@ -93,6 +93,12 @@ class SerialTests(unittest.TestCase):
         self.assertEqual(item["actionItemEnable"], {"bool": True})
         self.assertEqual(serial.to_bytes(serial.from_json(json)), data)
         self.assertEqual(document.root.items("actionArray")[0].str("actionItemKind"), "layeractionrasterdetailnew")
+        # A bool is always 1 byte: CSP reads a 0-byte false as true.
+        item["actionItemEnable"] = {"bool": False}
+        off = serial.parse(serial.to_bytes(serial.from_json(json)))
+        enable = off.root.items("actionArray")[0].get("actionItemEnable")
+        self.assertEqual(enable.raw, b"\x00")
+        self.assertEqual(serial.to_json(off)["actionArray"]["@array"][0]["actionItemEnable"], {"bool": False})
 
     def test_keeps_trailing_bytes_and_rejects_cut_files(self):
         data = serial.to_bytes(action_set())

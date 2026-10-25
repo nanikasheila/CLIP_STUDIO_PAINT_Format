@@ -93,9 +93,15 @@ pub const FORMATS: &[Format] = &[
         pattern: ".sut", family: Sqlite, purpose: "サブツール（書き出し・読み込み用）", support: Typed
     },
     Format {
+        pattern: ".laf",
+        family: Serial,
+        purpose: "オートアクションセット（CSP 内部、書き出し・読み込み用）",
+        support: Typed,
+    },
+    Format {
         pattern: ".las",
         family: Serial,
-        purpose: "オートアクションセット（書き出し・読み込み用）",
+        purpose: "オートアクションセット（同じ形式の別の拡張子。CSP 1.5 系の書き出しは .laf）",
         support: Typed,
     },
     Format {
@@ -112,9 +118,6 @@ pub const FORMATS: &[Format] = &[
         family: Sqlite,
         purpose: "ブラシ形状のプリセット（サブツールと同じ表）",
         support: Typed,
-    },
-    Format {
-        pattern: ".laf", family: Serial, purpose: "オートアクションセット（CSP 内部）", support: Typed
     },
     Format { pattern: ".sgs", family: Serial, purpose: "グラデーションセット", support: Typed },
     Format {

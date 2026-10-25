@@ -55,9 +55,11 @@ SQLite のデータベースで、表は `Manager`（1 行）、`Node`（ツー�
 object = fields(head) fields(body)       head は "typename"（クラス名、空のことが多い）
 fields = 個数, (キー, タグ, 値) × 個数
 数     = u8 n, n バイトのビッグエンディアン（最小の幅）
-タグ   0x06 文字列, 0x07 バイト列, 0x11 真偽, 0x13 整数（負なら 4 バイトの 2 の補数）, 0x14 符号なし,
+タグ   0x06 文字列, 0x07 バイト列, 0x11 真偽（いつも 1 バイト: 01 00 / 01 01）, 0x13 整数（負なら 4 バイトの 2 の補数）, 0x14 符号なし,
        0x15 実数（f64）, 0x48 配列（u32 長さ, fields, 個数, (タグ 値) × 個数）, 0x49 オブジェクト（u32 長さ, object）
 ```
+
+真偽だけは最小の幅にしない。CSP は 0 バイトの真偽を「真」と読む（W3: 0 バイトで書いた `actionItemEnable` の偽が、読み込むとオンになった）。
 
 ファイルはタグも長さもない object 1 つ。後ろのバイトは CSP が無視する（同梱の 1 ファイルに 21 バイトあった）ので保持する。
 JSON の形（`cspf asset dump`）は `serial.rs` の末尾を参照。
@@ -65,7 +67,11 @@ JSON の形（`cspf asset dump`）は `serial.rs` の末尾を参照。
 - **オートアクション**: `actionSetName`、`applicationUuid`、`actionArray`（`actionName`、`actionUuid`、`actionOpenArray`、
   `actionItemArray`（`actionItemKind`、`actionItemEnable`、`actionItemShowSettings`、`actionItemOpenParameter`、`actionItemParameter`））。
   コマンドの一覧は [`action-kinds.tsv`](action-kinds.tsv)。
+  CSP の「セットの書き出し」は `.laf` で書き、「セットの読み込み」も `.laf` を読む（W3）。読み込むと `actionUuid` は振り直され、
+  そのほか（名前、項目、オン・オフ、パラメーター）はそのまま残る。`actionOpenArray` はパレットで開いているかどうか。
 - **グラデーションセット**: `gradationSetArray`（`gradationSetName`、`gradationItemArray`（`gradationName`、`gradationData`））。
+  CSP には `.sgs` をファイルとして読み込む操作がない。「グラデーションの編集」の「グラデーションの読み込み」が読むのは
+  `.cgs`（カラーグラデーションファイル）と Photoshop の `.grd` で、セットは素材（「セットを素材として登録」「グラデーションセットを追加」）として受け渡す。
 
 ## 4. GradationData（確認済み: バイト一致、W1）
 
@@ -147,4 +153,5 @@ Shift+Space 回転、Ctrl レイヤー移動、Ctrl+Shift レイヤー選択、�
 - `.cls` の Shift_JIS の名前の後ろの `u32`、色の形式の語
 - 素材の `xxx.dat` / `asxx.dat`
 - ワークスペースの配置（`workspaceplacement` の BLOB）、修飾キー設定の 0x100 以上のキーと動作 1・2 以外の値
+- `.cgs`（CSP が読み込めるカラーグラデーションファイル。手元に実物がない）、`.las` の実物
 - サブツールの列のうち「推測（直訳）」の 296 列と「未解明」の 6 列（主にペン・ブラシ以外のツール）。CSP で確認済みは 18 列（W4）
