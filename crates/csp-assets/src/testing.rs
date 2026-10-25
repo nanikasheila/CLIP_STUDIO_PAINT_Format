@@ -1,6 +1,6 @@
 //! Synthetic files for tests (no CSP data): a tool database with a pen
 //! tool holding two sub tools (one with a brush tip material), an auto
-//! action set and a gradient set.
+//! action set, a gradient set and shortcut tables.
 
 use rusqlite::Connection;
 
@@ -138,4 +138,21 @@ pub fn gradient_set() -> GradientSet {
             }],
         }],
     }
+}
+
+/// A workspace's shortcut tables: two commands with keys, one without, and
+/// the pen tool of [`tool_db`] on P.
+pub fn workspace_shortcuts() -> Vec<u8> {
+    let c = Connection::open_in_memory().unwrap();
+    c.execute_batch(
+        "CREATE TABLE workspaceshortcutmenu(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, menucommandtype TEXT,
+           menucommand TEXT, shortcut TEXT, modifier INTEGER);
+         CREATE TABLE workspaceshortcuttool(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, uuid BLOB, shortcut TEXT);
+         INSERT INTO workspaceshortcutmenu(menucommandtype, menucommand, shortcut, modifier) VALUES
+           ('advancedcommand', 'applicationpreference', 'K', 4), ('basiccommand', 'redo', 'Z', 6),
+           ('advancedcommand', 'filesaveaspng', 'NULL', 0);",
+    )
+    .unwrap();
+    c.execute("INSERT INTO workspaceshortcuttool(uuid, shortcut) VALUES (?1, 'P')", [uuid(2)]).unwrap();
+    csp_format::database::serialize(&c).unwrap()
 }

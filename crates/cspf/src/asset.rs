@@ -11,6 +11,7 @@ use csp_assets::gradient::GradientSet;
 use csp_assets::kind::{Family, detect};
 use csp_assets::material::{self, Catalog, Element, InfoList, MaterialFolder};
 use csp_assets::serial::Document;
+use csp_assets::shortcut::Shortcuts;
 use csp_assets::subtool::{self, SubToolDb};
 use csp_assets::{c2f, tar};
 use csp_format::{Error, Result};
@@ -39,6 +40,9 @@ USAGE:
   cspf asset colorset-new OUT NAME COLOR...
                                     a colour set (COLOR: RRGGBB or RRGGBBAA, optional =NAME)
   cspf asset gradients FILE         gradient set as JSON (.sgs)
+  cspf asset shortcuts FILE [--tools EditImageTool.todb]
+                                    shortcut keys as text: command, then keys (.khc, .spws);
+                                    tool keys are named from the tool DB when given
   cspf asset catalog DIR            material folders under DIR as JSON (no decryption)
   cspf asset corpus ROOT OUT.jsonl  read every file under ROOT and check round trips
 ";
@@ -60,6 +64,7 @@ pub fn run(args: &[String]) -> Result<bool> {
         "undump" => undump(rest),
         "actions" => one(rest).and_then(|f| actions(&f)),
         "colorset" => one(rest).and_then(|f| colorset(&f)),
+        "shortcuts" => shortcuts(rest),
         "colorset-new" => colorset_new(rest),
         "gradients" => one(rest).and_then(|f| gradients(&f)),
         "catalog" => one(rest).and_then(|d| catalog(&d)),
@@ -162,7 +167,13 @@ fn inspect(path: &Path) -> Result<bool> {
     let detail = match detected.family {
         Family::Sqlite => match SubToolDb::from_bytes(&data) {
             Ok(db) => subtool_summary(&db),
-            Err(_) => json!({ "tables": sqlite_summary(&data)? }),
+            Err(_) => {
+                let mut detail = json!({ "tables": sqlite_summary(&data)? });
+                if let Ok(keys) = Shortcuts::from_bytes(&data) {
+                    detail["shortcuts"] = json!({"commands": keys.commands.len(), "unassigned": keys.unassigned.len(), "tools": keys.tools.len()});
+                }
+                detail
+            }
         },
         Family::Serial => {
             let document = Document::parse(&data)?;
@@ -349,6 +360,28 @@ fn actions(path: &Path) -> Result<bool> {
             let dialog = if item.show_settings { "  (dialog)" } else { "" };
             println!("    [{mark}] {}{dialog}", item.kind);
         }
+    }
+    Ok(true)
+}
+
+fn shortcuts(args: &[String]) -> Result<bool> {
+    let (path, tools) = match args {
+        [path] => (path, None),
+        [path, flag, tools] if flag == "--tools" => (path, Some(SubToolDb::open(tools)?)),
+        _ => return Err(usage_error("expected FILE [--tools EditImageTool.todb]")),
+    };
+    let names: std::collections::HashMap<String, String> =
+        tools.iter().flat_map(|db| db.nodes.iter().map(|n| (n.uuid_hex(), n.name.clone()))).collect();
+    let shortcuts = Shortcuts::from_bytes(&std::fs::read(path)?)?;
+    let mut done = std::collections::HashSet::new();
+    for s in &shortcuts.commands {
+        if done.insert(s.command.as_str()) {
+            println!("{}\t{}", s.command, shortcuts.keys(&s.command).join("  "));
+        }
+    }
+    for tool in &shortcuts.tools {
+        let name = names.get(&tool.tool).map_or(tool.tool.as_str(), String::as_str);
+        println!("tool:{name}\t{}", tool.key);
     }
     Ok(true)
 }
