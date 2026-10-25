@@ -6,7 +6,9 @@ computes the same digest with the Python reader, then writes one JSON line:
 CRC-32s are compared or written: no names, text, paths or pixels.
 
     python tools/validation/python_reader_check.py ROOT LIST.txt OUT.jsonl \
-        --digest target/release/examples/layer_digest [--shard K/N] [--seconds S]
+        --digest target/release/examples/layer_digest [--shard K/N] [--seconds S] [--text-only]
+
+``--text-only`` compares only the layer ids, kinds and text blocks (fast).
 
 Resumable: files already in OUT.jsonl are skipped.
 """
@@ -37,10 +39,14 @@ def image(found):
     return [picture.width, picture.height, x, y, crc(picture.rgba)]
 
 
-def digest(path: Path) -> dict:
+def digest(path: Path, text_only: bool = False) -> dict:
     with read_clip(path) as clip:
         layers = []
         for layer, depth in clip.root.walk():
+            text = [crc(block.text.encode()) for block in clip.text_blocks(layer)]
+            if text_only:
+                layers.append({"id": layer.main_id, "kind": layer.kind, "text": text})
+                continue
             thumbnail = clip.layer_thumbnail(layer)
             vector = clip.vector_objects(layer) if clip.has_table("VectorObjectList") else []
             layers.append({
@@ -54,8 +60,10 @@ def digest(path: Path) -> dict:
                 "mask": image(clip.layer_mask(layer)),
                 "thumbnail": None if thumbnail is None else crc(thumbnail.rgba),
                 "vector": [len(vector), sum(len(item.raw_points) for item in vector)],
-                "text": [crc(block.text.encode()) for block in clip.text_blocks(layer)],
+                "text": text,
             })
+        if text_only:
+            return {"layers": layers}
         preview = clip.preview()
         return {"canvas": [clip.canvas.width_px, clip.canvas.height_px],
                 "preview": None if preview is None else crc(preview.rgba), "layers": layers}
@@ -63,10 +71,9 @@ def digest(path: Path) -> dict:
 
 def differences(rust: dict, python: dict) -> list[str]:
     found = []
-    if rust.get("canvas") != python["canvas"]:
-        found.append("canvas")
-    if rust.get("preview") != python["preview"]:
-        found.append("preview")
+    for field in ("canvas", "preview"):
+        if field in python and rust.get(field) != python[field]:
+            found.append(field)
     rust_layers, python_layers = rust.get("layers", []), python["layers"]
     if [l["id"] for l in rust_layers] != [l["id"] for l in python_layers]:
         return found + ["layer tree"]
@@ -85,6 +92,7 @@ def main() -> None:
     parser.add_argument("--digest", required=True)
     parser.add_argument("--shard", default="0/1")
     parser.add_argument("--seconds", type=float, default=0)
+    parser.add_argument("--text-only", action="store_true")
     args = parser.parse_args()
     k, n = map(int, args.shard.split("/"))
     done = set()
@@ -106,10 +114,11 @@ def main() -> None:
                 break
             path = args.root / relative
             begin = time.monotonic()
-            rust_line = subprocess.run([args.digest, str(path)], capture_output=True, text=True).stdout
+            command = [args.digest, *(["--text-only"] if args.text_only else []), str(path)]
+            rust_line = subprocess.run(command, capture_output=True, text=True).stdout
             rust = json.loads(rust_line) if rust_line.strip() else {"error": "no output"}
             try:
-                python = digest(path)
+                python = digest(path, args.text_only)
                 error = None
             except Exception as exception:  # noqa: BLE001 - reported, not hidden
                 python, error = None, f"{type(exception).__name__}: {exception}"

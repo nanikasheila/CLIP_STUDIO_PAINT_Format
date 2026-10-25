@@ -3,7 +3,9 @@
 //! with this crate. Pixels are reduced to CRC-32s; no names, text or pixels
 //! are printed.
 //!
-//! Usage: layer_digest FILE.clip...
+//! Usage: layer_digest [--text-only] FILE.clip...
+//!
+//! `--text-only` gives only the layer ids, kinds and text (fast).
 use csp_format::database::{select, table_exists, value_as_text};
 use csp_format::vector::VectorData;
 use csp_format::{ClipFile, RgbaImage};
@@ -22,11 +24,20 @@ fn image(found: Option<(RgbaImage, (i64, i64))>) -> Value {
     }
 }
 
-fn digest(path: &str) -> csp_format::Result<Value> {
+fn digest(path: &str, text_only: bool) -> csp_format::Result<Value> {
     let file = ClipFile::open(path)?;
     let has_vectors = table_exists(file.database(), "VectorObjectList")?;
     let mut layers = Vec::new();
     for (layer, depth) in file.layers.flatten() {
+        let text: Vec<u32> = if matches!(layer.kind.name(), "text" | "story_info") {
+            csp_format::text::read_blocks(&layer.row)?.iter().map(|block| crc(block.text.as_bytes())).collect()
+        } else {
+            Vec::new()
+        };
+        if text_only {
+            layers.push(json!({"id": layer.main_id, "kind": layer.kind.name(), "text": text}));
+            continue;
+        }
         let mask = file.layer_mask(layer)?.map(|(mask, at)| {
             // The Python reader gives masks as opaque gray RGBA.
             let rgba: Vec<u8> = mask.pixels.iter().flat_map(|v| [*v, *v, *v, 255]).collect();
@@ -44,11 +55,6 @@ fn digest(path: &str) -> csp_format::Result<Value> {
                 }
             }
         }
-        let text: Vec<u32> = if matches!(layer.kind.name(), "text" | "story_info") {
-            csp_format::text::read_blocks(&layer.row)?.iter().map(|block| crc(block.text.as_bytes())).collect()
-        } else {
-            Vec::new()
-        };
         layers.push(json!({
             "id": layer.main_id,
             "depth": depth,
@@ -72,8 +78,10 @@ fn digest(path: &str) -> csp_format::Result<Value> {
 }
 
 fn main() {
-    for path in std::env::args().skip(1) {
-        let value = digest(&path).unwrap_or_else(|error| json!({"error": error.to_string()}));
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let text_only = args.iter().any(|arg| arg == "--text-only");
+    for path in args.iter().filter(|arg| *arg != "--text-only") {
+        let value = digest(path, text_only).unwrap_or_else(|error| json!({"error": error.to_string()}));
         println!("{}", serde_json::to_string(&value).expect("JSON"));
     }
 }
