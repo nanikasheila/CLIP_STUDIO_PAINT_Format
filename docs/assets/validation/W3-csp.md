@@ -89,11 +89,23 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 14 | 2-ストローク: 間隔 狭い、連続吹き付け オン、比較(暗)で合成 オン | `DualAutoIntervalType` 2 → 3、`DualContinuousPlot` 0 → 1、`DualBlendPatternByDarken` と `DualBlendPatternByDarken2` がともに 0 → 1 |
 | 15 | 2-紙質: インパスト、紙質濃度 44、濃度強調 オン、描点ごとに適用 オン | `DualTextureImage` が増える（素材の参照 1 件、種類 2）、`DualTextureDensity` 50 → 44、`DualTextureStressDensity` 0 → 1、`DualTextureForPlot` 0 → 1 |
 | 15 | 2-紙質: 拡大率 70、回転角 15、明るさ -9、コントラスト 29、紙質適用方法 乗算 | `DualTextureScale` 100 → 70（デュアルブラシには `Scale2` がない）、`DualTextureRotate` 0 → 15、`DualTextureBrightness` 0 → -9、`DualTextureContrast` 0 → 29、`DualTextureCompositeMode` 0 → 1 |
+| 16 | ブラシ濃度の影響元設定: 筆圧 オン・最小値 31、傾き オン・最小値 47・最大値 233、ランダム オン・最小値 59 | `BrushFlowEffector` の使う入力 0 → 0xB0、最小値 [0] 31・[1] 47・[3] 59、語 [10] 100 → 233。最大値は 100 未満にできない（77 を入れると 100） |
+| 16 | 厚さの影響元設定: 速度 オン・最小値 13 | `BrushThicknessEffector` の使う入力 0 → 0x40、最小値 [2] 0 → 13 |
+| 16 | 不透明度の影響元設定: 傾き オン・最小値 17 | `BrushOpacityEffector` の使う入力 0 → 0x20、最小値 [1] 100 → 17（最大値は 500 のまま）。不透明度は 0x100 を使える入力に持たない |
+| 17 | 塗りつぶし: 隣接ピクセルをたどる オフ、色の誤差 23.4 | `FillContinuousPixel` 1 → 0、`FillColorMargin` 16.2 → 23.4 |
+| 17 | 塗りつぶし: 領域拡縮 7、拡縮方法 1 番目のボタン、対称定規にスナップ オフ | `FillExpandLength` 4 → 7、`FillExpandType` 2 → 0、`EnableSnapSymmetry` 1 → 0 |
+| 18 | 塗りつぶし: 隣接ピクセルをたどる オン、隙間閉じ 2 段目、細い領域にしみこむ オフ | `FillContinuousPixel` 0 → 1、`FillCloseGap` 10 → 3、`FillSoakIntoNarrowArea` 1 → 0 |
+| 18 | 参照先: 複数参照の対象 3 番目（選択されたレイヤー）、参照しないレイヤーの 4 番目のボタン オン | `FillReferLayerType` 0 → 2、`FillNotReferCurrent` 0 → 1 |
+| 18 | 参照先: 中心線も含める オフ、作画フレームを参照 オン | `FillIncludeVectorCenter` 1 → 0、`FillReferDrawFrame` 0 → 1 |
+| 19 | 参照先: 参照しないレイヤーの 5 番目 オフ・6 番目 オン、ベクターの中心線で塗り止まる オフ、塗りを開始しない色 オン（黒のまま） | `FillNotReferPaper` 1 → 0、`FillNotReferLocked` 0 → 1、`FillReferVectorCenter` 1 → 0、`FillUseNotStartColor` 0 → 1 |
+| 19 | 塗りつぶし: 隙間閉じ オフ、領域拡縮 オフ。アンチエイリアス オフ | `FillUseCloseGap` 1 → 0、`FillUseExpand` 1 → 0、`FillAntiAlias` 1 → 0 |
+| 20 | 参照先: 複数参照の対象 4 番目（フォルダー内のレイヤー）、複数参照 オフ | `FillReferLayerType` 2 → 3、`FillReferMultiLayer` 1 → 0 |
 
-2〜15 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜20 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 91 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 113 列）。
 
 ## 残り
 
-- W4 の続き（ブラシサイズ以外の影響元設定、入力ビット 0x100、ペン以外のツール）
+- W4 の続き（塗りつぶし・ペン以外のツール: 図形、選択範囲、テキスト、グラデーションなど）
+- 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
