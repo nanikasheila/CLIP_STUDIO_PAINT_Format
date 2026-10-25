@@ -2,6 +2,8 @@
 //!
 //! Input files are only read; outputs go to the paths given.
 
+mod asset;
+
 use std::collections::HashSet;
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
@@ -53,6 +55,8 @@ USAGE:
   cspf corpus ROOT OUT.jsonl [--seconds N] [--no-reencode] [--shard K/N] [--list PATHS.txt] [--render]
                                     check every .clip / .cmc under ROOT (resumable);
                                     --render compares renders with the stored previews instead
+  cspf asset COMMAND ...            sub tools, auto actions, colour / gradient sets, materials
+                                    (`cspf asset help`)
 ";
 
 fn main() -> ExitCode {
@@ -81,6 +85,7 @@ fn main() -> ExitCode {
         "anim" => one_file(rest).and_then(anim),
         "frames" => frames(rest),
         "anim-set" => anim_set(rest),
+        "asset" => asset::run(rest),
         "-h" | "--help" | "help" => {
             print!("{USAGE}");
             Ok(true)

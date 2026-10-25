@@ -9,6 +9,9 @@ rust-version.workspace = true
 
 [dependencies]
 csp-format.workspace = true
+csp-assets.workspace = true
+rusqlite = { version = "0.40", features = ["bundled", "serialize"] }
+serde = "1"
 serde_json = { version = "1", features = ["preserve_order"] }
 
 [dev-dependencies]
