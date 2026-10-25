@@ -30,6 +30,7 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 - オートアクションの書き出し・読み込みはどちらも `.laf`（「オートアクションセットファイル」）。読み込むと新しいセットとして追加され、`actionUuid` は振り直される。
 - グラデーションセットは、ツールプロパティ・サブツール詳細・「グラデーションの編集」のどこにも `.sgs` のファイル読み込みがない。
   「グラデーションの読み込み」が読むのは `.cgs` と `.grd` で、セットは素材として登録・追加する。設定フォルダーへ直接置く方法はユーザーの設定を変えるので試していない。
+- CSP はページ（作品）を開いている間はサブツールを削除できない（「開いているページがあるため実行できません」）。カラーセットの削除は「カラーセットの編集」の「削除」で、確認なしに消える。試験で追加したサブツールとカラーセットは、確認後に CSP から削除した。
 
 ## W4: 1 項目ずつ変えた差分
 
@@ -70,11 +71,18 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 8 | 入り抜き: 入り 13、抜き 31（長さ指定） | `BrushInLength` 20 → 13、`BrushOutLength` 20 → 31 |
 | 8 | 入り抜き: 速度による入り抜き オフ | `BrushInOutBySpeed` 1 → 0 |
 | 8 | 入り抜き: 指定方法 パーセント指定 | `BrushInOutType` 0 → 1。表示は `BrushInRatio` / `BrushOutRatio` の 30.0 |
+| 9 | 水彩境界: オン、範囲 7 | `BrushUseWaterEdge` 0 → 1、`BrushWaterEdgeRadius` 3 → 7 |
+| 9 | 水彩境界: 透明度影響（バーで 1 段目）、明度影響（バーで 4 段目） | `BrushWaterEdgeAlphaPower` 20 → 5、`BrushWaterEdgeValuePower` 0 → 70 |
+| 9 | 水彩境界: ドラッグ後に処理 オン、ぼかし幅 5 | `BrushWaterEdgeAfterDrag` 0 → 1、`BrushWaterEdgeBlur` 0 → 5 |
+| 9 | 水彩境界: フチの表現 ビビッド、強さ（2 段目）、鮮やかさ（5 段目） | `BrushWaterEdgeStyle` 0 → 1、`BrushWaterEdgeStrength` 100 → 40、`BrushWaterEdgeVividness` 50 → 100。ビビッドでは透明度影響・明度影響・ぼかし幅が無効になるが、値は残る |
+| 10 | 色の変化: ブラシ先端色の変化 オン、色相 11、彩度 13、明度 17、サブ描画色混合率 19 | `BrushChangePatternColor` 0 → 1、`BrushHueChange`・`BrushSaturationChange`・`BrushValueChange`・`BrushSubColor` が同じ値 |
+| 10 | 色の変化: ストロークごとのランダム変化 オン、色相 23、彩度 29、明度 31、サブ描画色混合率 37 | `BrushChangeStrokeColor` 0 → 1、`BrushStroke{Hue,Saturation,Value}Change`・`BrushStrokeSubColor` が同じ値 |
+| 10 | 色の変化: 変化対象 サブ描画色 | `BrushChangeColorTarget` 1（メイン描画色）→ 2。一覧はメイン描画色とサブ描画色、メイン描画色、サブ描画色の順 |
 
-2〜8 回目ではほかの列は変わらなかった。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜10 回目ではほかの列は変わらなかった。9 回目からは 8 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 39 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 59 列）。
 
 ## 残り
 
-- W4 の続き（水彩境界、色の変化、デュアルブラシ、影響元設定と、ペン以外のツール）
+- W4 の続き（デュアルブラシ、影響元設定と、ペン以外のツール）
