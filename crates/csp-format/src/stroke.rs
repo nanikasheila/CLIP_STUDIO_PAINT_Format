@@ -41,9 +41,9 @@
 //!   the major semi-axis is the radius. The minor axis points at
 //!   `RotationBase` degrees (y down) when `RotationEffector` has bit 0x01,
 //!   at 0 without it, plus the direction of the line with bit 0x40; bit
-//!   0x80 turns each dab at random by up to `RotationRandom` × 180°, which
-//!   is drawn as a wider stroke (60% of the way to the widest dab of that
-//!   range). `BrushStyle.StyleFlag` bit 0x40 turns the tip a further
+//!   0x80 turns each dab at random by up to ±`RotationRandom` × 180°,
+//!   which is drawn as a round tip 30% of the way from the mean width of
+//!   the dabs of that range to the widest. `BrushStyle.StyleFlag` bit 0x40 turns the tip a further
 //!   quarter (the angle then names the major axis). A stroke is as wide as the ellipse across the line; the
 //!   anti-aliasing loss grows with how long the ellipse is across the line
 //!   against along it (× 0.4 to × 1.75).
@@ -169,10 +169,24 @@ impl Effector {
         effector
     }
 
-    /// The factor (0..1) at `pressure` and `velocity` (point values 0 and 2).
-    /// Velocity v takes `1 − (1 − min) × v`; a random factor is drawn as a
-    /// fixed `1 − 0.15 × (1 − min)` (the union of dabs of random sizes).
+    /// The factor (0..1) at `pressure` and `velocity` (point values 0 and 2)
+    /// for a size or thickness. Velocity v takes `1 − (1 − min) × v`. A
+    /// random factor per dab is drawn as a fixed `1 − (1 − min) × u`: CSP's
+    /// stroke is the union of its dabs, so the wider the range the nearer
+    /// the stroke is to its widest dabs (u = 0.42 for a range of 0.11, 0.15
+    /// for 0.74, 0.125 for 0.8, measured).
     pub fn factor(&self, pressure: f64, velocity: f64) -> f64 {
+        self.factor_with(pressure, velocity, |range| (0.467 - 0.428 * range).clamp(0.1, 0.5))
+    }
+
+    /// The factor for an opacity: a random opacity per dab is drawn as
+    /// `1 − 0.42 × (1 − min)` (measured with minimum 0.51 on straight test
+    /// lines and on real strokes).
+    pub fn opacity_factor(&self, pressure: f64, velocity: f64) -> f64 {
+        self.factor_with(pressure, velocity, |_| 0.42)
+    }
+
+    fn factor_with(&self, pressure: f64, velocity: f64, share: impl Fn(f64) -> f64) -> f64 {
         let mut factor = match &self.pressure {
             Some((minimum, curve)) => minimum + (1.0 - minimum) * curve.at(pressure).clamp(0.0, 1.0),
             None => 1.0,
@@ -181,7 +195,8 @@ impl Effector {
             factor *= 1.0 - (1.0 - minimum) * velocity.clamp(0.0, 1.0);
         }
         if let Some(minimum) = self.random {
-            factor *= 1.0 - 0.15 * (1.0 - minimum);
+            let range = 1.0 - minimum;
+            factor *= 1.0 - range * share(range);
         }
         factor
     }
@@ -296,7 +311,7 @@ impl Tip {
     /// vector `u` is.
     fn across(&self, radius: f64, thickness: f64, u: (f64, f64)) -> Across {
         if thickness >= 1.0 {
-            return Across { half: radius, loss: 1.0, spread: 1.0 };
+            return Across { half: radius, loss: 1.0, circle: false };
         }
         let angle = self.angle(u);
         // The ellipse's half extent along the unit vector v, its minor axis at `turn`.
@@ -307,16 +322,20 @@ impl Tip {
             ((radius * thickness * along_minor).powi(2) + (radius * along_major).powi(2)).sqrt()
         };
         let normal = (-u.1, u.0);
-        let half = extent(angle, normal);
-        let along = extent(angle, u).max(1e-9);
-        let loss = (half / along).clamp(0.4, 1.75);
+        // The anti-aliasing loss grows with how thin the tip is along the line.
+        let loss = |turn: f64| (extent(turn, normal) / extent(turn, u).max(1e-9)).clamp(0.4, 1.75);
         if self.rotation_flags & Self::RANDOM != 0 && self.rotation_random > 0.0 {
+            // Turned at random by up to ±`RotationRandom` × 180° per dab: the
+            // dabs overlap, so the stroke is wider than the mean width (CSP,
+            // synthetic lines with seeds: 0.3 of the way to the widest).
             let range = self.rotation_random.min(1.0) * std::f64::consts::PI;
-            let widest = (0..=16).map(|k| extent(angle + range * (k as f64 / 8.0 - 1.0), normal)).fold(half, f64::max);
-            let spread = half + 0.6 * (widest - half);
-            return Across { half: spread, loss, spread: spread / half.max(1e-9) };
+            let turns: Vec<f64> = (0..=32).map(|k| angle + range * (k as f64 / 16.0 - 1.0)).collect();
+            let mean = |f: &dyn Fn(f64) -> f64| turns.iter().map(|&turn| f(turn)).sum::<f64>() / turns.len() as f64;
+            let widest = turns.iter().map(|&turn| extent(turn, normal)).fold(0.0, f64::max);
+            let average = mean(&|turn| extent(turn, normal));
+            return Across { half: average + 0.3 * (widest - average), loss: mean(&loss), circle: true };
         }
-        Across { half, loss, spread: 1.0 }
+        Across { half: extent(angle, normal), loss: loss(angle), circle: false }
     }
 }
 
@@ -327,8 +346,9 @@ struct Across {
     half: f64,
     /// The factor on the anti-aliasing loss.
     loss: f64,
-    /// How much a tip turned at random widens the stroke.
-    spread: f64,
+    /// Whether the tip sweeps as a circle of radius `half` (a tip turned
+    /// at random).
+    circle: bool,
 }
 
 /// An ellipse as the map that takes it to the unit circle.
@@ -522,7 +542,7 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
                 radius: size * brush.size.factor(pressure, velocity),
                 thickness: brush.tip.thickness_at(pressure, velocity),
                 corner: point.flags & 0x2 != 0,
-                alpha: opacity * brush.opacity.factor(pressure, velocity),
+                alpha: opacity * brush.opacity.opacity_factor(pressure, velocity),
             }
         })
         .collect();
@@ -569,9 +589,11 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
         // point is found where the ellipse is a circle.
         let angle = brush.tip.angle(u);
         let ellipse = |t: f64| {
+            if across_a.circle {
+                return Ellipse::new(half_a + t * (half_b - half_a), 1.0, angle);
+            }
             let radius = a.radius + t * (b.radius - a.radius);
-            let spread = across_a.spread + t * (across_b.spread - across_a.spread);
-            Ellipse::new(radius * spread, a.thickness + t * (b.thickness - a.thickness), angle)
+            Ellipse::new(radius, a.thickness + t * (b.thickness - a.thickness), angle)
         };
         let middle = ellipse(0.5);
         let d = middle.map((dx, dy));
@@ -719,6 +741,22 @@ mod tests {
         let turned = Tip { turned: true, ..follows };
         assert!((width(&turned, 20.0, thickness, 90.0) - 37.9).abs() < 0.5);
         assert!((width(&turned, 20.0, thickness, 0.0) - 19.2).abs() < 0.5);
+        // Turned at random (CSP, synthetic lines with seeds, thickness 0.51,
+        // radius up to 20): RotationRandom 0.3 on a tip across the line keeps
+        // 0.96 of the ink; a fixed tip turned fully at random draws every line
+        // alike, at 0.94 of the widest (this model: 0.85 at radius 20, 1.0 at 4).
+        let tip = |flags: i64, random: f64| Tip {
+            thickness: 0.51,
+            rotation: 181.5,
+            rotation_flags: flags,
+            rotation_random: random,
+            ..Tip::default()
+        };
+        let across = width(&tip(0x43, 0.0), 20.0, 0.51, 0.0);
+        assert!((width(&tip(0xc3, 0.3), 20.0, 0.51, 0.0) / across - 0.963).abs() < 0.04);
+        let random: Vec<f64> =
+            [0.0, 45.0, 90.0].iter().map(|&d| width(&tip(0x81, 1.0), 20.0, 0.51, d) / across).collect();
+        assert!(random.iter().all(|w| (w - random[0]).abs() < 0.02 && (w - 0.94).abs() < 0.1), "{random:?}");
     }
 
     #[test]
@@ -755,5 +793,11 @@ mod tests {
         assert!((Effector::parse(&both, &curves).factor(1.0, 0.5) - 0.8).abs() < 1e-6);
         let velocity = [0x41u32, 0.2f32.to_bits()].iter().flat_map(|w| w.to_be_bytes()).collect::<Vec<_>>();
         assert!((Effector::parse(&velocity, &curves).factor(1.0, 0.75) - 0.4).abs() < 1e-6);
+        // Random (CSP, real strokes: size minimum 0.89 → 0.954, opacity
+        // minimum 0.51 → 0.796).
+        let random =
+            |minimum: f32| Effector::parse(&[0x81u32, minimum.to_bits()].map(u32::to_be_bytes).concat(), &curves);
+        assert!((random(0.89).factor(1.0, 0.0) - 0.954).abs() < 0.005);
+        assert!((random(0.51).opacity_factor(1.0, 0.0) - 0.796).abs() < 0.005);
     }
 }
