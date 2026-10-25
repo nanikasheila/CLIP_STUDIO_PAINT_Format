@@ -153,6 +153,33 @@ impl RgbaImage {
         }
     }
 
+    /// Draw `other` over self (normal blending, straight alpha) with its
+    /// top-left at (x, y); parts outside are dropped.
+    pub fn draw_over(&mut self, other: &RgbaImage, x: i64, y: i64) {
+        for sy in 0..other.height as i64 {
+            let ty = y + sy;
+            if ty < 0 || ty >= self.height as i64 {
+                continue;
+            }
+            for sx in 0..other.width as i64 {
+                let tx = x + sx;
+                if tx < 0 || tx >= self.width as i64 {
+                    continue;
+                }
+                let s = other.pixel(sx as u32, sy as u32);
+                if s[3] == 0 {
+                    continue;
+                }
+                let d = self.pixel(tx as u32, ty as u32);
+                let (sa, da) = (s[3] as f32 / 255.0, d[3] as f32 / 255.0);
+                let a = sa + da * (1.0 - sa);
+                let mix = |c: usize| (s[c] as f32 * sa + d[c] as f32 * da * (1.0 - sa)) / a;
+                let out = [mix(0), mix(1), mix(2), a * 255.0].map(|v| v.round().clamp(0.0, 255.0) as u8);
+                self.set_pixel(tx as u32, ty as u32, out);
+            }
+        }
+    }
+
     pub fn to_png(&self) -> Result<Vec<u8>> {
         encode_png(self.width, self.height, png::ColorType::Rgba, &self.pixels)
     }

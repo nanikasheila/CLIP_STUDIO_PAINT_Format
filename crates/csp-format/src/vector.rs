@@ -7,13 +7,13 @@
 //! u32 0, u32 length of the objects
 //! object × n:
 //!   header (header_size bytes)
-//!     +0  u32 header_size (76, 88, 96)   +4  u32 72
+//!     +0  u32 header_size (76, 88, 92, 96) +4  u32 72
 //!     +8  u32 point_size (88, 104)       +12 u32 88
 //!     +16 u32 point_count                +20 u32 flags
 //!     +24 i32 bbox x0, y0, x1, y1 (layer pixels)
 //!     +40 u32 main colour R, G, B        +52 u32 sub colour R, G, B
 //!     +64 f64 opacity (1.0)
-//!     +72 …  brush style ids and the brush size (f64), depending on the size
+//!     +72 …  brush style ids (u32 × 1–3), the brush size (f64), u32
 //!   point × point_count (point_size bytes)
 //!     +0 f64 x  +8 f64 y  +16 i32 bbox x0, y0, x1, y1  +32 u32 flags
 //!     +36 … f32 values (pressure, width ratio, …), +88 f64 x, y (104-byte points)
@@ -89,11 +89,11 @@ impl VectorObject {
         be_f64_at(&self.header, 64)
     }
 
-    /// Offset of the brush size (f64) in the header, by header size.
+    /// Offset of the brush size (f64) in the header: after the brush style
+    /// ids (one, two or three `u32` from +72) and before a last `u32`.
     fn brush_size_offset(&self) -> Option<usize> {
         match self.header.len() {
-            88 => Some(76),
-            96 => Some(84),
+            size @ (88 | 92 | 96) => Some(size - 12),
             _ => None,
         }
     }
@@ -111,11 +111,8 @@ impl VectorObject {
 
     /// Brush style ids (`BrushStyle.MainId`) the header refers to.
     pub fn brush_styles(&self) -> Vec<u32> {
-        match self.header.len() {
-            76 | 88 => vec![be_u32_at(&self.header, 72)],
-            96 => vec![be_u32_at(&self.header, 72), be_u32_at(&self.header, 76), be_u32_at(&self.header, 80)],
-            _ => Vec::new(),
-        }
+        let end = self.brush_size_offset().unwrap_or(76).min(self.header.len());
+        (72..end).step_by(4).map(|offset| be_u32_at(&self.header, offset)).collect()
     }
 
     pub fn point(&self, index: usize) -> Option<Point> {

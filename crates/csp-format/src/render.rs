@@ -604,34 +604,46 @@ impl Renderer<'_> {
                 masked: false,
             }));
         }
-        if let Some((buffer, masked)) = self.pixels(layer)? {
+        let effects = self.effects(layer);
+        if let Some((buffer, masked)) = self.pixels(layer, &effects)? {
             return Ok(Some(Content { buffer, mode: Some(mode), masked }));
         }
-        if layer.kind == LayerKind::Text
-            && let Some(buffer) = self.text(layer)?
-        {
-            self.report.text_layers += 1;
-            return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
+        // Layers drawn from other data than pixels. With effects they are
+        // drawn at full size (see `pixels`), unless the canvas is too large.
+        let canvas = (self.file.canvas.width_px, self.file.canvas.height_px);
+        let full = effects.any() && canvas.0 as u64 * canvas.1 as u64 <= EFFECT_PIXELS_MAX;
+        if layer.kind == LayerKind::Text {
+            let text = self.text(layer, full)?;
+            if text.is_some() {
+                self.report.text_layers += 1;
+            }
+            match text {
+                Some(TextImage::Full(image)) => {
+                    let (buffer, masked) = self.with_effects(layer, image, (0, 0), &effects)?;
+                    return Ok(Some(Content { buffer, mode: Some(mode), masked }));
+                }
+                Some(TextImage::Placed(buffer)) => {
+                    return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
+                }
+                None => {}
+            }
         }
-        if layer.kind == LayerKind::ImageMaterial
-            && let Some(image) = self.material(layer)?
-        {
-            self.report.material_layers += 1;
-            return Ok(Some(Content {
-                buffer: self.place(image, (0, 0), self.scale),
-                mode: Some(mode),
-                masked: false,
-            }));
-        }
-        if layer.kind == LayerKind::Vector
-            && let Some(image) = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?
-        {
-            self.report.vector_layers += 1;
-            return Ok(Some(Content {
-                buffer: self.place(image, (0, 0), self.scale),
-                mode: Some(mode),
-                masked: false,
-            }));
+        let drawn = if layer.kind == LayerKind::ImageMaterial {
+            self.material(layer, full)?.inspect(|_| self.report.material_layers += 1)
+        } else if layer.kind == LayerKind::Vector {
+            let (w, h, scale) =
+                if full { (canvas.0, canvas.1, 1.0) } else { (self.width as u32, self.height as u32, self.scale) };
+            draw_layer(self.file, layer, w, h, scale)?.inspect(|_| self.report.vector_layers += 1)
+        } else {
+            None
+        };
+        if let Some(image) = drawn {
+            let (buffer, masked) = if full {
+                self.with_effects(layer, image, (0, 0), &effects)?
+            } else {
+                (self.place(image, (0, 0), self.scale), false)
+            };
+            return Ok(Some(Content { buffer, mode: Some(mode), masked }));
         }
         *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
         Ok(None)
@@ -640,9 +652,11 @@ impl Renderer<'_> {
     /// A text layer from the images CSP rendered its text blocks into
     /// (attribute record 50, see [`crate::text`]): each is the size of the
     /// block's bounding box and placed at its top-left (layer pixels). The
-    /// text itself is not laid out here.
-    fn text(&self, layer: &Layer) -> Result<Option<Buffer>> {
-        let mut buffer: Option<Buffer> = None;
+    /// text itself is not laid out here. With `full`, the blocks are drawn
+    /// on a canvas-sized image for the effects; otherwise each is placed in
+    /// an output buffer.
+    fn text(&self, layer: &Layer, full: bool) -> Result<Option<TextImage>> {
+        let mut result: Option<TextImage> = None;
         let mut seen = Vec::new();
         for block in read_blocks(&layer.row)? {
             let (Some(id), Some(bbox)) = (block.attributes.render_offscreen(), block.attributes.bbox()) else {
@@ -657,18 +671,26 @@ impl Renderer<'_> {
                 continue;
             }
             let origin = (layer.offset.0 + bbox[0] as i64, layer.offset.1 + bbox[1] as i64);
-            let placed = self.place(offscreen.to_rgba()?, origin, 1.0);
-            match &mut buffer {
-                Some(target) => target.composite(&placed, BlendMode::Normal, |_| 1.0),
-                None => buffer = Some(placed),
+            let image = offscreen.to_rgba()?;
+            match &mut result {
+                None if full => {
+                    let mut canvas = RgbaImage::new(self.file.canvas.width_px, self.file.canvas.height_px);
+                    canvas.draw_over(&image, origin.0, origin.1);
+                    result = Some(TextImage::Full(canvas));
+                }
+                None => result = Some(TextImage::Placed(self.place(image, origin, 1.0))),
+                Some(TextImage::Full(canvas)) => canvas.draw_over(&image, origin.0, origin.1),
+                Some(TextImage::Placed(buffer)) => {
+                    buffer.composite(&self.place(image, origin, 1.0), BlendMode::Normal, |_| 1.0)
+                }
             }
         }
-        Ok(buffer)
+        Ok(result)
     }
 
     /// An image material drawn from its original image and placement, at
-    /// the output size (see [`crate::material`]).
-    fn material(&self, layer: &Layer) -> Result<Option<RgbaImage>> {
+    /// the output size, or the canvas's when `full` (see [`crate::material`]).
+    fn material(&self, layer: &Layer, full: bool) -> Result<Option<RgbaImage>> {
         let original = layer.row.int("ResizableOriginalMipmap");
         let Some(placement) = layer.row.blob("ResizableImageInfo").and_then(|data| Placement::parse(data).ok()) else {
             return Ok(None);
@@ -676,14 +698,19 @@ impl Renderer<'_> {
         if original == 0 {
             return Ok(None);
         }
-        let wanted = (self.scale * placement.magnification()).min(1.0);
+        let (width, height, scale) = if full {
+            (self.file.canvas.width_px, self.file.canvas.height_px, 1.0)
+        } else {
+            (self.width as u32, self.height as u32, self.scale)
+        };
+        let wanted = (scale * placement.magnification()).min(1.0);
         let Some((offscreen, level_scale)) = self.level(original, wanted)? else { return Ok(None) };
         if offscreen.data.is_none() {
             return Ok(None);
         }
         let offset = (layer.offset.0 as f64, layer.offset.1 as f64);
         let image = offscreen.to_rgba()?;
-        Ok(placement.draw(&image, level_scale, offset, self.width as u32, self.height as u32, self.scale))
+        Ok(placement.draw(&image, level_scale, offset, width, height, scale))
     }
 
     /// The mipmap level to read for the output scale: the smallest stored
@@ -755,11 +782,10 @@ impl Renderer<'_> {
 
     /// The layer's stored pixels placed in an output buffer, and whether
     /// the mask was applied to them already.
-    fn pixels(&mut self, layer: &Layer) -> Result<Option<(Buffer, bool)>> {
+    fn pixels(&mut self, layer: &Layer, effects: &Effects) -> Result<Option<(Buffer, bool)>> {
         if layer.render_mipmap == 0 {
             return Ok(None);
         }
-        let effects = self.effects(layer);
         // Borders and tones are drawn at full size (their widths and screens
         // are in canvas pixels), then scaled with the layer.
         let scale = if effects.any() { 1.0 } else { self.scale };
@@ -768,7 +794,7 @@ impl Renderer<'_> {
             return Ok(None);
         }
         if effects.any() {
-            return Ok(Some(self.with_effects(layer, offscreen.to_rgba()?, layer.pixel_origin(), &effects)?));
+            return Ok(Some(self.with_effects(layer, offscreen.to_rgba()?, layer.pixel_origin(), effects)?));
         }
         // Halve block by block when the wanted scale is a power of two
         // below the level (large canvases read for a preview).
@@ -908,6 +934,13 @@ fn recolor(image: &mut RgbaImage, (main, sub): ([u8; 3], [u8; 3])) {
             p[c] = ((main[c] as u32 * (255 - light) + sub[c] as u32 * light + 127) / 255) as u8;
         }
     }
+}
+
+/// A text layer's blocks: on a canvas-sized image, or placed in an output
+/// buffer.
+enum TextImage {
+    Full(RgbaImage),
+    Placed(Buffer),
 }
 
 /// The effects a layer is drawn with.

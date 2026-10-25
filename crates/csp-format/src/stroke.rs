@@ -156,7 +156,7 @@ pub struct Placement {
 pub fn draw_objects(image: &mut RgbaImage, objects: &[VectorObject], brushes: &HashMap<i64, Brush>, at: Placement) {
     let fallback = Brush::default();
     for object in objects {
-        let brush = object.brush_styles().first().and_then(|id| brushes.get(&(*id as i64))).unwrap_or(&fallback);
+        let brush = object.brush_styles().iter().find_map(|id| brushes.get(&(*id as i64))).unwrap_or(&fallback);
         draw_object(image, object, brush, at);
     }
 }
