@@ -130,9 +130,7 @@ pub const FORMATS: &[Format] = &[
         support: Catalogued,
     },
     Format { pattern: ".khc", family: Sqlite, purpose: "ショートカットキー設定", support: Typed },
-    Format {
-        pattern: ".tomd", family: Sqlite, purpose: "修飾キー設定（ツールごと）", support: Catalogued
-    },
+    Format { pattern: ".tomd", family: Sqlite, purpose: "修飾キー設定（ツールごと）", support: Typed },
     Format {
         pattern: ".tlbr", family: Sqlite, purpose: "コマンドバー / クイックアクセスの項目", support: Catalogued
     },

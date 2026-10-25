@@ -121,6 +121,24 @@ CSP は列を必要になったときに足すので、同じ形式でもファ�
 上のレイヤーを選択 Alt+]、選択範囲外を消去 Shift+Delete）と合う。ワークスペースの `workspaceshortcuttool` は、
 ツールのノードの UUID（ツール DB の `Node.NodeUuid`）とキーの組。`cspf asset shortcuts FILE --tools EditImageTool.todb` で名前付きで読める。
 
+### 7.2 修飾キー設定（`.tomd`）（推測: 既定の設定と照合）
+
+`Shortcut/DefaultToolModifyKey.tomd` の `ModifyKeySetting`。1 行がツールの種類 1 つ（`InputOperation` / `OutputOperation` /
+`RangeOperation` はツール DB の `NodeInputOp` などと同じ。すべて 0 の行は「共通設定」）で、`SettingData` はビッグエンディアンの BLOB:
+
+```text
+u32 8, u32 個数
+項目 × 個数: u32 大きさ（この 12 バイトを含む）, u32 キー, u32 動作, 中身
+  キー: ビット 1 Shift, 2 Ctrl, 4 Alt, 8 Space（0x100 以上はペンのボタンなど、未解明）
+  動作 2: u32 0, u32 16, ツールのノードの UUID（押している間そのツールに切り替え）
+  動作 1: u32 操作の番号（100 直線、200〜202・310 選択範囲の追加・削除など）
+  動作 64・4・65536・131072: u32 値（64 は Ctrl+Alt のブラシサイズ変更と推測）
+```
+
+キーのビットはショートカット（7.1）と違う。CSP の既定（共通設定の Space 手のひら、Ctrl+Space ズームイン、Alt+Space ズームアウト、
+Shift+Space 回転、Ctrl レイヤー移動、Ctrl+Shift レイヤー選択、ペンの Alt スポイト・Ctrl オブジェクト・Shift 直線）と合う。
+`cspf asset modifier-keys FILE --tools EditImageTool.todb` で読める。
+
 ## 8. 未解明の一覧
 
 - 影響元設定の入力ビット 0x100、ヘッダーの語 [10]（100 / 500）
@@ -128,5 +146,5 @@ CSP は列を必要になったときに足すので、同じ形式でもファ�
 - CSP が `.sut` に値のない列を残す規則
 - `.cls` の Shift_JIS の名前の後ろの `u32`、色の形式の語
 - 素材の `xxx.dat` / `asxx.dat`
-- ワークスペースの配置（`workspaceplacement` の BLOB）、修飾キー設定（`.tomd` の `SettingData`）
+- ワークスペースの配置（`workspaceplacement` の BLOB）、修飾キー設定の 0x100 以上のキーと動作 1・2 以外の値
 - サブツールの列のうち「推測（直訳）」の 296 列と「未解明」の 6 列（主にペン・ブラシ以外のツール）。CSP で確認済みは 18 列（W4）

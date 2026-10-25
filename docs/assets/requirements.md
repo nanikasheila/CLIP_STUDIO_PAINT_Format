@@ -185,6 +185,6 @@ SQLite 系の全形式について、表・列・型・行数・観察された�
 | A9 グラデーションセット | W1 W3 | 一部 | W1 合格。W3 は未 |
 | A10 カラーセット | W1 W3 | 済 | W1 合格。[W3](validation/W3-csp.md): CSP で読み込み、書き出し直すとバイト一致 |
 | A11 素材の目録 | W1 | 済 | [W1](validation/W1-samples.md) |
-| A12 ワークスペースなど | W1 | 一部 | ショートカットはコマンドとキーの組で読める（`shortcut`、`cspf asset shortcuts`、Python）。表の列は [目録](spec/sqlite-tables.tsv)。配置の BLOB と修飾キー設定は未解明 |
+| A12 ワークスペースなど | W1 | 一部 | ショートカットはコマンドとキーの組で、修飾キー設定はキーと動作の組で読める（`shortcut`、`cspf asset shortcuts` / `modifier-keys`、Python）。表の列は [目録](spec/sqlite-tables.tsv)。ワークスペースの配置の BLOB は未解明 |
 | A13 CLI | W2 | 済 | `crates/cspf/tests/asset.rs` |
 | A14 Python | W5 | 済 | [W5](validation/W5-python.md): 158 件で違い 0、CI で合成ファイルを毎回照合 |

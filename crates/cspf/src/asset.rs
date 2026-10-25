@@ -11,7 +11,7 @@ use csp_assets::gradient::GradientSet;
 use csp_assets::kind::{Family, detect};
 use csp_assets::material::{self, Catalog, Element, InfoList, MaterialFolder};
 use csp_assets::serial::Document;
-use csp_assets::shortcut::Shortcuts;
+use csp_assets::shortcut::{ModifierAction, Shortcuts, modifier_keys};
 use csp_assets::subtool::{self, SubToolDb};
 use csp_assets::{c2f, tar};
 use csp_format::{Error, Result};
@@ -43,6 +43,9 @@ USAGE:
   cspf asset shortcuts FILE [--tools EditImageTool.todb]
                                     shortcut keys as text: command, then keys (.khc, .spws);
                                     tool keys are named from the tool DB when given
+  cspf asset modifier-keys FILE [--tools EditImageTool.todb]
+                                    modifier key settings as text (.tomd): per kind of tool,
+                                    keys and what they do
   cspf asset catalog DIR            material folders under DIR as JSON (no decryption)
   cspf asset corpus ROOT OUT.jsonl  read every file under ROOT and check round trips
 ";
@@ -65,6 +68,7 @@ pub fn run(args: &[String]) -> Result<bool> {
         "actions" => one(rest).and_then(|f| actions(&f)),
         "colorset" => one(rest).and_then(|f| colorset(&f)),
         "shortcuts" => shortcuts(rest),
+        "modifier-keys" => modifier_keys_text(rest),
         "colorset-new" => colorset_new(rest),
         "gradients" => one(rest).and_then(|f| gradients(&f)),
         "catalog" => one(rest).and_then(|d| catalog(&d)),
@@ -364,14 +368,45 @@ fn actions(path: &Path) -> Result<bool> {
     Ok(true)
 }
 
+/// FILE [--tools EditImageTool.todb]: the file and the tool DB, if given.
+fn file_and_tools(args: &[String]) -> Result<(&String, Option<SubToolDb>)> {
+    match args {
+        [path] => Ok((path, None)),
+        [path, flag, tools] if flag == "--tools" => Ok((path, Some(SubToolDb::open(tools)?))),
+        _ => Err(usage_error("expected FILE [--tools EditImageTool.todb]")),
+    }
+}
+
+fn tool_names(tools: &Option<SubToolDb>) -> std::collections::HashMap<String, String> {
+    tools.iter().flat_map(|db| db.nodes.iter().map(|n| (n.uuid_hex(), n.name.clone()))).collect()
+}
+
+fn modifier_keys_text(args: &[String]) -> Result<bool> {
+    let (path, tools) = file_and_tools(args)?;
+    let names = tool_names(&tools);
+    for rule in modifier_keys(&std::fs::read(path)?)? {
+        // The first sub tool of this kind, to say which tool the row is for.
+        let example = tools
+            .iter()
+            .flat_map(|db| db.nodes.iter())
+            .find(|n| n.variant_id != 0 && (n.input_op, n.output_op) == (rule.input_op, rule.output_op));
+        let named = example.map(|n| format!("  ({})", n.name)).unwrap_or_default();
+        println!("ops {} {} {}{named}", rule.input_op, rule.output_op, rule.range_op);
+        for entry in &rule.entries {
+            let action = match &entry.action {
+                ModifierAction::Tool(uuid) => format!("tool:{}", names.get(uuid).unwrap_or(uuid)),
+                ModifierAction::Operation(n) => format!("operation {n}"),
+                ModifierAction::Other { action, payload } => format!("action {action} {payload}"),
+            };
+            println!("  {}\t{action}", entry.label());
+        }
+    }
+    Ok(true)
+}
+
 fn shortcuts(args: &[String]) -> Result<bool> {
-    let (path, tools) = match args {
-        [path] => (path, None),
-        [path, flag, tools] if flag == "--tools" => (path, Some(SubToolDb::open(tools)?)),
-        _ => return Err(usage_error("expected FILE [--tools EditImageTool.todb]")),
-    };
-    let names: std::collections::HashMap<String, String> =
-        tools.iter().flat_map(|db| db.nodes.iter().map(|n| (n.uuid_hex(), n.name.clone()))).collect();
+    let (path, tools) = file_and_tools(args)?;
+    let names = tool_names(&tools);
     let shortcuts = Shortcuts::from_bytes(&std::fs::read(path)?)?;
     let mut done = std::collections::HashSet::new();
     for s in &shortcuts.commands {
