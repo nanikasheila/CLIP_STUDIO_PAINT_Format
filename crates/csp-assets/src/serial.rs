@@ -10,7 +10,7 @@
 //! value     = u8 tag, then by tag:
 //!   0x06 string   number(length) UTF-8 bytes
 //!   0x07 bytes    number(length) bytes
-//!   0x11 bool     number
+//!   0x11 bool     number, always 1 byte (01 00 / 01 01); CSP reads 0 bytes as true
 //!   0x13 int      number (4 bytes when negative: two's complement)
 //!   0x14 uint     number
 //!   0x15 real     number(8 bytes) = f64 big endian
@@ -79,7 +79,7 @@ pub fn looks_like(data: &[u8]) -> bool {
 
 impl Value {
     pub fn bool(value: bool) -> Value {
-        Value::Number { tag: TAG_BOOL, raw: minimal(value as u64) }
+        Value::Number { tag: TAG_BOOL, raw: vec![value as u8] }
     }
 
     pub fn int(value: i64) -> Value {
@@ -470,7 +470,11 @@ fn value_json(value: &Value) -> Json {
                 TAG_UINT => map.insert("uint".into(), json!(number)),
                 other => map.insert(format!("tag{other:02x}"), json!(number)),
             };
-            let canonical = if *tag == TAG_INT { *value == Value::int(number) } else { *raw == minimal(number as u64) };
+            let canonical = match *tag {
+                TAG_INT => *value == Value::int(number),
+                TAG_BOOL => *raw == [number as u8],
+                _ => *raw == minimal(number as u64),
+            };
             if !canonical || (*tag == TAG_BOOL && number > 1) {
                 map.insert("@raw".into(), Json::String(hex(raw)));
             }
@@ -590,6 +594,16 @@ mod tests {
         assert_eq!(Value::int(-100).as_i64(), Some(-100));
         assert_eq!(Value::Number { tag: TAG_INT, raw: vec![0xff, 0xff] }.as_i64(), Some(65535));
         assert_eq!(Value::int(0), Value::Number { tag: TAG_INT, raw: vec![] });
+    }
+
+    #[test]
+    fn bools_take_one_byte() {
+        // CSP writes 01 00 for false and reads a 0-byte bool as true (W3).
+        assert_eq!(Value::bool(false), Value::Number { tag: TAG_BOOL, raw: vec![0] });
+        assert_eq!(Value::bool(true), Value::Number { tag: TAG_BOOL, raw: vec![1] });
+        assert_eq!(value_json(&Value::bool(false)), json!({ "bool": false }));
+        let short = Value::Number { tag: TAG_BOOL, raw: vec![] };
+        assert_eq!(value_json(&short), json!({ "bool": false, "@raw": "" }));
     }
 
     #[test]
