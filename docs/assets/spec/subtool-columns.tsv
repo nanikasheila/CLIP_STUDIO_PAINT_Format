@@ -8,11 +8,11 @@ BalloonTailWidth	フキダシ	しっぽ 幅	名前からの直訳	推測（直�
 BalloonTailWidthUnit	フキダシ	しっぽ 幅 単位	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	0	
 BalloonTone	フキダシ	トーン	名前からの直訳	推測（直訳）	INTEGER	180	effectLines,balloon,brush,?	0	1	
 BalloonUniteText	フキダシ	結合 テキスト	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	1	1	
-BrushAdjustFlowByInterval	インク	間隔に合わせて濃度を調整	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushAdjustFlowByInterval	ブラシ先端	間隔によるブラシ濃度調整	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
 BrushAdjustVelocity	補正	速度の調整	0/1	推測	INTEGER	1473	brush,eraser,shape,balloon,effectLines,frame,liquify,blend,fill,vectorEdit,selection,ruler	0	1	
 BrushAtLeast1Pixel	ブラシサイズ	最小値を 1 ピクセルにする	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
-BrushAutoIntervalType	ストローク	間隔	0 固定, 1 広い（推測）, 2 普通, 3 狭い（推測）	確認済み（W4: 固定 0、普通 2）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	3	
-BrushBlendPatternByDarken	ブラシ先端	比較(暗)で重ねる	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushAutoIntervalType	ストローク	間隔	0 固定, 1 広い（推測）, 2 普通, 3 狭い	確認済み（W4: 固定 0、普通 2）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	3	
+BrushBlendPatternByDarken	ストローク	比較(暗)で合成	0/1（2-ストロークの同じ項目から推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
 BrushBlur	水彩	ぼかし幅		推測	REAL	1578	brush,eraser,?	0.0	200.0	
 BrushBlurEffector	水彩	ぼかし幅の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
 BrushBlurKind	水彩	ぼかしの種類		推測	INTEGER	106	brush,eraser	0	1	
@@ -72,7 +72,7 @@ BrushSaturationChange	色の変化	彩度（ブラシ先端色の変化）		確�
 BrushSaturationChangeEffector	色の変化	彩度（ブラシ先端色の変化）の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1271	brush,eraser			effector:1271
 BrushSharpenCorner	補正	角をとがらせる	0/1	確認済み（W4）	INTEGER	1811	brush,eraser,shape,balloon,vectorEdit,frame,?,selection,fill,ruler,blend	0	1	
 BrushSize	ブラシサイズ	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	確認済み（W3 表示、W4）	REAL	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0.5	2000.0	
-BrushSizeEffector	ブラシサイズ	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend			effector:1962
+BrushSizeEffector	ブラシサイズ	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	確認済み（W4: 入力のビット、入力ごとの最小値、傾きの最大値、筆圧のグラフ）	BLOB	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend			effector:1962
 BrushSizeSyncViewScale	ブラシサイズ	画面上のサイズで指定	0/1	確認済み（W4）	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	1	
 BrushSizeUnit	ブラシサイズ	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	2	
 BrushSprayBias	散布効果	散布偏向	-100–100	確認済み（W4）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	-100	100	
@@ -120,7 +120,7 @@ BrushWaterEdgeStrength	水彩境界	強さ（フチの表現 ビビッド）	0�
 BrushWaterEdgeStyle	水彩境界	フチの表現	0 通常, 1 ビビッド	確認済み（W4）	INTEGER	12	brush	0	1	
 BrushWaterEdgeValuePower	水彩境界	明度影響	0–100（バー）	確認済み（W4）	INTEGER	1578	brush,eraser,?	0	70	
 BrushWaterEdgeVividness	水彩境界	鮮やかさ（フチの表現 ビビッド）	0–100（バー）	確認済み（W4）	INTEGER	12	brush	50	50	
-ChangeRGBByDual	デュアルブラシ	2 つ目の先端で色を変える		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+ChangeRGBByDual	2-ブラシ形状	RGB値に適用	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 CloseFillReferColorType	塗りつぶし	囲って塗る: 参照する色		推測	INTEGER	28	fill,selection	0	8	
 ComicFrameBaseChannel	コマ枠	基準 チャンネル	名前からの直訳	推測（直訳）	INTEGER	16	frame,?	0	0	
 ComicFrameDrawLine	コマ枠	描画 線	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	0	1	
@@ -147,16 +147,16 @@ CutFrameHorizontalGapUnit	コマ枠カット	横 間隔 単位	名前からの�
 CutFrameUsePreferenceGap	コマ枠カット	使う 環境設定 間隔	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	1	
 CutFrameVerticalGap	コマ枠カット	縦 間隔	名前からの直訳	推測（直訳）	REAL	16	frame	15.0	180.0	
 CutFrameVerticalGapUnit	コマ枠カット	縦 間隔 単位	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	0	
-DualAdjustFlowByInterval	インク（デュアルブラシ）	間隔に合わせて濃度を調整	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualAntiAlias	アンチエイリアス（デュアルブラシ）	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
-DualAutoIntervalType	ストローク（デュアルブラシ）	間隔	0 固定, 1 広い（推測）, 2 普通, 3 狭い（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
-DualBlendPatternByDarken	ブラシ先端（デュアルブラシ）	比較(暗)で重ねる	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualBlendPatternByDarken2		Dual Blend Pattern で Darken2	名前からの直訳	未解明	INTEGER	1178	brush,eraser,shape,balloon,effectLines,frame,fill,blend,vectorEdit,selection	0	1	
-DualBrushCompositeMode	デュアルブラシ	合成モード		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	12	
-DualContinuousPlot	ストローク（デュアルブラシ）	連続吹き付け	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualFlow	インク（デュアルブラシ）	ブラシ濃度	1–100 %	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
+DualAdjustFlowByInterval	ブラシ先端（デュアルブラシ）	間隔によるブラシ濃度調整	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualAntiAlias	アンチエイリアス（デュアルブラシ）	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	確認済み（W4: 中 2、強 3）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
+DualAutoIntervalType	ストローク（デュアルブラシ）	間隔	0 固定, 1 広い（推測）, 2 普通, 3 狭い	確認済み（W4: 普通 2、狭い 3）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
+DualBlendPatternByDarken	ストローク（デュアルブラシ）	比較(暗)で合成	0/1（1 つのチェックで 2 列とも変わる）	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualBlendPatternByDarken2	ストローク（デュアルブラシ）	比較(暗)で合成（2 列目）	0/1（DualBlendPatternByDarken と同じ値）	確認済み（W4）	INTEGER	1178	brush,eraser,shape,balloon,effectLines,frame,fill,blend,vectorEdit,selection	0	1	
+DualBrushCompositeMode	2-ブラシ形状	適用方法	CSP の並び順 0 通常, 1 乗算, 2 加算(発光), 3 減算, 4 比較(暗), 5 比較(明), 6 スクリーン, 7 オーバーレイ, 8 覆い焼きカラー, 9 焼き込みカラー, 10 焼き込み(リニア), 11 ハードミックス, 12 高さ(リニア)（1 と 6 を確認）	確認済み（W4: 乗算 1、スクリーン 6）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	12	
+DualContinuousPlot	ストローク（デュアルブラシ）	連続吹き付け	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualFlow	インク（デュアルブラシ）	ブラシ濃度	1–100 %	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
 DualFlowEffector	インク（デュアルブラシ）	ブラシ濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
-DualHardness	ブラシ先端（デュアルブラシ）	硬さ	1–100（円形の先端）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	100	
+DualHardness	ブラシ先端（デュアルブラシ）	硬さ	1–100（円形の先端）	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	100	
 DualInterval	ストローク（デュアルブラシ）	間隔	% (先端の直径に対する)	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	150.0	
 DualIntervalEffector	ストローク（デュアルブラシ）	間隔の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
 DualPatternImageArray	ブラシ先端（デュアルブラシ）	先端の素材	素材の参照の列	推測		147	brush			materials:147
@@ -164,40 +164,40 @@ DualPatternOrderType	ブラシ先端（デュアルブラシ）	素材の順序�
 DualPatternReverseHorizontal	ブラシ先端（デュアルブラシ）	左右反転	0 なし, 2 ランダム, 3 進行方向（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	2	
 DualPatternReverseVertical	ブラシ先端（デュアルブラシ）	上下反転		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	2	
 DualRibbon	ストローク（デュアルブラシ）	リボン	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualRotation	ブラシ先端（デュアルブラシ）	ブラシ先端の向き	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
+DualRotation	ブラシ先端（デュアルブラシ）	ブラシ先端の向き	度	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
 DualRotationEffector	ブラシ先端（デュアルブラシ）	向きの影響元	ビット: 筆圧・傾き・進行方向・ランダムなど（.clip 側の RotationEffector と同じ）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	163	
 DualRotationEffectorInSpray	散布効果（デュアルブラシ）	粒子の向きの影響元	ビット	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	257	
-DualRotationInSpray	散布効果（デュアルブラシ）	粒子の向き	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
+DualRotationInSpray	散布効果（デュアルブラシ）	粒子の向き	度	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
 DualRotationRandomInSpray	散布効果（デュアルブラシ）	粒子の向きのランダムの幅	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	100	
 DualRotationRandomScale	ブラシ先端（デュアルブラシ）	向きのランダムの幅	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	2	100	
-DualSize	ブラシサイズ（デュアルブラシ）	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	6.0	800.0000000000001	
+DualSize	ブラシサイズ（デュアルブラシ）	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	6.0	800.0000000000001	
 DualSizeEffector	ブラシサイズ（デュアルブラシ）	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
 DualSizeUnit	ブラシサイズ（デュアルブラシ）	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
-DualSprayBias	散布効果（デュアルブラシ）	散布偏向	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	100	
-DualSprayDensity	散布効果（デュアルブラシ）	粒子密度	1–16	推測	INTEGER	1272	brush,eraser,balloon,effectLines,shape,frame,blend,selection	1	16	
+DualSprayBias	散布効果（デュアルブラシ）	散布偏向	-100–100	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	100	
+DualSprayDensity	散布効果（デュアルブラシ）	粒子密度	1–16	確認済み（W4）	INTEGER	1272	brush,eraser,balloon,effectLines,shape,frame,blend,selection	1	16	
 DualSprayDensityEffector	散布効果（デュアルブラシ）	粒子密度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
 DualSprayFixedPointArray	散布効果（デュアルブラシ）	固定の散布位置	点の列（標本では空）	推測		0				
-DualSpraySize	散布効果（デュアルブラシ）	粒子サイズ		推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	450.0	
+DualSpraySize	散布効果（デュアルブラシ）	粒子サイズ		確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	450.0	
 DualSpraySizeEffector	散布効果（デュアルブラシ）	粒子サイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
-DualSpraySizeSyncBrushSize	散布効果（デュアルブラシ）	粒子サイズをブラシサイズに連動	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualSpraySizeSyncBrushSize	散布効果（デュアルブラシ）	粒子サイズをブラシサイズに連動	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 DualSpraySizeUnit	散布効果（デュアルブラシ）	粒子サイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
 DualSprayUseFixedPoint	散布効果（デュアルブラシ）	固定の散布位置を使う	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
-DualTextureBrightness	紙質（デュアルブラシ）	明るさ	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	50	
-DualTextureCompositeMode	紙質（デュアルブラシ）	紙質適用方法	CSP の並び順 0 通常, 1 乗算, 2 減算, 3 比較, 4 輪郭, 5 オーバーレイ, 6 覆い焼きカラー, 7 焼き込みカラー, 8 ハードミックス, 9 高さ（0 と 3 を確認）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	6	
-DualTextureContrast	紙質（デュアルブラシ）	コントラスト	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-50	0	
-DualTextureDensity	紙質（デュアルブラシ）	紙質濃度	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
+DualTextureBrightness	紙質（デュアルブラシ）	明るさ	-100–100	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	50	
+DualTextureCompositeMode	紙質（デュアルブラシ）	紙質適用方法	CSP の並び順 0 通常, 1 乗算, 2 減算, 3 比較, 4 輪郭, 5 オーバーレイ, 6 覆い焼きカラー, 7 焼き込みカラー, 8 ハードミックス, 9 高さ（0 と 3 を確認）	確認済み（W4: 通常 0、乗算 1）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	6	
+DualTextureContrast	紙質（デュアルブラシ）	コントラスト	-100–100	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-50	0	
+DualTextureDensity	紙質（デュアルブラシ）	紙質濃度	%	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
 DualTextureDensityEffector	紙質（デュアルブラシ）	紙質濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
-DualTextureForPlot	紙質（デュアルブラシ）	描点ごとに適用	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualTextureImage	紙質（デュアルブラシ）	紙質の素材	素材の参照の列	推測		73	brush			materials:73
+DualTextureForPlot	紙質（デュアルブラシ）	描点ごとに適用	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualTextureImage	紙質（デュアルブラシ）	紙質の素材	素材の参照の列	確認済み（W4: 素材の参照）		73	brush			materials:73
 DualTextureReverseDensity	紙質（デュアルブラシ）	濃度反転	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualTextureRotate	紙質（デュアルブラシ）	回転角	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	0.0	
-DualTextureScale	紙質（デュアルブラシ）	拡大率（旧形式）	%	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	25.0	100.0	
-DualTextureStressDensity	紙質（デュアルブラシ）	濃度強調	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualThickness	ブラシ先端（デュアルブラシ）	厚さ	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	60	200	
+DualTextureRotate	紙質（デュアルブラシ）	回転角	度	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	0.0	
+DualTextureScale	紙質（デュアルブラシ）	拡大率	%（デュアルブラシには Scale2 の列がなく、この列が今の拡大率）	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	25.0	100.0	
+DualTextureStressDensity	紙質（デュアルブラシ）	濃度強調	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualThickness	ブラシ先端（デュアルブラシ）	厚さ	%	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	60	200	
 DualThicknessEffector	ブラシ先端（デュアルブラシ）	厚さの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
 DualUsePatternImage	ブラシ先端（デュアルブラシ）	先端形状: 素材	0 円形, 1 素材	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualUseSpray	散布効果（デュアルブラシ）	散布効果	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualVerticalThicknes	ブラシ先端（デュアルブラシ）	厚さの適用方向	0 水平, 1 垂直	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualUseSpray	散布効果（デュアルブラシ）	散布効果	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualVerticalThicknes	ブラシ先端（デュアルブラシ）	厚さの適用方向	0 水平, 1 垂直	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 DustMode	ゴミ取り	モード		推測	INTEGER	17	vectorEdit,?	0	2	
 DustModeForSelect	ゴミ取り	選択範囲のモード		推測	INTEGER	9	selection,?	0	0	
 DustSize	ゴミ取り	ゴミサイズ		推測	REAL	26	vectorEdit,selection,?	4.0	10.0	
@@ -418,7 +418,7 @@ StreamUseLineLengthDisturb	効果線	使う 線 長さ 乱れ	名前からの直
 StreamUseStartGapDisturb	効果線	使う 開始 間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
 SymmetryRulerLineNumber	対称定規	線 数	名前からの直訳	推測（直訳）	INTEGER	8	ruler	2	11	
 SymmetryRulerLineSymmetry	対称定規	線 対称	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
-SyncDualBrushSize	デュアルブラシ	ブラシサイズを連動	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+SyncDualBrushSize	2-ブラシ形状	メインのブラシサイズに連動	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 TextAlignment	テキスト	揃え	名前からの直訳	推測（直訳）	INTEGER	20	text	0	2	
 TextAlignmentJustify	テキスト	揃え 均等	名前からの直訳	推測（直訳）	INTEGER	15	text	0	2	
 TextAlternateHalfMetrics	テキスト	代替 半角 メトリクス	名前からの直訳	推測（直訳）	INTEGER	20	text	1	1	
@@ -498,7 +498,7 @@ TextureScale2	紙質	拡大率	%	確認済み（W4）	REAL	1914	brush,effectLine
 TextureStressDensity	紙質	濃度強調	0/1	推測	INTEGER	1921	brush,effectLines,eraser,shape,balloon,frame,?,vectorEdit,selection,ruler,blend,fill	0	1	
 TimeLineDragType	タイムライン	ドラッグ 方式	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
 TimeLineNext	タイムライン	次	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
-UseDualBrush	デュアルブラシ	デュアルブラシ	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+UseDualBrush	2-ブラシ形状	2-ブラシ形状（デュアルブラシを使う）	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 VariantID	（内部）	設定行の ID	Node.NodeVariantID / NodeInitVariantID から参照	推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	2	1606	
 VariantShowParam	（内部）	ツールプロパティに表示する項目	項目 ID の列、subtool-items.tsv	推測	BLOB	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common			records:2515
 VariantShowSeparator	（内部）	ツールプロパティの区切り線		推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	0	0	
