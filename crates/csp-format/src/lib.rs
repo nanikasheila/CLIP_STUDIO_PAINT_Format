@@ -5,9 +5,11 @@
 
 #![deny(unsafe_code)]
 
+pub mod animation;
 pub mod binary;
 pub mod clip;
 pub mod cmc;
+pub mod cmt;
 pub mod container;
 pub mod correction;
 pub mod create;
