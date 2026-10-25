@@ -1,5 +1,5 @@
 //! Copies of a CSP-saved file that pretend to come from another CSP version,
-//! to see how CSP reacts (docs/validation/V8-versions.md).
+//! to see how CSP reacts (docs/validation/V9-versions.md).
 //!
 //! - `base`: renamed top layer only (control)
 //! - `unk_set`: an unknown Layer column, registered like CSP's `Has1_0_N`

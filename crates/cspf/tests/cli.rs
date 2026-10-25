@@ -153,3 +153,16 @@ fn folders_and_attributes() {
     assert!(layers.contains("    L [raster] hidden  opacity=128 blend=2"), "{layers}");
     assert!(!cspf(&["set", &changed2, &layer, &changed, "--blend", "999"]).status.success());
 }
+
+#[test]
+fn animation_commands_on_a_file_without_timelines() {
+    let dir = tempfile::tempdir().unwrap();
+    let clip = path(dir.path(), "still.clip");
+    ok(&["new", &clip, "--size", "16x16"]);
+    assert_eq!(ok(&["anim", &clip]).trim(), "null");
+    let frames = cspf(&["frames", &clip, &path(dir.path(), "frames")]);
+    assert!(!frames.status.success());
+    assert!(String::from_utf8_lossy(&frames.stderr).contains("no timeline"));
+    let set = cspf(&["anim-set", &clip, &path(dir.path(), "out.clip"), "--fps", "12"]);
+    assert!(!set.status.success());
+}

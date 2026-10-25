@@ -183,27 +183,30 @@ pub struct TextBlock {
     pub attributes: Attributes,
 }
 
-/// The text blocks of a layer: from the arrays when present, else the
-/// single string and attributes.
+/// The text blocks of a layer: the single string and attributes first,
+/// then one block per entry of the arrays. The arrays hold the other
+/// blocks, not a copy of the first: in the corpus the single block always
+/// has its own bounding box and rendered image (V7).
 pub fn read_blocks(row: &crate::database::Row) -> Result<Vec<TextBlock>> {
-    if let (Some(strings), Some(attributes)) = (row.blob("TextLayerStringArray"), row.blob("TextLayerAttributesArray"))
-    {
-        let strings = split_array(strings)?;
-        let attributes = split_array(attributes)?;
-        return strings
-            .iter()
-            .zip(attributes.iter().map(|blob| Attributes::parse(blob)))
-            .map(|(text, attributes)| {
-                Ok(TextBlock { text: String::from_utf8_lossy(text).into_owned(), attributes: attributes? })
-            })
-            .collect();
+    let mut blocks = Vec::new();
+    let (text, attributes) = (row.blob("TextLayerString"), row.blob("TextLayerAttributes"));
+    if text.is_some() || attributes.is_some() {
+        blocks.push(block(text.unwrap_or_default(), attributes)?);
     }
-    let Some(text) = row.blob("TextLayerString") else { return Ok(Vec::new()) };
-    let attributes = match row.blob("TextLayerAttributes") {
+    let strings = row.blob("TextLayerStringArray").map(split_array).transpose()?.unwrap_or_default();
+    let attributes = row.blob("TextLayerAttributesArray").map(split_array).transpose()?.unwrap_or_default();
+    for index in 0..strings.len().max(attributes.len()) {
+        blocks.push(block(strings.get(index).copied().unwrap_or_default(), attributes.get(index).copied())?);
+    }
+    Ok(blocks)
+}
+
+fn block(text: &[u8], attributes: Option<&[u8]>) -> Result<TextBlock> {
+    let attributes = match attributes {
         Some(blob) => Attributes::parse(blob)?,
         None => Attributes::default(),
     };
-    Ok(vec![TextBlock { text: String::from_utf8_lossy(text).into_owned(), attributes }])
+    Ok(TextBlock { text: String::from_utf8_lossy(text).into_owned(), attributes })
 }
 
 #[cfg(test)]
@@ -224,5 +227,29 @@ mod tests {
         assert!(Attributes::parse(&bytes[..bytes.len() - 1]).is_err());
         let array = join_array(&[bytes.clone(), vec![]]);
         assert_eq!(split_array(&array).unwrap(), vec![bytes.as_slice(), &[][..]]);
+    }
+
+    #[test]
+    fn the_arrays_follow_the_single_block() {
+        use crate::database::{Row, SqlValue as Value};
+        let mut first = Attributes::default();
+        first.set_bbox([0, 0, 10, 10]);
+        let mut second = Attributes::default();
+        second.set_bbox([20, 0, 30, 10]);
+        let columns = ["TextLayerString", "TextLayerAttributes", "TextLayerStringArray", "TextLayerAttributesArray"];
+        let row = Row::new(
+            columns.iter().map(|c| c.to_string()).collect(),
+            vec![
+                Value::Blob(b"one".to_vec()),
+                Value::Blob(first.to_bytes()),
+                Value::Blob(join_array(&[b"two".to_vec()])),
+                Value::Blob(join_array(&[second.to_bytes()])),
+            ],
+        );
+        let blocks = read_blocks(&row).unwrap();
+        assert_eq!(blocks.iter().map(|b| b.text.as_str()).collect::<Vec<_>>(), ["one", "two"]);
+        assert_eq!(blocks[1].attributes.bbox(), Some([20, 0, 30, 10]));
+        let single = Row::new(vec!["TextLayerString".into()], vec![Value::Blob(b"only".to_vec())]);
+        assert_eq!(read_blocks(&single).unwrap().len(), 1);
     }
 }

@@ -127,13 +127,19 @@ def _blob(row, column: str) -> bytes | None:
 
 
 def read_blocks(row) -> list[TextBlock]:
-    """The text blocks of a ``Layer`` row: from the arrays when present, else the single string."""
-    strings, attributes = _blob(row, "TextLayerStringArray"), _blob(row, "TextLayerAttributesArray")
-    if strings is not None and attributes is not None:
-        return [TextBlock(text.decode("utf-8", "replace"), Attributes.parse(attrs))
-                for text, attrs in zip(split_array(strings), split_array(attributes))]
-    text = _blob(row, "TextLayerString")
-    if text is None:
-        return []
-    attrs = _blob(row, "TextLayerAttributes")
-    return [TextBlock(text.decode("utf-8", "replace"), Attributes.parse(attrs) if attrs else Attributes())]
+    """The text blocks of a ``Layer`` row: the single string and attributes
+    first, then one block per entry of the arrays (the arrays hold the other
+    blocks, not a copy of the first)."""
+    blocks = []
+    text, attrs = _blob(row, "TextLayerString"), _blob(row, "TextLayerAttributes")
+    if text is not None or attrs is not None:
+        blocks.append(TextBlock((text or b"").decode("utf-8", "replace"), Attributes.parse(attrs) if attrs else Attributes()))
+    strings = _blob(row, "TextLayerStringArray")
+    attributes = _blob(row, "TextLayerAttributesArray")
+    strings = split_array(strings) if strings is not None else []
+    attributes = split_array(attributes) if attributes is not None else []
+    for index in range(max(len(strings), len(attributes))):
+        string = strings[index] if index < len(strings) else b""
+        blob = attributes[index] if index < len(attributes) else b""
+        blocks.append(TextBlock(string.decode("utf-8", "replace"), Attributes.parse(blob)))
+    return blocks

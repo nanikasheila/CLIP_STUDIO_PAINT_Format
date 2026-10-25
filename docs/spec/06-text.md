@@ -8,7 +8,7 @@
 |---|---|
 | `TextLayerString` | 本文（UTF-8） |
 | `TextLayerAttributes` | 書式（下のレコードの列） |
-| `TextLayerStringArray`、`TextLayerAttributesArray` | 文字のまとまり（フキダシ）が複数あるとき: まとまりごとに `u32le 長さ` + 本文 / 書式 |
+| `TextLayerStringArray`、`TextLayerAttributesArray` | 文字のまとまり（フキダシ）が複数あるとき、**2 つ目以降**のまとまり: まとまりごとに `u32le 長さ` + 本文 / 書式。1 つ目は `TextLayerString` / `TextLayerAttributes`（確認済み: コーパスの配列を持つ 133 レイヤーすべてで、1 つ目の書式は配列のどれとも違い、自分の外接矩形と描いた画像を持つ） |
 | `TextLayerAddAttributesV01` | 書式の追加分（未解読、保持する） |
 | `TextLayerType`、`TextLayerVersion`、`TextLayerAttributesVersion` | 種類と版（値の意味は未解明） |
 

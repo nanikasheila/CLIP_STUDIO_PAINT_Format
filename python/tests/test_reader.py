@@ -212,6 +212,14 @@ class VectorTextTest(unittest.TestCase):
                                  ("台詞".encode(), blob)).fetchone()
         (block,) = read_blocks(row)
         self.assertEqual((block.text, block.attributes.font_size), ("台詞", 6.0))
+        # The arrays hold the other blocks (balloons), after the single one.
+        row = connection.execute(
+            "SELECT ? AS TextLayerString, ? AS TextLayerAttributes, ? AS TextLayerStringArray, "
+            "? AS TextLayerAttributesArray",
+            (b"one", blob, struct.pack("<I", 3) + b"two", struct.pack("<I", 0))).fetchone()
+        blocks = read_blocks(row)
+        self.assertEqual([b.text for b in blocks], ["one", "two"])
+        self.assertEqual((blocks[0].attributes.font_size, blocks[1].attributes.records), (6.0, ()))
 
 
 class CmcTest(unittest.TestCase):
@@ -238,6 +246,9 @@ class CmcTest(unittest.TestCase):
                 first, second = work.pages()
                 self.assertIsInstance(work.page_thumbnail(first), Image)
                 self.assertIsNone(work.page_thumbnail(second))  # its file is missing
+                # Starts on the right: the single page is a right page, the spread starts on the left.
+                self.assertEqual([(s.position, s.spread, s.left) for s in work.positions()],
+                                 [(0, False, False), (1, True, True)])
 
     def test_not_a_cmc(self):
         with self.assertRaises(CspFormatError):

@@ -1,0 +1,38 @@
+kind	csp_name	menu	parameters	certainty	note
+92015820-D5B9-44D4-81B6-1F674762E420	放射ぼかし	フィルター > ぼかし（プラグイン、UUID で指定）	1, 2, 3, 4, input1, 3D7F32A9-…	確認済み（名前）	パラメーターは番号付き。CSP のパレットでは名前付きの設定として表示される
+FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF	ガウスぼかし	フィルター > ぼかし（プラグイン、UUID で指定）	1, input1, 3D7F32A9-…	確認済み（名前）	パラメーターは番号付き。CSP のパレットでは名前付きの設定として表示される
+adjustmentactionToneCurve	トーンカーブ	色調補正 > トーンカーブ	channelred, channelgreen, channelblue	確認済み（名前）
+adjustmentactiongradientmap	グラデーションマップ	色調補正 > グラデーションマップ	gradation	確認済み（名前）	gradation は GradationData（gradient.rs）
+adjustmentactionhsv	色相・彩度・明度	色調補正 > 色相・彩度・明度	hue, saturation, value	確認済み（名前）
+applicationactionchangecurrentcolor	描画色の変更	描画色の変更	currentcolor	確認済み（名前）
+editactionbordering	選択範囲をフチ取り	編集 > 選択範囲をフチどり	borderingtype, borderingsize, borderexpandtype, isdrawcanvasedge	確認済み（名前）
+editactionchangelinecolor	線の色を描画色に変更	編集 > 線の色を描画色に変更		確認済み（名前）
+editactioncut	切り取り	編集 > 切り取り	cutlayer	確認済み（名前）
+editactiondetailpaint	高度な塗りつぶし	編集 > 塗りつぶし（詳細設定）	antialias, colormargin, compositemode, expandsize, isrefermultilayer, isshrink, opacity, paintexpandtype	確認済み（名前）
+editactionpaint	塗りつぶし	編集 > 塗りつぶし		確認済み（名前）
+editactionpaste	貼り付け	編集 > 貼り付け		確認済み（名前）
+layeractionchangebelowclip	下のレイヤーでクリッピングの変更	下のレイヤーでクリッピング	belowclip	確認済み（名前）	パレットでは末尾が切れて「下のレイヤーでクリッピングの…」。残りは推測
+layeractionchangedraftlayer	下描きレイヤーの設定	下描きレイヤーに設定	draftlayer	確認済み（名前）
+layeractionchangename	レイヤー名の変更	レイヤー名の変更	layername	確認済み（名前）
+layeractioncopy	レイヤーを複製	レイヤーを複製		確認済み（名前）
+layeractiondelete	レイヤーを削除	レイヤーを削除		確認済み（名前）
+layeractionfoldernewandinsert	フォルダーを作成してレイヤーを挿入	新規レイヤーフォルダーを作成してレイヤーを挿入	duplicate	確認済み（名前）	パレットでは末尾が切れて「フォルダーを作成してレイヤー…」。残りは推測
+layeractionmergealllayer	画像を統合	画像を統合		確認済み（名前）
+layeractionmergelowerlayer	下のレイヤーと結合	下のレイヤーに結合	keepmask	確認済み（名前）
+layeractionmergeselectedlayer	選択中のレイヤーを結合	選択中のレイヤーを結合		確認済み（名前）
+layeractionmergevisiblelayercopy	表示レイヤーのコピーを結合	表示レイヤーのコピーを結合		確認済み（名前）
+layeractionrasterdetailnew	新規ラスターレイヤー（詳細）	新規ラスターレイヤー（詳細設定）	layername, colortype, compositemode, channelorder, addnumbertoname	確認済み（名前）
+layeractionrasterize	ラスタライズ	ラスタライズ		確認済み（名前）
+layeractionrasternew	新規ラスターレイヤー	新規ラスターレイヤー		確認済み（名前）
+layeractionselectcontinuouslayer	指定したレイヤーまでを選択	レイヤーを連続選択	layername	確認済み（名前）
+layeractionselectlowerlayer	下のレイヤーを編集対象にする	下のレイヤーを選択		確認済み（名前）	パレットでは末尾が切れて「下のレイヤーを編集対象にす…」。残りは推測
+layeractionselectupperlayer	上のレイヤーを編集対象にする	上のレイヤーを選択		確認済み（名前）	パレットでは末尾が切れて「上のレイヤーを編集対象にす…」。残りは推測
+layeractionsetcompositemode	合成モードの変更	合成モードの変更	compositemode	確認済み（名前）
+layeractionsetcurrentlayer	編集レイヤーの変更	レイヤーを選択（名前で）	layername	確認済み（名前）
+layeractionsetopacity	不透明度の変更	不透明度の変更	opacity	確認済み（名前）
+layeractionsetuselayercolor	レイヤーカラー使用の変更	レイヤーカラーを使う	use	確認済み（名前）
+layeractionsetusetone	トーン使用の変更	トーン化	use	確認済み（名前）
+selectactiondeselect	選択を解除	選択を解除		確認済み（名前）
+selectactionexpand	選択範囲を拡張	選択範囲を拡張	expandtype, sizelength	確認済み（名前）
+selectactionreduce	選択範囲を縮小	選択範囲を縮小	reducetype, sizelength, reduceatpageedge	確認済み（名前）
+toolactionmovelayer	レイヤーを移動	レイヤー移動（ツール操作）	movelayerx, movelayery, movetarget, inselectarea, movegrid, remainoriginal, selectlayer	確認済み（名前）

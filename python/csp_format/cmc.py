@@ -46,6 +46,17 @@ class CanvasNode:
 
 
 @dataclass(frozen=True)
+class PageSlot:
+    """Where a page sits in the work (as ``work::PageSlot`` in Rust)."""
+
+    #: Pages before this one, counting a spread as two.
+    position: int
+    spread: bool
+    #: The page (a spread: its first page) is a left-hand page.
+    left: bool
+
+
+@dataclass(frozen=True)
 class CmcProject:
     """Work settings from ``Project`` (the common subset; ``CmcFile.database`` has the rest)."""
 
@@ -53,8 +64,9 @@ class CmcProject:
     root_node: int
     story_name: str
     author_name: str
-    #: ``ComicBindPosition`` (0 or 1).
+    #: ``ComicBindPosition``: 1 right binding, 0 left binding.
     bind_position: int
+    #: ``ComicStartPage``: 0 starts on the left, 1 on the right.
     start_page: int
     cover: bool
     #: ``DefaultPageUnit`` (0 = px, 2 = mm in the samples).
@@ -140,6 +152,17 @@ class CmcFile:
             pages.append(node)
             node_id = node.next
         return pages
+
+    def positions(self) -> list[PageSlot]:
+        """Each page's position and side, counted from the page list as CSP
+        does (the page files' own ``ComicPageIndex``/``ComicIsLeftPage`` are
+        caches CSP refreshes only when it opens the page)."""
+        start_right = self.project.start_page == 1
+        slots, position = [], 0
+        for node in self.pages():
+            slots.append(PageSlot(position, node.spread, (position % 2 == 0) != start_right))
+            position += 2 if node.spread else 1
+        return slots
 
     def _folder(self, folder: str | os.PathLike | None) -> Path:
         if folder is not None:

@@ -86,7 +86,10 @@ impl ClipFile {
     pub fn create(canvas: &NewCanvas) -> Result<ClipFile> {
         let connection = Connection::open_in_memory()?;
         connection.execute_batch(SCHEMA)?;
-        fill_registry(&connection)?;
+        fill_registry(&connection, PARAM_SCHEME, ELEM_SCHEME)?;
+        for (table, column) in EXTERNAL_COLUMNS {
+            connection.execute("INSERT INTO ExternalTableAndColumnName VALUES (?1, ?2)", (table, column))?;
+        }
         fill_singletons(&connection, canvas)?;
         let bytes = ContainerWriter::new(new_uuid()).assemble(&database::serialize(&connection)?)?;
         // The database holds a bare root folder so that it opens; it is
@@ -105,12 +108,13 @@ impl ClipFile {
     }
 }
 
-fn fill_registry(connection: &Connection) -> Result<()> {
+/// Fill `ParamScheme` and `ElemScheme` from the tab-separated copies in `data/`.
+pub(crate) fn fill_registry(connection: &Connection, param_scheme: &str, elem_scheme: &str) -> Result<()> {
     let mut insert = connection.prepare(
         "INSERT INTO ParamScheme (TableName, LabelName, DataType, Flag, OwnerType, LockType, LockSpecified, \
          AlternativeLockType, AlternativeLockSpecified, LinkTable) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
     )?;
-    for line in PARAM_SCHEME.lines().filter(|line| !line.is_empty()) {
+    for line in param_scheme.lines().filter(|line| !line.is_empty()) {
         let cells: Vec<Value> = line
             .split('\t')
             .enumerate()
@@ -122,22 +126,19 @@ fn fill_registry(connection: &Connection) -> Result<()> {
             .collect();
         insert.execute(rusqlite::params_from_iter(cells))?;
     }
-    for line in ELEM_SCHEME.lines().filter(|line| !line.is_empty()) {
+    for line in elem_scheme.lines().filter(|line| !line.is_empty()) {
         let (table, kind) = line.split_once('\t').unwrap_or((line, "0"));
         connection.execute(
             "INSERT INTO ElemScheme (TableName, ElemType, MaxIndex) VALUES (?1, ?2, 0)",
             (table, kind.parse::<i64>().unwrap_or(0)),
         )?;
     }
-    for (table, column) in EXTERNAL_COLUMNS {
-        connection.execute("INSERT INTO ExternalTableAndColumnName VALUES (?1, ?2)", (table, column))?;
-    }
     Ok(())
 }
 
 /// The comic settings CSP writes for a new illustration (Project and Canvas
 /// share them).
-fn comic_story() -> Vec<(&'static str, Value)> {
+pub(crate) fn comic_story() -> Vec<(&'static str, Value)> {
     let (int, text, real) = (Value::Integer, |s: &str| Value::Text(s.to_owned()), Value::Real);
     vec![
         ("ComicStoryStoryName", text("")),
@@ -170,7 +171,7 @@ fn comic_story() -> Vec<(&'static str, Value)> {
     ]
 }
 
-fn insert(connection: &Connection, table: &str, values: &[(&str, Value)]) -> Result<()> {
+pub(crate) fn insert(connection: &Connection, table: &str, values: &[(&str, Value)]) -> Result<()> {
     let names: Vec<String> = values.iter().map(|(name, _)| database::quote(name)).collect();
     let marks: Vec<String> = (1..=values.len()).map(|i| format!("?{i}")).collect();
     let sql = format!("INSERT INTO {} ({}) VALUES ({})", database::quote(table), names.join(", "), marks.join(", "));
@@ -347,6 +348,28 @@ mod tests {
         // New thumbnails are blank (CSP redraws them).
         let thumbnail = again.layer_thumbnail(again.layers.get(raster).unwrap()).unwrap().unwrap();
         assert_eq!((thumbnail.width, thumbnail.height, thumbnail.pixel(5, 5)[3]), (512, 512, 0));
+    }
+
+    #[test]
+    fn empty_raster_layers_store_empty_blocks_like_csp() {
+        // CSP reports a raster layer whose base offscreen has no block data as
+        // damaged; its own empty layers store every block as an empty record
+        // and leave the smaller levels without (V8).
+        let file = ClipFile::create(&NewCanvas { width: 600, height: 400, ..Default::default() }).unwrap();
+        let file = ClipFile::from_bytes(file.to_bytes().unwrap()).unwrap();
+        for (layer, _) in file.layers.flatten() {
+            let mipmap = file.mipmap(layer.render_mipmap).unwrap().unwrap();
+            for (level, info) in mipmap.levels.iter().enumerate() {
+                let offscreen = file.offscreen(info.offscreen).unwrap().unwrap();
+                let stored = layer.kind == LayerKind::Raster && level == 0;
+                assert_eq!(offscreen.data.is_some(), stored, "{:?} level {level}", layer.kind);
+                if let Some(data) = &offscreen.data {
+                    assert_eq!(data.blocks.len(), 6);
+                    assert!(data.record_sizes().iter().all(|&size| size == crate::offscreen::EMPTY_RECORD_SIZE));
+                    assert_eq!(offscreen.attribute.block_sizes().unwrap(), &data.record_sizes()[..]);
+                }
+            }
+        }
     }
 
     #[test]

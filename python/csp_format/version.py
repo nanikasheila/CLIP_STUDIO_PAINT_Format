@@ -4,7 +4,7 @@ CSP stores no version number of its own. Every release registers the columns
 it knows in ``ParamScheme`` and labels are never removed, so the registered
 labels tell the newest CSP generation that saved the file. CSP up to 2.x
 appended new labels after the old rows; CSP 3.0 and newer rewrite a .clip's
-registry but keep retired labels. See ``docs/spec/08-versions.md``.
+registry but keep retired labels. See ``docs/spec/09-versions.md``.
 """
 from __future__ import annotations
 

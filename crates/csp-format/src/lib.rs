@@ -5,9 +5,11 @@
 
 #![deny(unsafe_code)]
 
+pub mod animation;
 pub mod binary;
 pub mod clip;
 pub mod cmc;
+pub mod cmt;
 pub mod container;
 pub mod correction;
 pub mod create;
@@ -29,6 +31,7 @@ pub mod tone;
 pub mod vector;
 pub mod verify;
 pub mod version;
+pub mod work;
 pub mod zlib;
 
 pub use clip::ClipFile;
@@ -38,3 +41,4 @@ pub use error::{Error, Result};
 pub use image::{GrayImage, RgbaImage};
 pub use model::{Canvas, Layer, LayerKind, LayerTree};
 pub use version::VersionInfo;
+pub use work::NewWork;

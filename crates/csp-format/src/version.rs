@@ -21,7 +21,7 @@
 //! (Preferences > File > Version compatibility, since 1.13.0).
 //!
 //! The generation table and the CSP versions are learnt from the corpus and
-//! CSP's release notes; see `docs/spec/08-versions.md`.
+//! CSP's release notes; see `docs/spec/09-versions.md`.
 
 use std::collections::{BTreeSet, HashSet};
 

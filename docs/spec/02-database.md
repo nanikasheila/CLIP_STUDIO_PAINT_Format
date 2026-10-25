@@ -25,7 +25,7 @@ CSP は、自分が知っているすべての表と列を、ファイルの中�
 | `LinkTable` | ID の列が指す表（値はその表の `MainId`）。空ならリンクなし | 確認済み |
 | `OwnerType` | この列が「どの要素の ID か」。`CanvasId` 2、`LayerId` 4、`LayerObjectId` 8、`BankId` 1024、`ItemId` 2048、`TrackId` 4096。ほかは 0 | 確認済み（下の `ElemType` と一致） |
 | `Flag` | リンクの種類。4 は持ち物への参照（`Layer.LayerRenderMipmap`、`Mipmap.BaseMipmapInfo` など）、6 は同じ表の並びのリンク（`NextIndex`、`LayerFirstChildIndex`、`LayerNextIndex`）、2 は `CanvasNode.SelectedIndex` だけ | 推測 |
-| `LockType`、`LockSpecified`、`AlternativeLockType`、`AlternativeLockSpecified` | 値 0・1・2・4 と 0・1・2・4・1024・2048。画素の表（Offscreen、Mipmap など）とレイヤーの表に多い。CSP が知らない列に値があるときのロック。`LockType` 1 = その行のレイヤー、4 = `LockSpecified` の範囲（2 = キャンバス）、0 = 無視。`Alternative…` があればそちら（[08 章](08-versions.md)） | 確認済み（1、4・2、代わり）、ほかは推測 |
+| `LockType`、`LockSpecified`、`AlternativeLockType`、`AlternativeLockSpecified` | 値 0・1・2・4 と 0・1・2・4・1024・2048。画素の表（Offscreen、Mipmap など）とレイヤーの表に多い。CSP が知らない列に値があるときのロック。`LockType` 1 = その行のレイヤー、4 = `LockSpecified` の範囲（2 = キャンバス）、0 = 無視。`Alternative…` があればそちら（[09 章](09-versions.md)） | 確認済み（1、4・2、代わり）、ほかは推測 |
 
 ### `ElemScheme`（表ごとに 1 行）
 

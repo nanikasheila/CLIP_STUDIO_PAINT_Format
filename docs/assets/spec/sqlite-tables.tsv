@@ -1,0 +1,1432 @@
+format	table	column	declared	seen	files	rows	nulls	min	max	bytes
+.asli	listinfo	_PW_ID	INTEGER	integer	1	3	0	8341	8343	
+.asli	listinfo	lastpath	TEXT	text	1	3	0			10
+.asli	listinfo	materialuuid	TEXT	text	1	3	0			0
+.bsm	brushsizepreset	_PW_ID	INTEGER	integer	1	40	0	12161	12200	
+.bsm	brushsizepreset	brushsizebrushsize	INTEGER	integer	1	40	0	7	20000	
+.bsm	brushsizepreset	brushsizeviewindex	INTEGER	integer	1	40	0	0	39	
+.clhs	colordata	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.clhs	colordata	colordata		blob	1	1	0			17004
+.cscr	repairtable	_PW_ID	INTEGER	integer	1	244	0	1	244	
+.cscr	repairtable	repairpath	TEXT	text	1	244	0			67
+.cscr	repairtable	targetpath	TEXT	text	1	244	0			67
+.dtdb	DownloadToolVariantManager	FirstNodeUuid	BLOB	blob	1	1	0			1
+.dtdb	DownloadToolVariantManager	ParentFolderNodeUuid	BLOB	blob	1	1	0			1
+.dtdb	DownloadToolVariantManager	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.dtdb	DownloadToolVariantNode	_PW_ID	INTEGER		1	0	0			
+.dtdb	ToolVariant	_PW_ID	INTEGER		1	0	0			
+.dtdb	ToolVariantNode	_PW_ID	INTEGER		1	0	0			
+.khc	shortcutinfo	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.khc	shortcutmenu	_PW_ID	INTEGER	integer	1	909	0	20771	21679	
+.khc	shortcutmenu	menucommand	TEXT	text	1	909	0			3–73
+.khc	shortcutmenu	menucommandtype	TEXT	text	1	909	0			12–15
+.khc	shortcutmenu	modifier	INTEGER	integer	1	909	0	0	7	
+.khc	shortcutmenu	shortcut	TEXT	text	1	909	0			1–9
+.mfts	OpenedTag	TagPath	TEXT	text	12	28	0			2–28
+.mfts	OpenedTag	_PW_ID	INTEGER	integer	12	28	0	1	3	
+.mfts	SelectedTag	TagPath	TEXT	text	12	12	0			2–28
+.mfts	SelectedTag	_PW_ID	INTEGER	integer	12	12	0	1	1	
+.pcb	colorblend	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.pcb	colorblend	colorblendleftbottomcolorb	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendleftbottomcolorg	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendleftbottomcolorr	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendlefttopcolorb	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendlefttopcolorg	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendlefttopcolorr	INTEGER	integer	1	1	0	255	255	
+.pcb	colorblend	colorblendrightbottomcolorb	INTEGER	integer	1	1	0	0	0	
+.pcb	colorblend	colorblendrightbottomcolorg	INTEGER	integer	1	1	0	0	0	
+.pcb	colorblend	colorblendrightbottomcolorr	INTEGER	integer	1	1	0	0	0	
+.pcb	colorblend	colorblendrighttopcolorb	INTEGER	integer	1	1	0	0	0	
+.pcb	colorblend	colorblendrighttopcolorg	INTEGER	integer	1	1	0	0	0	
+.pcb	colorblend	colorblendrighttopcolorr	INTEGER	integer	1	1	0	255	255	
+.pcc	currentcolormanagercolor	_PW_ID	INTEGER	integer	1	2	0	79	80	
+.pcc	currentcolormanagercolor	currentcolormanagercolordata	BLOB	blob	1	2	0			76
+.pcc	currentcolormanagercolor	currentcolormanagercolorindex	INTEGER	integer	1	2	0	1	2	
+.pcc	currentcolormanagercurrent	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.pcc	currentcolormanagercurrent	currentcolormanagercurrentindex	INTEGER	integer	1	1	0	0	0	
+.pcg	colorguide	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.pcg	colorguide	colorguidehorzindex	INTEGER	integer	1	1	0	2	2	
+.pcg	colorguide	colorguidehorzrate	INTEGER	integer	1	1	0	50	50	
+.pcg	colorguide	colorguidevertindex	INTEGER	integer	1	1	0	1	1	
+.pcg	colorguide	colorguidevertrate	INTEGER	integer	1	1	0	52	52	
+.pcs	colorset	_PW_ID	INTEGER	integer	2	16	0	1	15	
+.pcs	colorset	colorsetdata	BLOB	blob	2	16	0			225–6311
+.pcs	colorset	colorsetindex	INTEGER	integer	2	16	0	1	15	
+.pcs	colorset	colorsetmaterialid	TEXT	null,text	1	15	14			0
+.pcs	colorset	colorsetname	TEXT	text	2	16	0			7–30
+.pcs	colorset	setmaterialcatalogcontentid	INTEGER	integer,null	1	15	14	-1	-1	
+.pcs	loadedcolorset	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.pcs	loadedcolorset	loadedcolorsetfilename	TEXT	text	1	1	0			12
+.pmx	mixpalette	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.pmx	mixpalette	brushsize	REAL	real	1	1	0	40.0	40.0	
+.pmx	mixpalette	canvastoolselected	INTEGER	integer	1	1	0	0	0	
+.pmx	mixpalette	currentCanvas	TEXT	text	1	1	0			9
+.pmx	mixpalette	paperBlue	INTEGER	integer	1	1	0	4294967295	4294967295	
+.pmx	mixpalette	paperGreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+.pmx	mixpalette	paperRed	INTEGER	integer	1	1	0	4294967295	4294967295	
+.pmx	mixpalette	showPaper	INTEGER	integer	1	1	0	0	0	
+.pmx	mixpalette	version	INTEGER	integer	1	1	0	2	2	
+.prgr	Pressure	PressureGraph	BLOB	null	1	1	1			
+.prgr	Pressure	PressureGraphInitialized	INTEGER	integer	1	1	0	1	1	
+.prgr	Pressure	Version	INTEGER	integer	1	1	0	1	1	
+.prgr	Pressure	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.psv	subview	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.psv	subview	subviewcurrentindex	INTEGER	integer	1	1	0	0	0	
+.psv	subview	subviewfitting	INTEGER	integer	1	1	0	0	0	
+.psv	subviewimagecategory	_PW_ID	INTEGER		1	0	0			
+.qmm	quickmenusetting100	_PW_ID	INTEGER	integer	1	9	0	2737	2745	
+.qmm	quickmenusetting100	quickmenusettingdirectionmode	INTEGER	integer	1	9	0	0	0	
+.qmm	quickmenusetting100	quickmenusettingid	INTEGER	integer	1	9	0	0	8	
+.qmm	quickmenusetting100	quickmenusettingitem1command	TEXT	text	1	9	0			0–22
+.qmm	quickmenusetting100	quickmenusettingitem1commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem1kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem1menuid	INTEGER	integer	1	9	0	0	1	
+.qmm	quickmenusetting100	quickmenusettingitem2command	TEXT	text	1	9	0			0–21
+.qmm	quickmenusetting100	quickmenusettingitem2commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem2kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem2menuid	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem3command	TEXT	text	1	9	0			0–20
+.qmm	quickmenusetting100	quickmenusettingitem3commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem3kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem3menuid	INTEGER	integer	1	9	0	0	3	
+.qmm	quickmenusetting100	quickmenusettingitem4command	TEXT	text	1	9	0			0–32
+.qmm	quickmenusetting100	quickmenusettingitem4commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem4kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem4menuid	INTEGER	integer	1	9	0	0	4	
+.qmm	quickmenusetting100	quickmenusettingitem5command	TEXT	text	1	9	0			0–28
+.qmm	quickmenusetting100	quickmenusettingitem5commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem5kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem5menuid	INTEGER	integer	1	9	0	0	5	
+.qmm	quickmenusetting100	quickmenusettingitem6command	TEXT	text	1	9	0			0–22
+.qmm	quickmenusetting100	quickmenusettingitem6commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem6kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem6menuid	INTEGER	integer	1	9	0	0	6	
+.qmm	quickmenusetting100	quickmenusettingitem7command	TEXT	text	1	9	0			0–16
+.qmm	quickmenusetting100	quickmenusettingitem7commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem7kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem7menuid	INTEGER	integer	1	9	0	0	7	
+.qmm	quickmenusetting100	quickmenusettingitem8command	TEXT	text	1	9	0			0–21
+.qmm	quickmenusetting100	quickmenusettingitem8commandtype	TEXT	text	1	9	0			0–15
+.qmm	quickmenusetting100	quickmenusettingitem8kind	INTEGER	integer	1	9	0	0	2	
+.qmm	quickmenusetting100	quickmenusettingitem8menuid	INTEGER	integer	1	9	0	0	8	
+.qmm	quickmenusetting100	quickmenusettingname	TEXT	text	1	9	0			6–9
+.sal	toolbardatamode	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sal	toolbardatamode	isaddedremotecontrollerset	INTEGER	integer	1	1	0	0	0	
+.sal	toolbardatamode	isslatedevicedata	INTEGER	integer	1	1	0	0	0	
+.sal	toolbardatamode	istabletpcdata	INTEGER	integer	1	1	0	0	0	
+.sal	toolbardatamode	setname	TEXT	text	1	1	0			0
+.sal	toolbaritem	_PW_ID	INTEGER	integer	1	20	0	79	98	
+.sal	toolbaritem	categoryindex	INTEGER	integer	1	20	0	0	1	
+.sal	toolbaritem	command	TEXT	text	1	20	0			0–32
+.sal	toolbaritem	commandIDtype	TEXT	text	1	20	0			0–15
+.sal	toolbaritem	itemcolor	INTEGER	integer	1	20	0	0	0	
+.sal	toolbaritem	itemgroupindex	INTEGER	integer	1	20	0	0	11	
+.sal	toolbaritem	itemtype	INTEGER	integer	1	20	0	10	21	
+.sal	toolbaritem	name	TEXT	text	1	20	0			6–54
+.sal	toolbaritem	option	INTEGER	integer	1	20	0	0	0	
+.sal	toolbaritem	setindex	INTEGER	integer	1	20	0	0	0	
+.sal	toolbaritem	uuid	BLOB	blob,null	1	20	19			16
+.sal	toolbarotherinfo	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sal	toolbarotherinfo	save163andlater	INTEGER	integer	1	1	0	1	1	
+.sal	toolbarviewsetting	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sal	toolbarviewsetting	toolbarreordertype	INTEGER	integer	1	1	0	2	2	
+.spwi	workspacecurrent	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.spwi	workspacecurrent	workspacecurrentfilename	TEXT	text	1	1	0			0
+.spwi	workspacecurrent	workspacecurrentispreset	INTEGER	integer	1	1	0	0	0	
+.spwi	workspacecurrent	workspacecurrentname	TEXT	text	1	1	0			0
+.spws	workspaceinfomation	_PW_ID	INTEGER	integer	18	18	0	1	1	
+.spws	workspaceinfomation	workspaceinfomationindex	INTEGER	integer	18	18	0	0	2	
+.spws	workspaceinfomation	workspaceinfomationname	TEXT	text	18	18	0			5–15
+.spws	workspaceinfomation	workspaceusemainframebyosx	INTEGER	integer	6	6	0	1	1	
+.spws	workspaceplacement	_PW_ID	INTEGER	integer	18	18	0	1	1	
+.spws	workspaceplacement	workspaceplacement	BLOB	blob	18	18	0			45678–53272
+.spws	workspacepreference	_PW_ID	INTEGER	integer	18	18	0	1	1	
+.spws	workspacepreference	workspacegloballengthunit	INTEGER	integer	18	18	0	0	2	
+.spws	workspacepreference	workspacetextunit	INTEGER	integer	18	18	0	5	6	
+.spws	workspaceshortcutinfo	_PW_ID	INTEGER	integer	18	18	0	1	1	
+.spws	workspaceshortcutinfo	workspaceusemultilingualsupportingcommandshortcut	INTEGER	integer	18	18	0	0	1	
+.spws	workspaceshortcutmenu	_PW_ID	INTEGER	integer	18	15758	0	871	3484	
+.spws	workspaceshortcutmenu	menucommand	TEXT	text	18	15758	0			3–73
+.spws	workspaceshortcutmenu	menucommandtype	TEXT	text	18	15758	0			12–15
+.spws	workspaceshortcutmenu	modifier	INTEGER	integer	18	15758	0	0	7	
+.spws	workspaceshortcutmenu	shortcut	TEXT	text	18	15758	0			1–14
+.spws	workspaceshortcuttool	_PW_ID	INTEGER	integer	18	4608	0	253	1008	
+.spws	workspaceshortcuttool	shortcut	TEXT	text	18	4608	0			1–4
+.spws	workspaceshortcuttool	uuid	BLOB	blob	18	4608	0			16
+.spws	workspacetoolbardatamode	_PW_ID	INTEGER	integer	18	18	0	1	1	
+.spws	workspacetoolbardatamode	isaddedremotecontrollerset	INTEGER	integer	18	18	0	0	0	
+.spws	workspacetoolbardatamode	isslatedevicedata	INTEGER	integer	18	18	0	0	0	
+.spws	workspacetoolbardatamode	istabletpcdata	INTEGER	integer	18	18	0	0	0	
+.spws	workspacetoolbardatamode	setname	TEXT	text	18	18	0			0
+.spws	workspacetoolbaritem	_PW_ID	INTEGER	integer	18	390	0	22	88	
+.spws	workspacetoolbaritem	categoryindex	INTEGER	integer	18	390	0	0	7	
+.spws	workspacetoolbaritem	command	TEXT	text	18	390	0			4–36
+.spws	workspacetoolbaritem	commandIDtype	TEXT	text	18	390	0			12–15
+.spws	workspacetoolbaritem	itemcolor	INTEGER	integer	18	390	0	0	0	
+.spws	workspacetoolbaritem	itemgroupindex	INTEGER	integer	18	390	0	0	5	
+.spws	workspacetoolbaritem	itemtype	INTEGER	integer	18	390	0	10	10	
+.spws	workspacetoolbaritem	name	TEXT	text	18	390	0			6–45
+.spws	workspacetoolbaritem	option	INTEGER	integer	18	390	0	0	268435456	
+.spws	workspacetoolbaritem	setindex	INTEGER	integer	18	390	0	0	0	
+.sqlite	AlignDistribute	AlignDistributeBaseArea	INTEGER	integer	1	1	0	100	100	
+.sqlite	AlignDistribute	AlignDistributeUseDrawRect	INTEGER	integer	1	1	0	1	1	
+.sqlite	AlignDistribute	AlignDistributeUseVectorCoreLine	INTEGER	integer	1	1	0	0	0	
+.sqlite	AlignDistribute	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Animation	PastingAnimationCelBehavior	INTEGER	integer	1	1	0	1	1	
+.sqlite	Animation	ToAssignCelOnAddingLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	Animation	ToExtendClip	INTEGER	integer	1	1	0	0	0	
+.sqlite	Animation	ToRemoveCelIndexOnRemovingLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	Animation	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	ApplicationRestoringState	IsBackgroundFlag	INTEGER	integer	1	1	0	0	0	
+.sqlite	ApplicationRestoringState	RestoringRecoveryCanvasesFlag	INTEGER	integer	1	1	0	0	0	
+.sqlite	ApplicationRestoringState	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	ApplicationState	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Canvas	CheckerboardColor01	BLOB	blob	1	1	0			12
+.sqlite	Canvas	CheckerboardColor02	BLOB	blob	1	1	0			12
+.sqlite	Canvas	ViewAngleStep	BLOB	blob	1	1	0			16
+.sqlite	Canvas	ViewDisplayResolution	BLOB	blob	1	1	0			16
+.sqlite	Canvas	ViewQuality	INTEGER	integer	1	1	0	2	2	
+.sqlite	Canvas	ViewScaleList	BLOB	blob	1	1	0			740
+.sqlite	Canvas	ViewWheelStep	BLOB	blob	1	1	0			16
+.sqlite	Canvas	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Cloud	CloudPreinAction	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cloud	CloudPreinModeler	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cloud	CloudPreinPaint	INTEGER	integer	1	1	0	1	1	
+.sqlite	Cloud	CloudPreinRevision	TEXT	text	1	1	0			2
+.sqlite	Cloud	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.sqlite	ComicFrame	ComicFrameShowArea	INTEGER	integer	1	1	0	1	1	
+.sqlite	ComicFrame	HorizontalGapLength	BLOB	blob	1	1	0			12
+.sqlite	ComicFrame	VerticalGapLength	BLOB	blob	1	1	0			12
+.sqlite	ComicFrame	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Command	PasteSvgAsVector	INTEGER	integer	1	1	0	1	1	
+.sqlite	Command	TransformDecideByDoubleClick	INTEGER	integer	1	1	0	1	1	
+.sqlite	Command	TransformOnlyRasterAndVector	INTEGER	integer	1	1	0	0	0	
+.sqlite	Command	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Cursor	BrushSmall	INTEGER	integer	1	1	0	2	2	
+.sqlite	Cursor	CursorPredictionEnabled	INTEGER	integer	1	1	0	1	1	
+.sqlite	Cursor	ForceVisibleOnPenTablet	INTEGER	integer	1	1	0	1	1	
+.sqlite	Cursor	ReverseCursor	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	ShapeDynamicUpdate	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeBrush	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeDeXBrush	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeDeXEraser	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeDeXFill	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeDeXModify	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeDeXPen	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeDeXShape	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeDeXView	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeEraser	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeFill	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeModify	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypePen	INTEGER	integer	1	1	0	10	10	
+.sqlite	Cursor	TypeShape	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	TypeView	INTEGER	integer	1	1	0	0	0	
+.sqlite	Cursor	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.sqlite	DontShowMessage	applicationupdateinfomation3_0_0	INTEGER	integer	1	1	0	0	0	
+.sqlite	DontShowMessage	applicationupdateinfomation4_0_0	INTEGER	integer	1	1	0	0	0	
+.sqlite	DontShowMessage	applicationupdateinfomation5_0_0	INTEGER	integer	1	1	0	0	0	
+.sqlite	DontShowMessage	applicationupdateinfomation5_1_0	INTEGER	integer	1	1	0	0	0	
+.sqlite	DontShowMessage	canvascontrollerimcompatiblelayerquestion	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	canvascontrollersavelayerquestion	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	enabletimelapsequestion	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	layerordercontrollerdeletelayerquestion	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	movecloudsettingconfirmation	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	newcanvasdialogboxdocumentsizewarning	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	newcanvasdialogboxtimelapseinformation	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	runningcloudsyncjobconfirmation	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	runsoftwarebackupconfirmation	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	shouldload3dpbr	INTEGER	integer	1	1	0	1	1	
+.sqlite	DontShowMessage	supportoswarning	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	BackgroundSaveEnabled2	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	CpgMergeAllLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	CpgRasterizeVector	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	CpgVectorAntiAlias	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	ExportLayerCacheEnabled	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	FileDialogKind	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	PeriodicSaveInterval	INTEGER	integer	1	1	0	600	600	
+.sqlite	File	PeriodicSaveKind	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	PngCompressionLevel	INTEGER	integer	1	1	0	-1	-1	
+.sqlite	File	RecoveryDocumentEnabled	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	RecoveryDocumentInterval	INTEGER	integer	1	1	0	900	900	
+.sqlite	File	SaveRenderMipmap	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	ShowMessageForSaving	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	TextCompatibleIllustStudio	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	XpgMergeAllLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	XpgRasterizeVector	INTEGER	integer	1	1	0	0	0	
+.sqlite	File	XpgVectorAntiAlias	INTEGER	integer	1	1	0	1	1	
+.sqlite	File	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gallery	GalleryPageDblClickOpenNewTab	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gallery	GallerySaveBeforeExchange	INTEGER	integer	1	1	0	0	0	
+.sqlite	Gallery	GalleryWindowAutoScrollFlag	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gallery	GalleryWindowLayout	INTEGER	integer	1	1	0	2	2	
+.sqlite	Gallery	GalleryWindowPageReorderType	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gallery	GalleryWindowWebtoonWrapDirectionDefault	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gallery	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Gesture	_PW_ID	INTEGER	integer	1	10	0	81	90	
+.sqlite	Gesture	area	TEXT	null,text	1	10	7			7
+.sqlite	Gesture	command	TEXT	text	1	10	0			0–30
+.sqlite	Gesture	commandtype	TEXT	text	1	10	0			0–15
+.sqlite	Gesture	gesture	TEXT	text	1	10	0			5–14
+.sqlite	Gesture	operation	TEXT	text	1	10	0			4–6
+.sqlite	GestureOption	GestureNoSwitchingByLongPress	INTEGER	integer	1	1	0	0	0	
+.sqlite	GestureOption	GestureOptionSensitivePalmRecognition	INTEGER	integer	1	1	0	0	0	
+.sqlite	GestureOption	GestureOptionSwipeToMouseWheel	INTEGER	integer	1	1	0	1	1	
+.sqlite	GestureOption	GesturePaletteTouchRestriction	INTEGER	integer	1	1	0	0	0	
+.sqlite	GestureOption	GestureRecognitionMode	INTEGER	integer	1	1	0	0	0	
+.sqlite	GestureOption	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	IccProfile	IccProfileCMYKProfilePath	TEXT	text	1	1	0			109
+.sqlite	IccProfile	IccProfileEmbededRGBProfileKind	INTEGER	integer	1	1	0	1	1	
+.sqlite	IccProfile	IccProfileRGBProfilePath	TEXT	text	1	1	0			68
+.sqlite	IccProfile	IccProfileRenderingIntent	INTEGER	integer	1	1	0	1	1	
+.sqlite	IccProfile	IccProfileSaveWithPath	INTEGER	integer	1	1	0	1	1	
+.sqlite	IccProfile	IccProfileUseLibraryType	INTEGER	integer	1	1	0	2	2	
+.sqlite	IccProfile	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Interface	ApplicationThemeColor	INTEGER	integer	3	3	0	2	2	
+.sqlite	Interface	ApplicationThemeColorDarkDensity	INTEGER	integer	1	1	0	-10	-10	
+.sqlite	Interface	ApplicationThemeColorLightDensity	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	IMEEditControl	INTEGER	integer	1	1	0	1	1	
+.sqlite	Interface	IMETextLayerAutoOn	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	InterfaceUsePenHovering	INTEGER	integer	1	1	0	1	1	
+.sqlite	Interface	LayoutUseTabletLayout	INTEGER	integer	1	1	0	1	1	
+.sqlite	Interface	OSXUseMainFrame	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	SlateDeviceScalingSetNextBoot	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	SlateDeviceSlaingType	INTEGER	integer	1	1	0	1	1	
+.sqlite	Interface	SlateDeviceUseScaling	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	TouchShowSticky	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	_PW_ID	INTEGER	integer	3	3	0	1	1	
+.sqlite	Interface	iOSEdgeKeyboardAssistiveButtonNormalizedLocationX	BLOB	blob	1	1	0			16
+.sqlite	Interface	iOSEdgeKeyboardAssistiveButtonNormalizedLocationY	BLOB	blob	1	1	0			16
+.sqlite	Interface	iOSEdgeKeyboardModifierType	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	iOSEdgeKeyboardType	INTEGER	integer	1	1	0	0	0	
+.sqlite	Interface	iOSStatusBarVisible	INTEGER	integer	1	1	0	1	1	
+.sqlite	JoyPadTabMateBle	StartsScanOnAppStartup	INTEGER	integer	1	1	0	1	1	
+.sqlite	JoyPadTabMateBle	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Layer	LayerCopySuffixType	INTEGER	integer	1	1	0	0	0	
+.sqlite	Layer	LayerCreateNew3DLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	Layer	LayerFolderThrough	INTEGER	integer	1	1	0	0	0	
+.sqlite	Layer	SelectAreaLayerOpacity	INTEGER	integer	1	1	0	50	50	
+.sqlite	Layer	ToneToGrayByShowScale	INTEGER	integer	1	1	0	1	1	
+.sqlite	Layer	VectorCoreLineOpacity	INTEGER	integer	1	1	0	70	70	
+.sqlite	Layer	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	LightTable	LightTableCommonOpacity	INTEGER	integer	1	1	0	50	50	
+.sqlite	LightTable	LightTableHalfcolor	INTEGER	integer	1	1	0	0	0	
+.sqlite	LightTable	LightTableMaincolor	BLOB	blob	1	1	0			12
+.sqlite	LightTable	LightTableOpacity	INTEGER	integer	1	1	0	100	100	
+.sqlite	LightTable	LightTableSubcolor	BLOB	blob	1	1	0			12
+.sqlite	LightTable	LightTableUsecolor	INTEGER	integer	1	1	0	0	0	
+.sqlite	LightTable	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Locus	AllLayerFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Locus	AllLayerFrameOpacity	INTEGER	integer	1	1	0	30	30	
+.sqlite	Locus	CameraFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Locus	CameraFrameOpacity	INTEGER	integer	1	1	0	80	80	
+.sqlite	Locus	LocusColor	BLOB	blob	1	1	0			12
+.sqlite	Locus	LocusDrawFrame	INTEGER	integer	1	1	0	1	1	
+.sqlite	Locus	LocusDrawLine	INTEGER	integer	1	1	0	1	1	
+.sqlite	Locus	LocusFirstFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Locus	LocusLastFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Locus	LocusOpacity	INTEGER	integer	1	1	0	20	20	
+.sqlite	Locus	LocusRootPoint	INTEGER	integer	1	1	0	0	0	
+.sqlite	Locus	LocusTargetFrame	INTEGER	integer	1	1	0	0	0	
+.sqlite	Locus	LocusTargetLayer	INTEGER	integer	1	1	0	0	0	
+.sqlite	Locus	LocusUseDifferentColor	INTEGER	integer	1	1	0	0	0	
+.sqlite	Locus	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Login	Version	TEXT	text	2	2	0			5
+.sqlite	Login	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.sqlite	MainFrame	MainFrameAutoVisibleWorkTab	INTEGER	integer	1	1	0	0	0	
+.sqlite	MainFrame	MainFrameLockDockHeight	INTEGER	integer	1	1	0	0	0	
+.sqlite	MainFrame	MainFrameLockDockWidth	INTEGER	integer	1	1	0	0	0	
+.sqlite	MainFrame	MainFrameLockPaletteDragDrop	INTEGER	integer	1	1	0	0	0	
+.sqlite	MainFrame	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Mask	MaskAreaColor	BLOB	blob	1	1	0			12
+.sqlite	Mask	MaskAreaOpacity	INTEGER	integer	1	1	0	50	50	
+.sqlite	Mask	MaskShowArea	INTEGER	integer	1	1	0	0	0	
+.sqlite	Mask	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Material	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Other	LaunchVersion	TEXT	text	2	2	0			5
+.sqlite	Other	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.sqlite	OtherSettings	LaunchVersion	TEXT	text	1	1	0			5
+.sqlite	OtherSettings	SetPreferenceNextBoot	INTEGER	integer	1	1	0	0	0	
+.sqlite	OtherSettings	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Performance	ExecEnvironment	TEXT	text	1	1	0			38
+.sqlite	Performance	OpenGLLowLevelFormat	INTEGER	integer	1	1	0	0	0	
+.sqlite	Performance	SwapfileVolume	TEXT	text	1	1	0			3
+.sqlite	Performance	UndoCount	INTEGER	integer	1	1	0	200	200	
+.sqlite	Performance	UndoCountSaved230	INTEGER	integer	1	1	0	1	1	
+.sqlite	Performance	UndoCountSaved234	INTEGER	integer	1	1	0	1	1	
+.sqlite	Performance	UndoDelayInterval	INTEGER	integer	1	1	0	0	0	
+.sqlite	Performance	UsedMemoryMonitoringShowNotifications	INTEGER	integer	1	1	0	1	1	
+.sqlite	Performance	VramLimitPercent	INTEGER	integer	1	1	0	70	70	
+.sqlite	Performance	VramLimitPercentForDisplayForiOS	INTEGER	integer	1	1	0	0	0	
+.sqlite	Performance	_PW_ID	INTEGER	integer	3	3	0	1	1	
+.sqlite	PrivacySettings	SendUsageInformation	INTEGER	integer	1	1	0	0	0	
+.sqlite	PrivacySettings	SendUsageInformationAgreeVersion	TEXT	text	1	1	0			6
+.sqlite	PrivacySettings	SendUsageInformationFirebase	INTEGER	integer	1	1	0	0	0	
+.sqlite	PrivacySettings	SendUsageInformationFirebaseAgreeVersion	TEXT	text	1	1	0			6
+.sqlite	PrivacySettings	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	ProductGradeType	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	RemoteController	ServerPortNumber	INTEGER	integer	1	1	0	32035	32035	
+.sqlite	RemoteController	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Risk	Message	TEXT	text	1	1	0			178
+.sqlite	Risk	OS	TEXT	text	1	1	0			3
+.sqlite	Risk	ProductCode	TEXT	text	1	1	0			0
+.sqlite	Risk	RiskID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Risk	RiskLevel	INTEGER	integer	1	1	0	100	100	
+.sqlite	Risk	Software	TEXT	text	1	1	0			6
+.sqlite	Risk	URL	TEXT	text	1	1	0			86
+.sqlite	Risk	VersionMax	TEXT	text	1	1	0			5
+.sqlite	Risk	VersionMin	TEXT	text	1	1	0			5
+.sqlite	Risk	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Ruler	CancelSnapPerspective	INTEGER	integer	1	1	0	1	1	
+.sqlite	Ruler	CropFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	GridDivideLineColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	GridLineColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	OfAlpha	INTEGER	integer	1	1	0	40	40	
+.sqlite	Ruler	SafeFrameColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	ShowNotSnapColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	ShowSnapColor	BLOB	blob	1	1	0			12
+.sqlite	Ruler	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Setting3D	Setting3DDessindollType	INTEGER	integer	1	1	0	1	1	
+.sqlite	Setting3D	Setting3DDessindollVersion	INTEGER	integer	1	1	0	2	2	
+.sqlite	Setting3D	Setting3DImportMethod	INTEGER	integer	1	1	0	0	0	
+.sqlite	Setting3D	Setting3DImporterType	INTEGER	integer	1	1	0	0	0	
+.sqlite	Setting3D	Setting3DShadowKind	INTEGER	integer	1	1	0	2	2	
+.sqlite	Setting3D	Setting3DTextureOpacityThreshold	INTEGER	integer	1	1	0	90	90	
+.sqlite	Setting3D	Setting3DWavefrontObjOrigin	INTEGER	integer	1	1	0	0	0	
+.sqlite	Setting3D	Setting3DWavefrontObjUpAxis	INTEGER	integer	1	1	0	0	0	
+.sqlite	Setting3D	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	ShortcutInfo	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.sqlite	Status	LastDateTime	TEXT	text	1	1	0			16
+.sqlite	Status	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	StoryEditor	StoryEditorInsertPropertyRule	INTEGER	integer	1	1	0	1	1	
+.sqlite	StoryEditor	StoryEditorInsertTextRule	INTEGER	integer	1	1	0	0	0	
+.sqlite	StoryEditor	StoryEditorNewlineSplitCount	INTEGER	integer	1	1	0	2	2	
+.sqlite	StoryEditor	StoryEditorNewlineViewStyle	INTEGER	integer	1	1	0	0	0	
+.sqlite	StoryEditor	StoryEditorViewDirection	INTEGER	integer	1	1	0	0	0	
+.sqlite	StoryEditor	StoryEditorViewFontName	TEXT	text	1	1	0			22
+.sqlite	StoryEditor	StoryEditorViewFontSize	REAL	real	1	1	0	12.0	12.0	
+.sqlite	StoryEditor	StoryEditorViewRubyFontName	TEXT	text	1	1	0			22
+.sqlite	StoryEditor	StoryEditorViewRubyFontSize	REAL	real	1	1	0	8.0	8.0	
+.sqlite	StoryEditor	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tablet	ContextKind	INTEGER	integer	1	1	0	1000	1000	
+.sqlite	Tablet	InputAreaMode	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	IsEffective	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	OutputAreaMode	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tablet	OutputMonitorIndex	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tablet	SetContextKindNextBoot	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	TabletEventLevel	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	TabletReduceEventELevel	INTEGER	integer	1	1	0	3	3	
+.sqlite	Tablet	UseAccurateWMPointer	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	UseMouseMode	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tablet	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	TextCodeInput	TextCodeInputListAnchorWord	INTEGER	integer	1	1	0	58752	58752	
+.sqlite	TextCodeInput	TextCodeInputListUnicodePage	INTEGER	integer	1	1	0	0	0	
+.sqlite	TextCodeInput	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	ConditionToShowStrokePrediction	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tool	OptionAutoScroll	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionCreatePreviewOfRuler	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionDecideByDoubleClick	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionReducePressureByFinger	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tool	OptionShowBrushSize	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionSizeChange	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionStartDragDistance	INTEGER	integer	1	1	0	3	3	
+.sqlite	Tool	OptionTemporaryLineType	INTEGER	integer	1	1	0	2	2	
+.sqlite	Tool	OptionTransparentToWhite	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tool	OptionUseHovering	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionVectorHandleSize	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	OptionViewToolFastModeIfDragging	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tool	StrokePredictionEnabled	INTEGER	integer	1	1	0	0	0	
+.sqlite	Tool	ToolShiftTime	INTEGER	integer	1	1	0	200	200	
+.sqlite	Tool	UseToolShift	INTEGER	integer	1	1	0	1	1	
+.sqlite	Tool	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Touch	TouchPositionOffsetXOffsetX	INTEGER	integer	1	1	0	0	0	
+.sqlite	Touch	TouchPositionOffsetXOffsetY	INTEGER	integer	1	1	0	0	0	
+.sqlite	Touch	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	TransformDefault	ActionUseRelative	INTEGER	integer	1	1	0	1	1	
+.sqlite	TransformDefault	CanSnap	INTEGER	integer	1	1	0	1	1	
+.sqlite	TransformDefault	ChangeVectorWidth	INTEGER	integer	1	1	0	1	1	
+.sqlite	TransformDefault	FixAspectRatio	INTEGER	integer	1	1	0	0	0	
+.sqlite	TransformDefault	PositionUnit	INTEGER	integer	1	1	0	0	0	
+.sqlite	TransformDefault	Quality	INTEGER	integer	1	1	0	4	4	
+.sqlite	TransformDefault	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.sqlite	Unit	GlobalLengthUnit	INTEGER	integer	1	1	0	0	0	
+.sqlite	Unit	TextUnit	INTEGER	integer	1	1	0	5	5	
+.sqlite	Unit	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.tgm	toolgroup	_PW_ID	INTEGER	integer	1	23	0	3325	3347	
+.tgm	toolgroup	toolgroupcommandid	INTEGER	integer	1	23	0	0	0	
+.tgm	toolgroup	toolgroupgroupindex	INTEGER	integer	1	23	0	0	3	
+.tgm	toolgroup	toolgroupitemtype	INTEGER	integer	1	23	0	1	1	
+.tgm	toolgroup	toolgroupvariantnodeuuid	BLOB	blob	1	23	0			16
+.tlbr	toolbardatamode	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.tlbr	toolbardatamode	isaddedremotecontrollerset	INTEGER	integer	1	1	0	0	0	
+.tlbr	toolbardatamode	isslatedevicedata	INTEGER	integer	2	2	0	0	0	
+.tlbr	toolbardatamode	istabletpcdata	INTEGER	integer	2	2	0	0	0	
+.tlbr	toolbardatamode	setflag_0	INTEGER	integer	1	1	0	0	0	
+.tlbr	toolbardatamode	setflag_1	INTEGER	integer	1	1	0	0	0	
+.tlbr	toolbardatamode	setname	TEXT	text	2	2	0			0–21
+.tlbr	toolbardatamode	setuuid_0	BLOB	blob	1	1	0			16
+.tlbr	toolbardatamode	setuuid_1	BLOB	blob	1	1	0			16
+.tlbr	toolbariconinfo	_PW_ID	INTEGER		1	0	0			
+.tlbr	toolbaritem	_PW_ID	INTEGER	integer	2	38	0	1	39	
+.tlbr	toolbaritem	categoryindex	INTEGER	integer	2	38	0	0	8	
+.tlbr	toolbaritem	command	TEXT	text	2	38	0			3–24
+.tlbr	toolbaritem	commandIDtype	TEXT	text	2	38	0			12–15
+.tlbr	toolbaritem	itemcolor	INTEGER	integer	2	38	0	0	0	
+.tlbr	toolbaritem	itemgroupindex	INTEGER	integer	2	38	0	0	3	
+.tlbr	toolbaritem	itemtype	INTEGER	integer	2	38	0	10	10	
+.tlbr	toolbaritem	name	TEXT	text	2	38	0			6–42
+.tlbr	toolbaritem	option	INTEGER	integer	2	38	0	0	268435456	
+.tlbr	toolbaritem	setindex	INTEGER	integer	2	38	0	0	1	
+.tlbr	toolbarotherinfo	_PW_ID	INTEGER	integer	1	1	0	1	1	
+.tlbr	toolbarotherinfo	save110andlater	INTEGER	integer	1	1	0	1	1	
+.tlbr	toolbarotherinfo	save166andlater	INTEGER	integer	1	1	0	1	1	
+.tlbr	toolbarviewsetting	_PW_ID	INTEGER	integer	2	2	0	1	1	
+.tlbr	toolbarviewsetting	currentset	INTEGER	integer	1	1	0	0	0	
+.tlbr	toolbarviewsetting	toolbarreordertype	INTEGER	integer	2	2	0	2	2	
+.tomd	ModifyKeySetting	InputOperation	INTEGER	integer	6	505	0	0	120	
+.tomd	ModifyKeySetting	OutputOperation	INTEGER	integer	6	505	0	0	120	
+.tomd	ModifyKeySetting	RangeOperation	INTEGER	integer	6	505	0	0	53	
+.tomd	ModifyKeySetting	SettingData	BLOB	blob,null	6	505	1			24–400
+.tomd	ModifyKeySetting	_PW_ID	INTEGER	integer	6	505	0	1	85	
+.tomd	ToolModifyKey	Version	INTEGER	integer	6	6	0	130	131	
+.tomd	ToolModifyKey	_PW_ID	INTEGER	integer	6	6	0	1	1	
+canvasviewsettings	direnctrender	_PW_ID	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	direnctrender	renderonedit	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	snap	_PW_ID	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	snap	snapgrid	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	snap	snapruler	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	snap	snapspecialruler	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	vectorcore	_PW_ID	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	_PW_ID	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visble3dobjectlauncher	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visblerulerbar	INTEGER	integer	1	1	0	0	0	
+canvasviewsettings	visble	visblescrollbar	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visbleselectarealauncher	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visbletextobjectlauncher	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visbletransformlauncher	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visible2dcamera	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visibleanimationalllayerframe	INTEGER	integer	1	1	0	0	0	
+canvasviewsettings	visble	visibleanimationlocus	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visibleautocolorpreview	INTEGER	integer	1	1	0	0	0	
+canvasviewsettings	visble	visiblecolorpreview	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	visble	visibleplayfps	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	webtoonframe	_PW_ID	INTEGER	integer	1	1	0	1	1	
+canvasviewsettings	webtoonframe	webtoonframeheightrate	BLOB	blob	1	1	0			16
+canvasviewsettings	webtoonframe	webtoonframeopacity	INTEGER	integer	1	1	0	80	80	
+canvasviewsettings	webtoonframe	webtoonframeshow	INTEGER	integer	1	1	0	0	0	
+canvasviewsettings	webtoonframe	webtoonframewidthrate	BLOB	blob	1	1	0			16
+counter	counter	_PW_ID	INTEGER	integer	1	1	0	1	1	
+counter	counter	commandfilenew	INTEGER	integer	1	1	0	66	66	
+counter	counter	commandfilesavemergeimage	INTEGER	integer	1	1	0	281	281	
+counter	counter	commandpagemultiexport	INTEGER	integer	1	1	0	62	62	
+dialogbox	addperspectiverulerdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	addperspectiverulerdialogbox	addfisheye	INTEGER	integer	1	1	0	0	0	
+dialogbox	addperspectiverulerdialogbox	makeLayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	addperspectiverulerdialogbox	vanishnumber	INTEGER	integer	1	1	0	3	3	
+dialogbox	batchplaydialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	bookbindingexportdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	changeresolutiondialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	changeresolutiondialogbox	isusesuperresolution	INTEGER	integer	1	1	0	0	0	
+dialogbox	changeresolutiondialogbox	quality	INTEGER	integer	1	1	0	4	4	
+dialogbox	colorpickerdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	colorpickerdialogbox	colorset	INTEGER	integer	1	1	0	0	0	
+dialogbox	colorpickerdialogbox	huewheel	INTEGER	integer	1	1	0	0	0	
+dialogbox	colorpickerdialogbox	previewcheckbox	INTEGER	integer	1	1	0	1	1	
+dialogbox	colorpickerdialogbox	radiobutton	INTEGER	integer	1	1	0	0	0	
+dialogbox	colorpickerdialogbox	samplertype	INTEGER	integer	1	1	0	0	0	
+dialogbox	combinepagedialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	combinepagedialogbox	deletelayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	combinepagedialogbox	mergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	combinepagedialogbox	mergeditchunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	combinepagedialogbox	mergeframe	INTEGER	integer	1	1	0	1	1	
+dialogbox	convertlayerdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	convertlayerdialogbox	allBlack	INTEGER	integer	1	1	0	1	1	
+dialogbox	convertlayerdialogbox	antiAlias	INTEGER	integer	1	1	0	0	0	
+dialogbox	convertlayerdialogbox	leaveOriginal	INTEGER	integer	1	1	0	0	0	
+dialogbox	convertlayerdialogbox	maxLineWidth	BLOB	blob	1	1	0			12
+dialogbox	convertlayerdialogbox	smoothLevel	INTEGER	integer	1	1	0	3	3	
+dialogbox	convertlayerdialogbox	threshold	INTEGER	integer	1	1	0	50	50	
+dialogbox	convertlayerdialogbox	withWhite	INTEGER	integer	1	1	0	0	0	
+dialogbox	exportMultiPageParameter	P_8B1A4AF1CDE345A981BB6E59F09D2E44	BLOB	blob	1	1	0			82
+dialogbox	exportMultiPageParameter	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	filterParameter	P_FFD22A25ABB34fdfA6F2596CC0E24BEF	BLOB	blob	1	1	0			62
+dialogbox	filterParameter	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	gradationsettingdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	gradationsettingdialogbox	gradationsetindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	licensepromotion	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	licensepromotion	displayedimage	TEXT	text	1	1	0			58
+dialogbox	ltconvert2dlayerdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	blackthreshold	INTEGER	integer	1	1	0	80	80	
+dialogbox	ltconvert2dlayerdialogbox	outline1directionbottom	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	outline1directionleft	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	outline1directionright	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	outline1directiontop	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	outline1threshold	INTEGER	integer	1	1	0	90	90	
+dialogbox	ltconvert2dlayerdialogbox	outline2thresholdhigh	REAL	real	1	1	0	8.0	8.0	
+dialogbox	ltconvert2dlayerdialogbox	outline2thresholdrow	REAL	real	1	1	0	6.0	6.0	
+dialogbox	ltconvert2dlayerdialogbox	outlineposterize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	outlineposterizenodearray	BLOB	blob	1	1	0			28
+dialogbox	ltconvert2dlayerdialogbox	outlinesize	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	outlinetype	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	settingblackthreshold	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	settingoutlinesize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	toneangle	INTEGER	integer	1	1	0	45	45	
+dialogbox	ltconvert2dlayerdialogbox	toneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	ltconvert2dlayerdialogbox	tonenoisedw	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert2dlayerdialogbox	tonenoisesize	INTEGER	integer	1	1	0	100	100	
+dialogbox	ltconvert2dlayerdialogbox	toneposterize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	toneposterizenodearray	BLOB	blob	1	1	0			28
+dialogbox	ltconvert2dlayerdialogbox	tonetype	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert2dlayerdialogbox	usetonesetting2d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	blackthreshold	INTEGER	integer	1	1	0	40	40	
+dialogbox	ltconvert3dlayerdialogbox	depthcontolpoints3d	BLOB	blob	1	1	0			52
+dialogbox	ltconvert3dlayerdialogbox	depthedgeonly3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outline1directionbottom	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outline1directionleft	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outline1directionright	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outline1directiontop	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outline1emphasis3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	outline1facet3d	INTEGER	integer	1	1	0	50	50	
+dialogbox	ltconvert3dlayerdialogbox	outline1threshold	INTEGER	integer	1	1	0	90	90	
+dialogbox	ltconvert3dlayerdialogbox	outline2angle3d	INTEGER	integer	1	1	0	135	135	
+dialogbox	ltconvert3dlayerdialogbox	outline2thresholdhigh	REAL	real	1	1	0	8.0	8.0	
+dialogbox	ltconvert3dlayerdialogbox	outline2thresholdrow	REAL	real	1	1	0	6.0	6.0	
+dialogbox	ltconvert3dlayerdialogbox	outlinelayerkind3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outlineposterize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	outlineposterizenodearray	BLOB	blob	1	1	0			28
+dialogbox	ltconvert3dlayerdialogbox	outlinesize	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	outlinesize3d	BLOB	blob	1	1	0			12
+dialogbox	ltconvert3dlayerdialogbox	outlinetype	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	outlinetype3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	settingblackthreshold	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	settingoutlinesize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	showgridxy3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	showgridxz3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	showgridyz3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	smoothlevel3d	INTEGER	integer	1	1	0	4	4	
+dialogbox	ltconvert3dlayerdialogbox	toneangle	INTEGER	integer	1	1	0	45	45	
+dialogbox	ltconvert3dlayerdialogbox	toneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	ltconvert3dlayerdialogbox	tonenoisedw	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	tonenoisesize	INTEGER	integer	1	1	0	100	100	
+dialogbox	ltconvert3dlayerdialogbox	toneposterize	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	toneposterizenodearray	BLOB	blob	1	1	0			28
+dialogbox	ltconvert3dlayerdialogbox	tonetype	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	usedepthsetting3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	usegridsetting3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	useoutline1facet3dscale	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	usesmoothsetting3d	INTEGER	integer	1	1	0	0	0	
+dialogbox	ltconvert3dlayerdialogbox	usetexturesetting3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	ltconvert3dlayerdialogbox	usetonesetting3d	INTEGER	integer	1	1	0	1	1	
+dialogbox	modifykeysettingdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	modifykeysettingdialogbox	settingtype	INTEGER	integer	1	1	0	1	1	
+dialogbox	multipageimportdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	multipageimportdialogbox	readraster	INTEGER	integer	1	1	0	0	0	
+dialogbox	multipageimportdialogbox	setdraft	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	authorname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	authornameposition	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogbox	bindposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	colorprofileonlycolortype	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	coverdefaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	coverdefaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	coverdefaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	coverdefaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogbox	coverpapercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	coverpapercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	coverpapercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	coverresolution	REAL	real	1	1	0	350.0	350.0	
+dialogbox	newcanvasdialogbox	coverspacifiedspinewidth	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	covertemplateisuser	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	covertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	covertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	covertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	coverusepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	coverusespacifiedspinewidth	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	coverusetemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	cropbymargin	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	cropditch	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogbox	cropheight	REAL	real	1	1	0	257.0	257.0	
+dialogbox	newcanvasdialogbox	cropinnerheight	REAL	real	1	1	0	219.0	219.0	
+dialogbox	newcanvasdialogbox	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	cropinnerwidth	REAL	real	1	1	0	149.0	149.0	
+dialogbox	newcanvasdialogbox	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	cropwidth	REAL	real	1	1	0	182.0	182.0	
+dialogbox	newcanvasdialogbox	defaultcolor	INTEGER	integer	1	1	0	33	33	
+dialogbox	newcanvasdialogbox	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	defaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogbox	filenameformattype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	height	REAL	real	1	1	0	297.0	297.0	
+dialogbox	newcanvasdialogbox	inneroffsetbaseposition	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	layoutcombine	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	mergecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	nombrecolor	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	nombreedgewidthcalue	REAL	real	1	1	0	0.3	0.3	
+dialogbox	newcanvasdialogbox	nombreedgewidthunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogbox	nombrefontname	TEXT	text	1	1	0			25
+dialogbox	newcanvasdialogbox	nombrefontsize	REAL	real	1	1	0	9.0	9.0	
+dialogbox	newcanvasdialogbox	nombreoffsetxunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogbox	nombreoffsetxvalue	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	nombreoffsetyunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogbox	nombreoffsetyvalue	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogbox	nombreposition	INTEGER	integer	1	1	0	5	5	
+dialogbox	newcanvasdialogbox	nombreprefix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	nombrestartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	nombresuffix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	nombreuseedge	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	pagenumberposition	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogbox	pagenumberstartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	pageshowtype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	papercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	papercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	papercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogbox	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	printcompanyid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	resolution	REAL	real	1	1	0	600.0	600.0	
+dialogbox	newcanvasdialogbox	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	safemarginright	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	safemargintop	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogbox	savefolderpath	TEXT	text	1	1	0			90
+dialogbox	newcanvasdialogbox	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogbox	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogbox	startpage	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	storyindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	storyname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	storynameposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	storysubtitle	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogbox	unitkind	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogbox	usecolorprofile	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	usecover	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	usecropframe	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	usefilenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	usehiddennombre	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	usepagenumberinfo	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	usepagesetting	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	usepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	useprintcompanyinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	usesafeframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	useshownnombre	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogbox	usestoryindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogbox	width	REAL	real	1	1	0	210.0	210.0	
+dialogbox	newcanvasdialogboxanimation	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	authorname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	authornameposition	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxanimation	bindposition	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	celtemplateisuser	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	celtemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	celtemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	celtemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	celusetemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	colorprofileonlycolortype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	cropbymargin	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	cropditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropheight	REAL	real	1	1	0	540.0	540.0	
+dialogbox	newcanvasdialogboxanimation	cropinnerheight	REAL	real	1	1	0	540.0	540.0	
+dialogbox	newcanvasdialogboxanimation	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropinnerwidth	REAL	real	1	1	0	720.0	720.0	
+dialogbox	newcanvasdialogboxanimation	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	cropwidth	REAL	real	1	1	0	720.0	720.0	
+dialogbox	newcanvasdialogboxanimation	cutindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	defaultcolor	INTEGER	integer	1	1	0	33	33	
+dialogbox	newcanvasdialogboxanimation	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	defaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxanimation	drawframedesignationtype	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	filenameformattype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	framecount	REAL	real	1	1	0	120.0	120.0	
+dialogbox	newcanvasdialogboxanimation	framedisplaymethod	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	framerate	REAL	real	1	1	0	30.0	30.0	
+dialogbox	newcanvasdialogboxanimation	height	REAL	real	1	1	0	648.0	648.0	
+dialogbox	newcanvasdialogboxanimation	inneroffsetbaseposition	INTEGER	integer	1	1	0	4	4	
+dialogbox	newcanvasdialogboxanimation	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	layoutcombine	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	mergecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	pagenumberposition	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogboxanimation	pagenumberstartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	papercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxanimation	papercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxanimation	papercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxanimation	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	resizequality	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogboxanimation	resolution	REAL	real	1	1	0	144.0	144.0	
+dialogbox	newcanvasdialogboxanimation	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	safemarginright	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	safemargintop	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxanimation	savefolderpath	TEXT	text	1	1	0			90
+dialogbox	newcanvasdialogboxanimation	sceneindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	separatorPosition	INTEGER	integer	1	1	0	6	6	
+dialogbox	newcanvasdialogboxanimation	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxanimation	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxanimation	startpage	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	storyindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	storyname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	storynameposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	storysubtitle	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxanimation	timelinenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	unitkind	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	useanimationframesetting	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	usecolorprofile	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usecropframe	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	usedrawframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usefilenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usepagenumberinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usepagesetting	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	usesafeframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	usestoryindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	usestoryindexforanimation	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxanimation	usetimelinenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxanimation	width	REAL	real	1	1	0	864.0	864.0	
+dialogbox	newcanvasdialogboxcomic	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	authorname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	authornameposition	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	bindposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	colorprofileonlycolortype	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	coverdefaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	coverdefaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	coverdefaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	coverdefaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxcomic	coverpapercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	coverpapercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	coverpapercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	coverresolution	REAL	real	1	1	0	350.0	350.0	
+dialogbox	newcanvasdialogboxcomic	coverspacifiedspinewidth	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	covertemplateisuser	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	covertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	covertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	covertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	coverusepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	coverusespacifiedspinewidth	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	coverusetemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	cropbymargin	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	cropditch	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogboxcomic	cropheight	REAL	real	1	1	0	257.0	257.0	
+dialogbox	newcanvasdialogboxcomic	cropinnerheight	REAL	real	1	1	0	219.0	219.0	
+dialogbox	newcanvasdialogboxcomic	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	cropinnerwidth	REAL	real	1	1	0	149.0	149.0	
+dialogbox	newcanvasdialogboxcomic	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	cropwidth	REAL	real	1	1	0	182.0	182.0	
+dialogbox	newcanvasdialogboxcomic	defaultcolor	INTEGER	integer	1	1	0	17	17	
+dialogbox	newcanvasdialogboxcomic	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	defaultcolortypeindex	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxcomic	filenameformattype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	height	REAL	real	1	1	0	297.0	297.0	
+dialogbox	newcanvasdialogboxcomic	inneroffsetbaseposition	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	layoutcombine	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	mergecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	nombrecolor	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	nombreedgewidthcalue	REAL	real	1	1	0	0.3	0.3	
+dialogbox	newcanvasdialogboxcomic	nombreedgewidthunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	nombrefontname	TEXT	text	1	1	0			25
+dialogbox	newcanvasdialogboxcomic	nombrefontsize	REAL	real	1	1	0	9.0	9.0	
+dialogbox	newcanvasdialogboxcomic	nombreoffsetxunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	nombreoffsetxvalue	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	nombreoffsetyunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	nombreoffsetyvalue	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogboxcomic	nombreposition	INTEGER	integer	1	1	0	5	5	
+dialogbox	newcanvasdialogboxcomic	nombreprefix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	nombrestartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	nombresuffix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	nombreuseedge	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	pagenumberposition	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogboxcomic	pagenumberstartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	papercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	papercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	papercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxcomic	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	printcompanyid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	resolution	REAL	real	1	1	0	600.0	600.0	
+dialogbox	newcanvasdialogboxcomic	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	safemarginright	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	safemargintop	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxcomic	savefolderpath	TEXT	text	1	1	0			90
+dialogbox	newcanvasdialogboxcomic	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxcomic	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxcomic	startpage	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	storyindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	storyname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	storynameposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	storysubtitle	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxcomic	unitkind	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxcomic	usecolorprofile	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	usecover	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	usecropframe	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	usefilenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	usehiddennombre	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	usepagenumberinfo	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	usepagesetting	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	usepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	useprintcompanyinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	usesafeframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	useshownnombre	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcomic	usestoryindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcomic	width	REAL	real	1	1	0	210.0	210.0	
+dialogbox	newcanvasdialogboxcommon	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxcommon	recordtimelapse	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxcommon	settingtype	TEXT	text	1	1	0			6
+dialogbox	newcanvasdialogboxfanzine	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	authorname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	authornameposition	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	bindposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	colorprofileonlycolortype	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	coverdefaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	coverdefaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	coverdefaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	coverdefaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxfanzine	coverpapercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	coverpapercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	coverpapercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	coverresolution	REAL	real	1	1	0	350.0	350.0	
+dialogbox	newcanvasdialogboxfanzine	coverspacifiedspinewidth	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	covertemplateisuser	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	covertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	covertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	covertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	coverusepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	coverusespacifiedspinewidth	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	coverusetemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	cropbymargin	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	cropditch	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogboxfanzine	cropheight	REAL	real	1	1	0	257.0	257.0	
+dialogbox	newcanvasdialogboxfanzine	cropinnerheight	REAL	real	1	1	0	219.0	219.0	
+dialogbox	newcanvasdialogboxfanzine	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	cropinnerwidth	REAL	real	1	1	0	149.0	149.0	
+dialogbox	newcanvasdialogboxfanzine	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	cropwidth	REAL	real	1	1	0	182.0	182.0	
+dialogbox	newcanvasdialogboxfanzine	defaultcolor	INTEGER	integer	1	1	0	17	17	
+dialogbox	newcanvasdialogboxfanzine	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	defaultcolortypeindex	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxfanzine	filenameformattype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	height	REAL	real	1	1	0	297.0	297.0	
+dialogbox	newcanvasdialogboxfanzine	inneroffsetbaseposition	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	layoutcombine	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	mergecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	nombrecolor	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	nombreedgewidthcalue	REAL	real	1	1	0	0.3	0.3	
+dialogbox	newcanvasdialogboxfanzine	nombreedgewidthunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	nombrefontname	TEXT	text	1	1	0			25
+dialogbox	newcanvasdialogboxfanzine	nombrefontsize	REAL	real	1	1	0	9.0	9.0	
+dialogbox	newcanvasdialogboxfanzine	nombreoffsetxunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	nombreoffsetxvalue	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	nombreoffsetyunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	nombreoffsetyvalue	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogboxfanzine	nombreposition	INTEGER	integer	1	1	0	5	5	
+dialogbox	newcanvasdialogboxfanzine	nombreprefix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	nombrestartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	nombresuffix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	nombreuseedge	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	pagenumberposition	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogboxfanzine	pagenumberstartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	papercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	papercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	papercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxfanzine	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	printcompanyid	TEXT	text	1	1	0			4
+dialogbox	newcanvasdialogboxfanzine	resolution	REAL	real	1	1	0	600.0	600.0	
+dialogbox	newcanvasdialogboxfanzine	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	safemarginright	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	safemargintop	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxfanzine	savefolderpath	TEXT	text	1	1	0			90
+dialogbox	newcanvasdialogboxfanzine	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxfanzine	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxfanzine	startpage	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	storyindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	storyname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	storynameposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	storysubtitle	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxfanzine	unitkind	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxfanzine	usecolorprofile	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usecover	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usecropframe	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usefilenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	usehiddennombre	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	usepagenumberinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	usepagesetting	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	useprintcompanyinfo	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usesafeframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	useshownnombre	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxfanzine	usestoryindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxfanzine	width	REAL	real	1	1	0	210.0	210.0	
+dialogbox	newcanvasdialogboxillust	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	authorname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	authornameposition	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxillust	bindposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	celnumber	INTEGER	integer	1	1	0	8	8	
+dialogbox	newcanvasdialogboxillust	colorprofileonlycolortype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	coverdefaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	coverdefaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	coverdefaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	coverdefaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxillust	coverpapercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxillust	coverpapercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxillust	coverpapercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxillust	coverresolution	REAL	real	1	1	0	72.0	72.0	
+dialogbox	newcanvasdialogboxillust	coverspacifiedspinewidth	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	covertemplateisuser	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	covertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	covertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	covertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	coverusepaperlayer	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	coverusespacifiedspinewidth	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	coverusetemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	cropbymargin	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	cropditch	REAL	real	1	1	0	0.59	0.59	
+dialogbox	newcanvasdialogboxillust	cropheight	REAL	real	1	1	0	43.69	43.69	
+dialogbox	newcanvasdialogboxillust	cropinnerheight	REAL	real	1	1	0	35.980000000000004	35.980000000000004	
+dialogbox	newcanvasdialogboxillust	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	cropinnerwidth	REAL	real	1	1	0	25.44	25.44	
+dialogbox	newcanvasdialogboxillust	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	cropwidth	REAL	real	1	1	0	30.86	30.86	
+dialogbox	newcanvasdialogboxillust	defaultcolor	INTEGER	integer	1	1	0	33	33	
+dialogbox	newcanvasdialogboxillust	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	defaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxillust	filenameformattype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	framerate	REAL	real	1	1	0	8.0	8.0	
+dialogbox	newcanvasdialogboxillust	height	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxillust	inneroffsetbaseposition	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	layoutcombine	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	mergecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	nombrecolor	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	nombreedgewidthcalue	REAL	real	1	1	0	0.5	0.5	
+dialogbox	newcanvasdialogboxillust	nombreedgewidthunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxillust	nombrefontname	TEXT	text	1	1	0			25
+dialogbox	newcanvasdialogboxillust	nombrefontsize	REAL	real	1	1	0	9.0	9.0	
+dialogbox	newcanvasdialogboxillust	nombreoffsetxunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxillust	nombreoffsetxvalue	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	nombreoffsetyunit	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxillust	nombreoffsetyvalue	REAL	real	1	1	0	5.0	5.0	
+dialogbox	newcanvasdialogboxillust	nombreposition	INTEGER	integer	1	1	0	5	5	
+dialogbox	newcanvasdialogboxillust	nombreprefix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	nombrestartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	nombresuffix	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	nombreuseedge	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	pagenumberposition	INTEGER	integer	1	1	0	3	3	
+dialogbox	newcanvasdialogboxillust	pagenumberstartindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	papercolorblue	INTEGER	integer	1	1	0	3557086212	3557086212	
+dialogbox	newcanvasdialogboxillust	papercolorgreen	INTEGER	integer	1	1	0	3557086212	3557086212	
+dialogbox	newcanvasdialogboxillust	papercolorred	INTEGER	integer	1	1	0	3557086212	3557086212	
+dialogbox	newcanvasdialogboxillust	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	printcompanyid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	resolution	REAL	real	1	1	0	350.0	350.0	
+dialogbox	newcanvasdialogboxillust	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	safemarginright	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	safemargintop	REAL	real	1	1	0	0.0	0.0	
+dialogbox	newcanvasdialogboxillust	savefolderpath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxillust	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxillust	startpage	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	storyindex	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	storyname	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	storynameposition	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	storysubtitle	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxillust	unitkind	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxillust	usecolorprofile	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxillust	usecover	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usecropframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usefilenameformat	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usehiddennombre	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usepagenumberinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usepagesetting	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usepaperlayer	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	useprintcompanyinfo	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usesafeframe	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	useshownnombre	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usestoryindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	usetimeline	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxillust	width	REAL	real	1	1	0	100.0	100.0	
+dialogbox	newcanvasdialogboxwebtoon	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	colorprofileonlycolortype	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxwebtoon	defaultcolor	INTEGER	integer	1	1	0	33	33	
+dialogbox	newcanvasdialogboxwebtoon	defaultcolorblackchecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	defaultcolortypeindex	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxwebtoon	defaultcolorwhitechecked	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	defaulttoneline	REAL	real	1	1	0	60.0	60.0	
+dialogbox	newcanvasdialogboxwebtoon	height	REAL	real	1	1	0	20000.0	20000.0	
+dialogbox	newcanvasdialogboxwebtoon	isusertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxwebtoon	layertemplatename	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxwebtoon	layertemplatepath	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxwebtoon	layertemplateuuid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxwebtoon	pagenumber	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	pagesplitnumber	INTEGER	integer	1	1	0	2	2	
+dialogbox	newcanvasdialogboxwebtoon	papercolorblue	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxwebtoon	papercolorgreen	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxwebtoon	papercolorred	INTEGER	integer	1	1	0	4294967295	4294967295	
+dialogbox	newcanvasdialogboxwebtoon	presetid	TEXT	text	1	1	0			0
+dialogbox	newcanvasdialogboxwebtoon	resolution	REAL	real	1	1	0	350.0	350.0	
+dialogbox	newcanvasdialogboxwebtoon	savefolderpath	TEXT	text	1	1	0			90
+dialogbox	newcanvasdialogboxwebtoon	simulatecolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxwebtoon	srccolorprofile	TEXT	text	1	1	0			68
+dialogbox	newcanvasdialogboxwebtoon	unitkind	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxwebtoon	usecolorprofile	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	uselayertemplate	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcanvasdialogboxwebtoon	usepagesetting	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	usepagesplit	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	usepaperlayer	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcanvasdialogboxwebtoon	width	REAL	real	1	1	0	690.0	690.0	
+dialogbox	newcomicframedialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcomicframedialogbox	antialias	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcomicframedialogbox	forleftpage	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcomicframedialogbox	forrightpage	INTEGER	integer	1	1	0	1	1	
+dialogbox	newcomicframedialogbox	linewidth	REAL	real	1	1	0	13.0	13.0	
+dialogbox	newcomicframedialogbox	linewidthunit	INTEGER	integer	1	1	0	0	0	
+dialogbox	newcomicframedialogbox	useline	INTEGER	integer	1	1	0	1	1	
+dialogbox	preferencedialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	preferencedialogbox	currentcategoryid	INTEGER	integer	1	1	0	1	1	
+dialogbox	quickmask	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	selectcolordialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	selectcolordialogbox	colormargin	REAL	real	1	1	0	10.0	10.0	
+dialogbox	selectcolordialogbox	createtype	INTEGER	integer	1	1	0	0	0	
+dialogbox	selectcolordialogbox	referMultiLayer	INTEGER	integer	1	1	0	0	0	
+dialogbox	selectcolordialogbox	refertype	INTEGER	integer	1	1	0	0	0	
+dialogbox	shortcutsettingdialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	shortcutsettingdialogbox	settingarea	INTEGER	integer	1	1	0	1	1	
+dialogbox	simpletonedialogbox	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	simpletonedialogbox	angle	INTEGER	integer	1	1	0	45	45	
+dialogbox	simpletonedialogbox	density	INTEGER	integer	1	1	0	40	40	
+dialogbox	simpletonedialogbox	line	REAL	real	1	1	0	60.0	60.0	
+dialogbox	simpletonedialogbox	noisedw	INTEGER	integer	1	1	0	0	0	
+dialogbox	simpletonedialogbox	noisesize	INTEGER	integer	1	1	0	10	10	
+dialogbox	simpletonedialogbox	screeningtype	INTEGER	integer	1	1	0	1	1	
+dialogbox	timelapseexport	_PW_ID	INTEGER	integer	1	1	0	1	1	
+dialogbox	timelapseexport	videoaspectratiooriginal	INTEGER	integer	1	1	0	1	1	
+dialogbox	timelapseexport	videoduration	REAL	real	1	1	0	60.0	60.0	
+dialogbox	timelapseexport	videodurationall	INTEGER	integer	1	1	0	0	0	
+dialogbox	timelapseexport	videosize	INTEGER	integer	1	1	0	1280	1280	
+dialogbox	timelapseexport	videousecsplogoimage	INTEGER	integer	1	1	0	0	0	
+dialogbox	timelapseexport	videousewatermark	INTEGER	integer	1	1	0	0	0	
+dialogstate	shortcutlist	_PW_ID	INTEGER	integer	1	109	0	2528	2636	
+dialogstate	shortcutlist	isclose	INTEGER	integer	1	109	0	0	1	
+dialogstate	shortcutlist	menucommand	TEXT	text	1	109	0			10–37
+dialogstate	shortcutlist	menucommandtype	TEXT	text	1	109	0			15
+digitizersettings	general	_PW_ID	INTEGER	integer	1	1	0	1	1	
+digitizersettings	general	coexistmode	TEXT	text	1	1	0			10
+exportsettings	aidisturbance	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	aidisturbance	useaidisturbance	INTEGER	integer	1	1	0	0	0	
+exportsettings	color	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	embedprofile	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	guideframeandtombow	INTEGER	integer	1	1	0	0	0	
+exportsettings	color	linetonebyscale	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	locuscolor	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	locusmaxopacity	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	mode	INTEGER	integer	1	1	0	4	4	
+exportsettings	color	monochrometype	INTEGER	integer	1	1	0	0	0	
+exportsettings	color	usealpha	INTEGER	integer	1	1	0	1	1	
+exportsettings	color	uselayereffecttone	INTEGER	integer	1	1	0	1	1	
+exportsettings	contents	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	contents	flags	INTEGER	integer	1	1	0	8	8	
+exportsettings	contents	frame	INTEGER	integer	1	1	0	0	0	
+exportsettings	contents	textlayerflags	INTEGER	integer	1	1	0	0	0	
+exportsettings	filejpg	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	filephotoshop	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	filephotoshop	filepsdmergeimageonly	INTEGER	integer	1	1	0	0	0	
+exportsettings	filewebp	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	outputquality	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	outputquality	outputprocesstype	INTEGER	integer	1	1	0	0	0	
+exportsettings	outputsize	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	outputsize	height	BLOB	blob	1	1	0			12
+exportsettings	outputsize	outputprocesstype	INTEGER	integer	1	1	0	0	0	
+exportsettings	outputsize	resolution	REAL	real	1	1	0	350.0	350.0	
+exportsettings	outputsize	stretchisinputscale	INTEGER	integer	1	1	0	1	1	
+exportsettings	outputsize	stretchscale	REAL	real	1	1	0	1.0	1.0	
+exportsettings	outputsize	width	BLOB	blob	1	1	0			12
+exportsettings	pageinfo	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	pageinfo	doublepage	INTEGER	integer	1	1	0	0	0	
+exportsettings	pageinfo	height	BLOB	blob	1	1	0			12
+exportsettings	pageinfo	resolution	REAL	real	1	1	0	350.0	350.0	
+exportsettings	pageinfo	width	BLOB	blob	1	1	0			12
+exportsettings	preset	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	preset	presetid	TEXT	text	1	1	0			0
+exportsettings	preview	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	preview	show	INTEGER	integer	1	1	0	0	0	
+exportsettings	watermark	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettings	watermark	usewatermark	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	aidisturbance	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	aidisturbance	useaidisturbance	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	color	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	embedprofile	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	guideframeandtombow	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	color	linetonebyscale	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	locuscolor	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	locusmaxopacity	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	mode	INTEGER	integer	1	1	0	4	4	
+exportsettingsforbatch	color	monochrometype	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	color	usealpha	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	color	uselayereffecttone	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	contents	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	contents	flags	INTEGER	integer	1	1	0	8	8	
+exportsettingsforbatch	contents	frame	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	contents	textlayerflags	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	filejpg	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	filephotoshop	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	filephotoshop	filepsdmergeimageonly	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	filewebp	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	outputquality	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	outputquality	outputprocesstype	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	outputquality	outputrasterstretchqualitytype	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	outputsize	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	outputsize	height	BLOB	blob	1	1	0			12
+exportsettingsforbatch	outputsize	outputprocesstype	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	outputsize	resolution	REAL	real	1	1	0	600.0	600.0	
+exportsettingsforbatch	outputsize	stretchisinputscale	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	outputsize	stretchscale	REAL	real	1	1	0	1.0	1.0	
+exportsettingsforbatch	outputsize	width	BLOB	blob	1	1	0			12
+exportsettingsforbatch	pageinfo	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	pageinfo	doublepage	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	pageinfo	height	BLOB	blob	1	1	0			12
+exportsettingsforbatch	pageinfo	resolution	REAL	real	1	1	0	600.0	600.0	
+exportsettingsforbatch	pageinfo	width	BLOB	blob	1	1	0			12
+exportsettingsforbatch	preset	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	preset	presetid	TEXT	text	1	1	0			0
+exportsettingsforbatch	preview	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	preview	show	INTEGER	integer	1	1	0	0	0	
+exportsettingsforbatch	watermark	_PW_ID	INTEGER	integer	1	1	0	1	1	
+exportsettingsforbatch	watermark	usewatermark	INTEGER	integer	1	1	0	0	0	
+exportsettingspreset	preset	_PW_ID	INTEGER		1	0	0			
+fontcollection	collection	_PW_ID	INTEGER		1	0	0			
+fontcollection	collectionlist	_PW_ID	INTEGER		1	0	0			
+functioncurvesettings	functioncurve	_PW_ID	INTEGER	integer	1	1	0	1	1	
+functioncurvesettings	functioncurve	enableSnapX	INTEGER	integer	1	1	0	1	1	
+functioncurvesettings	functioncurve	enableSnapY	INTEGER	integer	1	1	0	0	0	
+joypadsettings	general	_PW_ID	INTEGER	integer	2	2	0	1	1	
+joypadsettings	general	calibration	INTEGER	integer	1	1	0	6	6	
+joypadsettings	working	_PW_ID	INTEGER		1	0	0			
+lastmodifiedcanvaspath	lastmodifiedcanvaspathcategory	_PW_ID	INTEGER	integer	1	1	0	1	1	
+lastmodifiedcanvaspath	lastmodifiedcanvaspathcategory	lastmodifiedcanvaspath	TEXT	text	1	1	0			86
+lastmodifiedcanvaspath	lastmodifiedcanvaspathcategory	lastmodifiedcanvaspathbookmark	BLOB	blob	1	1	0			87
+lastmodifiedcanvaspath	lastmodifiedcanvaspathcategory	lastmodifiedcanvaspathcount	INTEGER	integer	1	1	0	2	2	
+layerpropertydefault	common	_PW_ID	INTEGER	integer	2	2	0	1	1	
+layerpropertydefault	common	authenticationkey	TEXT	text	1	1	0			0
+layerpropertydefault	common	defaultquickaccesssetindex	INTEGER	integer	1	1	0	-1	-1	
+layerpropertydefault	common	defaultquickaccesssetname	TEXT	text	1	1	0			0
+layerpropertydefault	common	defaultquickaccesssetuuid	TEXT	text	1	1	0			0
+layerpropertydefault	common	defaulttabkind	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	common	ipv4address	TEXT	text	1	1	0			0
+layerpropertydefault	common	issystemsleepprevented	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	common	istabbuttonbarrightonhorizontalview	INTEGER	integer	1	1	0	0	0	
+layerpropertydefault	common	isvibrationenabled	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	common	layereffect	BLOB	blob	1	1	0			638
+layerpropertydefault	common	lineQuality	INTEGER	integer	1	1	0	2	2	
+layerpropertydefault	common	portnumber	INTEGER	integer	1	1	0	32035	32035	
+layerpropertydefault	common	quickaccesssetselectionstyle	INTEGER	integer	1	1	0	3	3	
+layerpropertydefault	common	serverauthenticationkey	TEXT	text	1	1	0			0
+layerpropertydefault	common	serverversion	TEXT	text	1	1	0			0
+layerpropertydefault	common	subviewcurrentindex	INTEGER	integer	1	1	0	-1	-1	
+layerpropertydefault	common	toneArea	BLOB	blob	1	1	0			12
+layerpropertydefault	common	workertypestring	TEXT	text	1	1	0			4
+layerpropertydefault	layercolor	_PW_ID	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	layercolor	balloonmain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	balloonsub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	foldermain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	foldersub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	gradationmain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	gradationsub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	quickmaskmain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	rastermain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	rastersub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	resizablemain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	resizablesub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	selectareamain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	streamlinemain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	streamlinesub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	textmain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	textsub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	threedmain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	threedsub	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	vectormain	BLOB	blob	1	1	0			12
+layerpropertydefault	layercolor	vectorsub	BLOB	blob	1	1	0			12
+layerpropertydefault	previewcolor	_PW_ID	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	previewcolor	applyopacity	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	previewcolor	thresholdalpha	INTEGER	integer	1	1	0	2147483648	2147483648	
+layerpropertydefault	previewcolor	thresholdimage	INTEGER	integer	1	1	0	2147483648	2147483648	
+layerpropertydefault	reducecolor	_PW_ID	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	reducecolor	applyopacity	INTEGER	integer	1	1	0	1	1	
+layerpropertydefault	reducecolor	colorindex	INTEGER	integer	1	1	0	2	2	
+layerpropertydefault	reducecolor	thresholdalpha	INTEGER	integer	1	1	0	2147483648	2147483648	
+layerpropertydefault	reducecolor	thresholdimage	INTEGER	integer	1	1	0	2147483648	2147483648	
+layerpropertydefault	subviewimagecategory	_PW_ID	INTEGER		1	0	0			
+mixedfont	mixedfonttable	_PW_ID	INTEGER		1	0	0			
+multipageexportsettings	multipageexport	_PW_ID	INTEGER	integer	1	1	0	1	1	
+multipageexportsettings	multipageexport	coverindexes	INTEGER	integer	1	1	0	0	0	
+multipageexportsettings	multipageexport	exporttext	INTEGER	integer	1	1	0	0	0	
+multipageexportsettings	multipageexport	fileextension	TEXT	text	1	1	0			3
+multipageexportsettings	multipageexport	isdoublepageseparate	INTEGER	integer	1	1	0	0	0	
+multipageexportsettings	multipageexport	ismergelayer	INTEGER	integer	1	1	0	1	1	
+multipageexportsettings	multipageexport	outputkind	INTEGER	integer	1	1	0	2	2	
+popupfontcollection	popupfontcollection	_PW_ID	INTEGER	integer	1	1	0	1	1	
+popupfontcollection	popupfontcollection	currentcollection	TEXT	text	1	1	0			0
+popupfontcollection	popupfontcollection	currentviewstyle	TEXT	text	1	1	0			10
+popupfontcollection	popupfontcollection	fontlistcollectionclosing	INTEGER	integer	1	1	0	0	0	
+popupfontcollection	popupfontcollection	fontlistfilterstring	TEXT	text	1	1	0			0
+popupfontcollection	popupfontcollection	fontlisthistory0	TEXT	text	1	1	0			23
+popupfontcollection	popupfontcollection	fontlisthistory1	TEXT	text	1	1	0			32
+popupfontcollection	popupfontcollection	fontlisthistory2	TEXT	text	1	1	0			27
+popupfontcollection	popupfontcollection	fontlisthistory3	TEXT	text	1	1	0			30
+popupfontcollection	popupfontcollection	fontlisthistory4	TEXT	text	1	1	0			29
+popupfontcollection	popupfontcollection	fontlisthistory5	TEXT	text	1	1	0			12
+popupfontcollection	popupfontcollection	fontlisthistory6	TEXT	text	1	1	0			26
+popupfontcollection	popupfontcollection	fontlisthistory7	TEXT	text	1	1	0			36
+popupfontcollection	popupfontcollection	fontlisthistory8	TEXT	text	1	1	0			16
+popupfontcollection	popupfontcollection	fontlisthistory9	TEXT	text	1	1	0			18
+popupfontcollection	popupfontcollection	fontlisthistoryclosing	INTEGER	integer	1	1	0	0	0	
+popupfontcollection	popupfontcollection	fontlisthistorycount	INTEGER	integer	1	1	0	10	10	
+recentfiles	recentfilescanvas	_PW_ID	INTEGER	integer	1	1	0	1	1	
+recentfiles	recentfilescanvas	recentfilescanvasbookmarkcount	INTEGER	integer	1	1	0	10	10	
+recentfiles	recentfilescanvas	recentfilescanvascount	INTEGER	integer	1	1	0	10	10	
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark0	BLOB	blob	1	1	0			55
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark1	BLOB	blob	1	1	0			55
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark2	BLOB	blob	1	1	0			55
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark3	BLOB	blob	1	1	0			55
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark4	BLOB	blob	1	1	0			89
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark5	BLOB	blob	1	1	0			63
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark6	BLOB	blob	1	1	0			93
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark7	BLOB	blob	1	1	0			133
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark8	BLOB	blob	1	1	0			83
+recentfiles	recentfilescanvas	recentfilescanvasfilebookmark9	BLOB	blob	1	1	0			93
+recentfiles	recentfilescanvas	recentfilescanvasfilepath0	TEXT	text	1	1	0			54
+recentfiles	recentfilescanvas	recentfilescanvasfilepath1	TEXT	text	1	1	0			54
+recentfiles	recentfilescanvas	recentfilescanvasfilepath2	TEXT	text	1	1	0			54
+recentfiles	recentfilescanvas	recentfilescanvasfilepath3	TEXT	text	1	1	0			54
+recentfiles	recentfilescanvas	recentfilescanvasfilepath4	TEXT	text	1	1	0			88
+recentfiles	recentfilescanvas	recentfilescanvasfilepath5	TEXT	text	1	1	0			62
+recentfiles	recentfilescanvas	recentfilescanvasfilepath6	TEXT	text	1	1	0			92
+recentfiles	recentfilescanvas	recentfilescanvasfilepath7	TEXT	text	1	1	0			132
+recentfiles	recentfilescanvas	recentfilescanvasfilepath8	TEXT	text	1	1	0			82
+recentfiles	recentfilescanvas	recentfilescanvasfilepath9	TEXT	text	1	1	0			92
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark0		null	1	1	1			
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark1		null	1	1	1			
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark2		null	1	1	1			
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark3		null	1	1	1			
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark4	BLOB	blob	1	1	0			66
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark5	BLOB	blob	1	1	0			45
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark6	BLOB	blob	1	1	0			70
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark7	BLOB	blob	1	1	0			66
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark8		null	1	1	1			
+recentfiles	recentfilescanvas	recentfilescanvassubfilebookmark9	BLOB	blob	1	1	0			73
+sizeset	customsizeset	_PW_ID	INTEGER	integer	1	1	0	304	304	
+sizeset	customsizeset	cropditch	REAL	real	1	1	0	5.0	5.0	
+sizeset	customsizeset	cropheight	REAL	real	1	1	0	297.0	297.0	
+sizeset	customsizeset	cropinnerheight	REAL	real	1	1	0	268.0	268.0	
+sizeset	customsizeset	cropinneroffsetx	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	cropinneroffsety	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	cropinnerwidth	REAL	real	1	1	0	180.0	180.0	
+sizeset	customsizeset	cropmergeditch	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	cropoffsetx	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	cropoffsety	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	cropwidth	REAL	real	1	1	0	210.0	210.0	
+sizeset	customsizeset	height	REAL	real	1	1	0	297.0	297.0	
+sizeset	customsizeset	mergecropframe	INTEGER	integer	1	1	0	0	0	
+sizeset	customsizeset	name	TEXT	text	1	1	0			9
+sizeset	customsizeset	pagetype	INTEGER	integer	1	1	0	0	0	
+sizeset	customsizeset	presetid	TEXT	text	1	1	0			36
+sizeset	customsizeset	resolution	REAL	real	1	1	0	600.0	600.0	
+sizeset	customsizeset	resolutionstate	INTEGER	integer	1	1	0	1	1	
+sizeset	customsizeset	safemarginbottom	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	safemarginleft	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	safemarginright	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	safemargintop	REAL	real	1	1	0	0.0	0.0	
+sizeset	customsizeset	unitkind	INTEGER	integer	1	1	0	2	2	
+sizeset	customsizeset	usecropframe	INTEGER	integer	1	1	0	0	0	
+sizeset	customsizeset	usedrawframe	INTEGER	integer	1	1	0	0	0	
+sizeset	customsizeset	usesafeframe	INTEGER	integer	1	1	0	0	0	
+sizeset	customsizeset	width	REAL	real	1	1	0	210.0	210.0	
+sizeset	customsizesetanimation	_PW_ID	INTEGER		1	0	0			
+sizeset	customsizesetcomic	_PW_ID	INTEGER		1	0	0			
+sizeset	customsizesetfanzine	_PW_ID	INTEGER		1	0	0			
+sizeset	customsizesetillust	_PW_ID	INTEGER		1	0	0			
+sizeset	customsizesetwebtoon	_PW_ID	INTEGER		1	0	0			
+tabmatebleSettings	general	_PW_ID	INTEGER	integer	1	1	0	1	1	
+timelinesettings	keyframe	_PW_ID	INTEGER	integer	1	1	0	1	1	
+timelinesettings	keyframe	autokeyframe	INTEGER	integer	1	1	0	0	0	
+timelinesettings	keyframe	interpolation	INTEGER	integer	1	1	0	2	2	
+timelinesettings	keyframe	interpolation2	INTEGER	integer	1	1	0	0	0	
+timelinesettings	player	_PW_ID	INTEGER	integer	1	1	0	1	1	
+timelinesettings	player	loopplay	INTEGER	integer	1	1	0	1	1	
+timelinesettings	player	playenable2dcamera	INTEGER	integer	1	1	0	0	0	
+timelinesettings	player	playenableprecache	INTEGER	integer	1	1	0	0	0	
+timelinesettings	player	playqualitytype	INTEGER	integer	1	1	0	2	2	
+timelinesettings	player	playtype	INTEGER	integer	1	1	0	1	1	
+timelinesettings	tracklabel	_PW_ID	INTEGER	integer	1	1	0	1	1	
+timelinesettings	tracklabel	alwayschooselistitem	INTEGER	integer	1	1	0	1	1	
+timelinesettings	tracklabel	isdrawcelpalettecolor	INTEGER	integer	1	1	0	0	0	
+timelinesettings	tracklabel	isdrawclippalettecolor	INTEGER	integer	1	1	0	0	0	
+timelinesettings	tracklabel	isscrubbingaudio	INTEGER	integer	1	1	0	1	1	
+toolrotationsettings	working	_PW_ID	INTEGER	integer	1	1	0	27	27	
+toolrotationsettings	working	name	TEXT	text	1	1	0			12
+toolrotationsettings	working	rotationID	BLOB	blob	1	1	0			16
+toolrotationsettings	working	toolID_1	BLOB	blob	1	1	0			16
+toolrotationsettings	working	toolID_10	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_2	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_3	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_4	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_5	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_6	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_7	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_8	BLOB	blob	1	1	0			1
+toolrotationsettings	working	toolID_9	BLOB	blob	1	1	0			1
+toolrotationsettings	working	useToolNumber	INTEGER	integer	1	1	0	2	2	
+wacom	wacomstylus	_PW_ID	INTEGER	integer	1	1	0	1	1	
+wtabmatesettings	general	_PW_ID	INTEGER	integer	2	2	0	1	1	
+wtabmatesettings	general	buttonmultihittime	INTEGER	integer	1	1	0	300	300	
+wtabmatesettings	general	buttonpressholdtime	INTEGER	integer	1	1	0	500	500	
+wtabmatesettings	general	buttontoolshifttime	INTEGER	integer	1	1	0	0	0	
+wtabmatesettings	general	uselatestdefaultsettings	INTEGER	integer	2	2	0	0	1	
+wtabmatesettings	working	_PW_ID	INTEGER		1	0	0			

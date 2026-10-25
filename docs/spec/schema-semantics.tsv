@@ -104,20 +104,22 @@ re:^Project\.DefaultPage(ColorType|BlackChecked|WhiteChecked|ToneLine)$	推測	�
 re:^Project\.DefaultPageCrop	推測	既定のトンボ（仕上がり・基本枠・裁ち落とし幅、Canvas.CropFrame* と同じ）
 re:^Project\.DefaultPageSafeMargin	推測	既定の安全マージン（上下左右）
 Project.DefaultPageUseCropFrame	推測	既定のページにトンボを付ける
-Project.DefaultPageDoublePage	推測	既定のページを見開きにする
+Project.DefaultPageDoublePage	確認済み	対向ページを見開きにする（新規作成の設定。V8）
 Project.DefaultPageCheckBookBinding	推測	製本の確認（綴じの向き）を使う
 re:^Project\.DefaultPage(Cel)?(UseTemplate|IsUserTemplate|TemplateName|TemplatePath2?|TemplateUUID)$	推測	既定のページ（Cel はセル）に使うテンプレートと、それがユーザーのものか
 Project.DefaultPageSettingType	推測	既定のページの設定の種類（短い文字列）
 Project.DefaultPagePresetID	推測	既定のページのプリセットの ID
 re:^Project\.DefaultPage(RecordTimeLapse|TimeLapseCodec)$	推測	既定のページでタイムラプスを記録するか、その形式
-Project.DefaultPageUseDefaultCoverInfo	推測	表紙の既定（DefaultCover*）を使う
-re:^Project\.DefaultCover	推測	表紙の既定（大きさ・解像度・用紙・テンプレート・色の設定）。コーパスでは未設定
+Project.DefaultPageUseDefaultCoverInfo	確認済み	表紙の既定（DefaultCover*）を使う。表紙ありの作品で 1（V8）
+re:^Project\.DefaultCover	推測	表紙の既定（解像度・用紙・テンプレート・表現色・カラープロファイル）。表紙ありの作品を作ると加わる（V8）
 re:^Project\.Default(Src|Simulate)PageColorProfile$	推測	既定の色の設定（ICC プロファイル）。元と、刷り上がりのシミュレーション
 #
 Project.MaxCanvasFileIndex	確認済み	.cmc のページのファイル名に使った最大の番号。新しいページは + 1
-Project.ComicBindPosition	推測	.cmc の綴じる位置（0・1。どちらが右綴じかは CSP で未確認）
-re:^Project\.Comic(CoverExist|StartPage|BindAndStartPageIndeterminate)$	推測	.cmc の表紙の有無、開始ページ（左右）、綴じと開始ページが未定
-Project.ComicShowStyle	推測	.cmc のページの並べ方の表示
+Project.ComicBindPosition	確認済み	.cmc の綴じる位置（1 右綴じ、0 左綴じ。CSP で作った作品で確認、V8）
+Project.ComicStartPage	確認済み	.cmc の開始ページ（0 左から、1 右から。V8）
+Project.ComicCoverExist	確認済み	.cmc に表紙がある（1。表 1〜表 4 のページと DefaultCover* の列が加わる。V8）
+Project.ComicBindAndStartPageIndeterminate	推測	綴じと開始ページが決まっていない（1。縦スクロールの作品で 1）
+Project.ComicShowStyle	推測	.cmc の作品の種類（0 見開きの本、1 縦スクロール（Webtoon）。1 の作品では製本リストが使えない）
 Project.ComicWebtoonWrapDirection	推測	縦スクロール（Webtoon）の折り返しの向き
 Project.PrintingCompanyID	推測	入稿先の印刷所の ID
 re:^Project\.(Cover[14]|Sentence)(Prefix|Suffix)$	推測	表紙（表 1・表 4）と本文のノンブルの前後の文字。コーパスでは未設定
@@ -146,10 +148,10 @@ re:^Canvas\.CanvasUseColorAdjustment$	推測	表示の色の調整（レベル�
 re:^Canvas\.CanvasColorAdjustment(Level|ToneCurve)$	推測	表示の色の調整の設定（BLOB。FilterLayerInfo のレベル補正・トーンカーブと同じ形と推測）
 Canvas.SafeFrameShow	推測	安全マージンの枠を表示する
 re:^Canvas\.CanvasDefaultToneLine$	推測	既定のトーンの線数
-Canvas.ComicBindPosition	推測	綴じる位置（0・1。どちらが右綴じかは CSP で未確認）。.cmc では Project の値で上書きされる
+Canvas.ComicBindPosition	確認済み	綴じる位置（1 右綴じ、0 左綴じ）。.cmc の Project の写しで、CSP はページを開いたときに直す（V8）
 Canvas.ComicPageIndex	確認済み	作品の中のページの位置（0 から、見開きは 2 ページ分）。ノンブルの番号は ComicStoryNombreStart + これ
-Canvas.ComicIsLeftPage	推測	左のページ（位置が 1 つ進むごとに左右が入れ替わる）
-Canvas.ComicHasComicCover	推測	作品に表紙がある
+Canvas.ComicIsLeftPage	確認済み	左のページ（位置が偶数なら左、右から始まる作品では逆）。CSP はページを開いたときに直す（V8）
+Canvas.ComicHasComicCover	確認済み	作品に表紙がある（表紙ありの作品では本文のページも 1。V8）
 Canvas.ComicHasDoubleCover	推測	表紙が見開き
 Canvas.ComicStoryLayerCreated	確認済み	作品情報のレイヤー（LayerType 800）を作った
 Canvas.ComicStoryRightLayerCreated	推測	見開きの右ページの作品情報のレイヤーを作った
@@ -174,7 +176,7 @@ Canvas.CropFrameMergeDitch	推測	見開きの合わせの幅（−1 は既定�
 Canvas.CropFrameUnitKind	確認済み	トンボの単位（CanvasUnit と同じ番号）
 Canvas.CropFrameDesignationType	推測	トンボの指定の方法
 re:^Canvas\.CropFrameCropOffset[XY]$	推測	仕上がりの位置のずれ
-Canvas.CropFrameOptionFlag	推測	トンボの細かい設定（ビット）。単ページの左 2、右 4、見開き 17
+Canvas.CropFrameOptionFlag	確認済み	ページの種類とトンボ（ビット。1 見開き、2 左、4 右、16 トンボを合わせる）。新規作成の見開きは 3、見開きに変更したものは 17。CSP はページを開いたときに直す（V8）
 re:^Canvas\.CropFrameSafeMargin	推測	安全マージン（上下左右）
 re:^Canvas\.Grid	推測	グリッド（間隔・分割数・原点と単位）
 Canvas.ShowGrid	推測	グリッドを表示する
@@ -294,12 +296,12 @@ CanvasNode.LinkPath	確認済み	ページのファイル（.cmc のフォルダ
 CanvasNode.PageFlag	確認済み	1 で見開きのページ
 re:^CanvasNode\.(Name|CanvasThumbnail)$	推測	ページの名前とサムネイル。コーパスでは未設定
 CanvasNode.CanvasIndex	推測	キャンバスの番号。コーパスでは常に 0
-re:^CanvasNode\.(Memo|BookBindMemo)$	推測	ページのメモと製本のメモ。コーパスでは空
-CanvasNode.BookBindWarning	推測	製本の警告（ビット。1048576 など）
-CanvasNode.BookBindWarningDef	推測	製本の警告の既定を使う
-re:^CanvasNode\.LinkWrite(Year|Month|Day|Hour|Minute|Second)$	推測	ページのファイルの保存日時（年月日時分秒）。古い形式では値が崩れていることがある
-CanvasNode.LinkIsFolder	推測	リンク先がフォルダー
-re:^CanvasNode\.Link(Unit|Width|Height|Resolution)$	推測	ページのファイルの大きさ・単位・解像度の控え（ファイルを開かずに表示するため）
+re:^CanvasNode\.(Memo|BookBindMemo)$	推測	ページのメモと製本のメモ。コーパスと CSP で作った作品のどれでも空（製本リストの「印刷はありません」などは CSP が表示するだけ）
+CanvasNode.BookBindWarning	確認済み	製本リストの確認の印（ビット。2 裁ち落とし幅が基本設定と違う、8 解像度が同人誌印刷所で受け付けられない、16 ノンブルが仕上がりの外、32 テキストが仕上がりの外か近く、1048576 本文ページがカラー。見開きの 2 ページ目の 16・32 は 256・512）。CSP が計算して書く（V8）
+CanvasNode.BookBindWarningDef	推測	製本の確認の既定を使う。CSP が作る作品ではルート 0、ページ 1（V8）
+re:^CanvasNode\.LinkWrite(Year|Month|Day|Hour|Minute|Second)$	確認済み	ページのファイルの保存日時（年月日時分秒、PC の時刻）。新規作成の作品にはなく、作品の基本設定を変えると CSP が列を足して書く。古い形式では値が崩れていることがある（V8）
+CanvasNode.LinkIsFolder	推測	リンク先がフォルダー（CSP が書く作品では 0）
+re:^CanvasNode\.Link(Unit|Width|Height|Resolution)$	確認済み	ページのファイルの単位・大きさ・解像度の控え（LinkWrite* と同時に CSP が書く。V8）
 #
 # ---- brushes (used by vector strokes: VectorData points refer to BrushStyle)
 re:^BrushStyle\.(Size|Opacity)Effector$	推測	サイズ・不透明度への筆圧などの影響（BLOB: u32 フラグ、0x10 筆圧なら f32 最小値と u32 グラフ BrushEffectorGraphData.MainId）。ベクターの描画の近似で使う
@@ -383,3 +385,51 @@ re:^AnimationCutBank\.(CurrentIndex|Enable|FirstScenario|FirstTimeLine|FlagScena
 FolderInfo.FolderChildCount	推測	3D オブジェクトのフォルダーの子の数
 RemovedExternal.ExternalID	推測	削除された外部チャンクの ID。コーパスでは常に空
 SmallObjectInfo.SmallObjectLastAppliedMovableFrame	推測	小物に最後に当てた可動の姿勢（BLOB）
+# Animation (R17, docs/spec/08-animation.md; checked against CSP-made files and image-sequence exports, V6c)
+AnimationCutBank.CurrentIndex	確認済み	今のタイムライン（FirstTimeLine からの連結リストの 0 始まりの位置）
+AnimationCutBank.FirstTimeLine	確認済み	最初のタイムライン（TimeLine.MainId）。アニメーションのないファイルでは 0
+AnimationCutBank.Enable	推測	アニメーションを使うファイルで 1
+TimeLine.TimeLineName	確認済み	タイムラインの名前
+TimeLine.NextTimeLine	確認済み	次のタイムライン（0 で終わり）
+TimeLine.FirstTrack	確認済み	最初のトラック（Track.MainId、TrackNextIndex で続く）
+TimeLine.FrameRate	確認済み	フレームレート。変えると各トラックの TimeClip が 旧/新 倍に伸び、キーはフレームに留まる
+TimeLine.StartFrame	確認済み	再生範囲の最初のフレーム（0 始まり。CSP の表示は +1）
+TimeLine.EndFrame	確認済み	再生範囲の終わり（最後のフレームの次、0 始まり = CSP の表示の最後のフレーム）
+TimeLine.CurrentFrame	確認済み	今のフレーム（0 始まり）。TrackValueMap はこのフレームの値
+TimeLine.SmallestStartFrame	推測	これまでの最小の開始フレーム
+TimeLine.BiggestEndFrame	推測	これまでの最大の終了フレーム（新しいトラックのクリップの長さ）
+TimeLine.GuidelineFrameRate	確認済み	タイムラインの区切り線の間隔（フレーム）
+TimeLine.SceneIndexForName	確認済み	シーン番号（名前の書式用）
+TimeLine.CutIndexForName	確認済み	カット番号（名前の書式用）
+TimeLine.LabelFirstIndex	確認済み	最初のタイムラインラベル（TimeLineLabel.MainId）
+TimeLine.BankId	推測	AnimationCutBank.MainId
+TimeLine.NextScenario	推測	シナリオ機能の連結（観察では 0）
+TimeLineLabel.LabelName	確認済み	ラベルの名前（中割り記号は空）
+TimeLineLabel.LabelFrame	確認済み	フレーム（0 始まり）
+TimeLineLabel.LabelType	確認済み	0 = タイムラインのラベル、1 = 中割り記号（○）、3 = トラックの名前付きラベル（長さあり）
+TimeLineLabel.LabelLength	確認済み	トラックのラベルの長さ（フレーム）
+TimeLineLabel.LabelNextIndex	確認済み	次のラベル（0 で終わり）
+TimeLineLabel.ItemId	確認済み	タイムライン（TimeLine.MainId）
+TimeLineLabel.TrackId	確認済み	トラック（Track.MainId）。タイムラインのラベルは 0
+TimeLineLabel.BankId	推測	AnimationCutBank.MainId
+Track.ItemId	確認済み	タイムライン（TimeLine.MainId）
+Track.TrackNextIndex	確認済み	同じタイムラインの次のトラック（0 で終わり）
+Track.TrackKind	確認済み	2000 セル（アニメーションフォルダー）、2001 レイヤーのキーフレーム、2003 用紙、2005 2D カメラ
+Track.LayerUuidWithTrack	確認済み	対象レイヤーの LayerUuid（16 バイト）
+Track.TrackActionMixer	確認済み	キーの "cmt " 文書（版 0100、単精度）の外部チャンク。08 章
+Track.TrackActionMixer2	確認済み	同じ内容の "cmt " 文書（版 0110、倍精度）の外部チャンク
+Track.TrackActionMixerSize	確認済み	TrackActionMixer の文書の大きさ（展開後のバイト数）
+Track.TrackActionMixer2Size	確認済み	TrackActionMixer2 の文書の大きさ（展開後のバイト数）
+Track.TrackValueMap	確認済み	今のフレームの値（名前・タグ・型・値、ビッグエンディアン）。08 章
+Track.TrackOptionFlag	推測	256、アニメーションフォルダーは 768
+Track.TrackOpen	推測	タイムラインでトラックを開いているか
+Track.TrackContentOpen	推測	トラックの中身を開いているか
+Track.TrackLabelFirstIndex	確認済み	最初のトラックのラベル（TimeLineLabel.MainId）
+Track.BankId	推測	AnimationCutBank.MainId
+re:^Canvas\.OnionSkin	確認済み	オニオンスキン: 有効、前後の枚数、不透明度（開始・減衰）、色（Front = 前のフレーム、Behind = 後のフレーム、各チャンネル c × 0x01010101）、半分の色
+Layer.AnimationFolder	確認済み	アニメーションフォルダー（子のレイヤーがセル）
+Layer.TimeLineLayerKeyFrameEnabled	確認済み	レイヤーのキーフレームが有効（変形は TimeLineOriginalMipmap に掛ける）
+Layer.TimeLineOriginalMipmap	確認済み	キーフレームの変形前の画素（Mipmap.MainId）。LayerRenderMipmap は保存されず CSP が開くときに作る
+Layer.TimeLineOriginalLayerOpacity	推測	キーフレームを有効にする前の不透明度
+Layer.LightTableReferCell	確認済み	ライトテーブルの参照レイヤー（LayerType 10016、パレットに出ない。描かない）の印
+Layer.LinkLayerUUID	推測	ライトテーブルの参照レイヤーが指すレイヤーの LayerUuid
