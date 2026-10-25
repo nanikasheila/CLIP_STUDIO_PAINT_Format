@@ -385,3 +385,51 @@ re:^AnimationCutBank\.(CurrentIndex|Enable|FirstScenario|FirstTimeLine|FlagScena
 FolderInfo.FolderChildCount	推測	3D オブジェクトのフォルダーの子の数
 RemovedExternal.ExternalID	推測	削除された外部チャンクの ID。コーパスでは常に空
 SmallObjectInfo.SmallObjectLastAppliedMovableFrame	推測	小物に最後に当てた可動の姿勢（BLOB）
+# Animation (R17, docs/spec/08-animation.md; checked against CSP-made files and image-sequence exports, V6c)
+AnimationCutBank.CurrentIndex	確認済み	今のタイムライン（FirstTimeLine からの連結リストの 0 始まりの位置）
+AnimationCutBank.FirstTimeLine	確認済み	最初のタイムライン（TimeLine.MainId）。アニメーションのないファイルでは 0
+AnimationCutBank.Enable	推測	アニメーションを使うファイルで 1
+TimeLine.TimeLineName	確認済み	タイムラインの名前
+TimeLine.NextTimeLine	確認済み	次のタイムライン（0 で終わり）
+TimeLine.FirstTrack	確認済み	最初のトラック（Track.MainId、TrackNextIndex で続く）
+TimeLine.FrameRate	確認済み	フレームレート。変えると各トラックの TimeClip が 旧/新 倍に伸び、キーはフレームに留まる
+TimeLine.StartFrame	確認済み	再生範囲の最初のフレーム（0 始まり。CSP の表示は +1）
+TimeLine.EndFrame	確認済み	再生範囲の終わり（最後のフレームの次、0 始まり = CSP の表示の最後のフレーム）
+TimeLine.CurrentFrame	確認済み	今のフレーム（0 始まり）。TrackValueMap はこのフレームの値
+TimeLine.SmallestStartFrame	推測	これまでの最小の開始フレーム
+TimeLine.BiggestEndFrame	推測	これまでの最大の終了フレーム（新しいトラックのクリップの長さ）
+TimeLine.GuidelineFrameRate	確認済み	タイムラインの区切り線の間隔（フレーム）
+TimeLine.SceneIndexForName	確認済み	シーン番号（名前の書式用）
+TimeLine.CutIndexForName	確認済み	カット番号（名前の書式用）
+TimeLine.LabelFirstIndex	確認済み	最初のタイムラインラベル（TimeLineLabel.MainId）
+TimeLine.BankId	推測	AnimationCutBank.MainId
+TimeLine.NextScenario	推測	シナリオ機能の連結（観察では 0）
+TimeLineLabel.LabelName	確認済み	ラベルの名前（中割り記号は空）
+TimeLineLabel.LabelFrame	確認済み	フレーム（0 始まり）
+TimeLineLabel.LabelType	確認済み	0 = タイムラインのラベル、1 = 中割り記号（○）、3 = トラックの名前付きラベル（長さあり）
+TimeLineLabel.LabelLength	確認済み	トラックのラベルの長さ（フレーム）
+TimeLineLabel.LabelNextIndex	確認済み	次のラベル（0 で終わり）
+TimeLineLabel.ItemId	確認済み	タイムライン（TimeLine.MainId）
+TimeLineLabel.TrackId	確認済み	トラック（Track.MainId）。タイムラインのラベルは 0
+TimeLineLabel.BankId	推測	AnimationCutBank.MainId
+Track.ItemId	確認済み	タイムライン（TimeLine.MainId）
+Track.TrackNextIndex	確認済み	同じタイムラインの次のトラック（0 で終わり）
+Track.TrackKind	確認済み	2000 セル（アニメーションフォルダー）、2001 レイヤーのキーフレーム、2003 用紙、2005 2D カメラ
+Track.LayerUuidWithTrack	確認済み	対象レイヤーの LayerUuid（16 バイト）
+Track.TrackActionMixer	確認済み	キーの "cmt " 文書（版 0100、単精度）の外部チャンク。08 章
+Track.TrackActionMixer2	確認済み	同じ内容の "cmt " 文書（版 0110、倍精度）の外部チャンク
+Track.TrackActionMixerSize	確認済み	TrackActionMixer の文書の大きさ（展開後のバイト数）
+Track.TrackActionMixer2Size	確認済み	TrackActionMixer2 の文書の大きさ（展開後のバイト数）
+Track.TrackValueMap	確認済み	今のフレームの値（名前・タグ・型・値、ビッグエンディアン）。08 章
+Track.TrackOptionFlag	推測	256、アニメーションフォルダーは 768
+Track.TrackOpen	推測	タイムラインでトラックを開いているか
+Track.TrackContentOpen	推測	トラックの中身を開いているか
+Track.TrackLabelFirstIndex	確認済み	最初のトラックのラベル（TimeLineLabel.MainId）
+Track.BankId	推測	AnimationCutBank.MainId
+re:^Canvas\.OnionSkin	確認済み	オニオンスキン: 有効、前後の枚数、不透明度（開始・減衰）、色（Front = 前のフレーム、Behind = 後のフレーム、各チャンネル c × 0x01010101）、半分の色
+Layer.AnimationFolder	確認済み	アニメーションフォルダー（子のレイヤーがセル）
+Layer.TimeLineLayerKeyFrameEnabled	確認済み	レイヤーのキーフレームが有効（変形は TimeLineOriginalMipmap に掛ける）
+Layer.TimeLineOriginalMipmap	確認済み	キーフレームの変形前の画素（Mipmap.MainId）。LayerRenderMipmap は保存されず CSP が開くときに作る
+Layer.TimeLineOriginalLayerOpacity	推測	キーフレームを有効にする前の不透明度
+Layer.LightTableReferCell	確認済み	ライトテーブルの参照レイヤー（LayerType 10016、パレットに出ない。描かない）の印
+Layer.LinkLayerUUID	推測	ライトテーブルの参照レイヤーが指すレイヤーの LayerUuid

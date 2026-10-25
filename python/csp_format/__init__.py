@@ -8,9 +8,11 @@
 
 Images are plain RGBA (``Image.width``, ``height``, ``rgba``); with Pillow,
 ``PIL.Image.frombytes("RGBA", (image.width, image.height), bytes(image.rgba))``.
+Animation (timelines, cels, keyframes, 2D camera): :mod:`csp_format.animation`.
 The format is described in ``docs/spec``; the Rust crate in ``crates/``
 also writes and renders files.
 """
+from .animation import Animation, FrameState, Timeline, Track, read_animation
 from .clip import Canvas, ClipFile, Layer, read_clip
 from .cmc import CanvasNode, CmcFile, CmcProject, PageSlot, read_cmc
 from .container import Container
@@ -20,7 +22,7 @@ from .text import Attributes, TextBlock
 from .vector import Point, VectorObject, parse_vector_data
 
 __all__ = [
-    "Attributes", "Canvas", "CanvasNode", "ClipFile", "CmcFile", "CmcProject", "Container", "CspFormatError",
-    "Image", "Layer", "PageSlot", "Point", "TextBlock", "VectorObject", "decode_png", "parse_vector_data", "read_clip",
-    "read_cmc",
+    "Animation", "Attributes", "Canvas", "CanvasNode", "ClipFile", "CmcFile", "CmcProject", "Container",
+    "CspFormatError", "FrameState", "Image", "Layer", "PageSlot", "Point", "TextBlock", "Timeline", "Track", "VectorObject",
+    "decode_png", "parse_vector_data", "read_animation", "read_clip", "read_cmc",
 ]

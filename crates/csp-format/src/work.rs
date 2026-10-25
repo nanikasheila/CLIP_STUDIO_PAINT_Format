@@ -1,4 +1,4 @@
-//! New comic works (.cmc and its page files) without a template (R17).
+//! New comic works (.cmc and its page files) without a template (R18).
 //!
 //! The .cmc gets the tables and schema registry of a work CSP created
 //! (`data/cmc_schema.sql`, `data/cmc_*_scheme.tsv`; structure only). The

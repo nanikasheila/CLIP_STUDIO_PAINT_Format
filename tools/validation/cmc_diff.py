@@ -1,4 +1,4 @@
-"""R17: what changed between two works (.cmc and their page files), for works made in CSP for the test.
+"""R18: what changed between two works (.cmc and their page files), for works made in CSP for the test.
 
     python tools/validation/cmc_diff.py A.cmc B.cmc [--pages]
 
