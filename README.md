@@ -42,6 +42,7 @@ cspf render FILE OUT.png     # レイヤーを合成した画像（既定はプ�
 cspf compare FILE...         # 描画とプレビューの PSNR
 cspf roundtrip FILE OUT      # 無変更で保存してバイト一致を確かめる
 cspf new OUT.clip --size 1000x1400 --dpi 350 [--image PNG]   # 新規作成
+cspf new-work DIR NAME --trim 182x257 --dpi 600 --pages 8 --spreads --bind right --start left   # 作品（.cmc）の新規作成
 cspf add-layer FILE PNG OUT [--name NAME] [--at X,Y]         # ラスターレイヤーを追加
 cspf set FILE ID OUT --opacity 50 --blend 2                  # 属性の変更
 cspf corpus ROOT OUT.jsonl [--render]   # フォルダー内の全ファイルを検査（再開可能）

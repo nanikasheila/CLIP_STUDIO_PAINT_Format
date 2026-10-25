@@ -14,7 +14,7 @@ also writes and renders files.
 """
 from .animation import Animation, FrameState, Timeline, Track, read_animation
 from .clip import Canvas, ClipFile, Layer, read_clip
-from .cmc import CanvasNode, CmcFile, CmcProject, read_cmc
+from .cmc import CanvasNode, CmcFile, CmcProject, PageSlot, read_cmc
 from .container import Container
 from .errors import CspFormatError
 from .image import Image, decode_png
@@ -23,6 +23,6 @@ from .vector import Point, VectorObject, parse_vector_data
 
 __all__ = [
     "Animation", "Attributes", "Canvas", "CanvasNode", "ClipFile", "CmcFile", "CmcProject", "Container",
-    "CspFormatError", "FrameState", "Image", "Layer", "Point", "TextBlock", "Timeline", "Track", "VectorObject",
+    "CspFormatError", "FrameState", "Image", "Layer", "PageSlot", "Point", "TextBlock", "Timeline", "Track", "VectorObject",
     "decode_png", "parse_vector_data", "read_animation", "read_clip", "read_cmc",
 ]

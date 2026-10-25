@@ -274,13 +274,16 @@ impl ClipFile {
         Ok(id)
     }
 
-    /// A render mipmap for a new layer (nothing stored yet).
-    fn new_mipmap(&mut self, layer_id: i64, init: Option<&InitColor>) -> Result<i64> {
+    /// A render mipmap for a new layer. Only a raster layer's base level
+    /// stores blocks (all empty): CSP reports an empty raster layer whose base
+    /// offscreen has no block data as damaged, while folders, paper and the
+    /// smaller levels go without.
+    fn new_mipmap(&mut self, layer_id: i64, init: Option<&InitColor>, store_base: bool) -> Result<i64> {
         let sizes = mipmap_sizes(self.canvas.width_px, self.canvas.height_px);
         let mipmap = self.next_main_id("Mipmap")?;
         let infos = sizes.iter().map(|_| self.next_main_id("MipmapInfo")).collect::<Result<Vec<_>>>()?;
         for (level, size) in sizes.iter().enumerate() {
-            let offscreen = self.new_offscreen(layer_id, *size, init, false)?;
+            let offscreen = self.new_offscreen(layer_id, *size, init, store_base && level == 0)?;
             self.insert_row(
                 "MipmapInfo",
                 &[
@@ -387,7 +390,7 @@ impl ClipFile {
     pub(crate) fn insert_layer_row(&mut self, id: i64, kind: NewLayer, name: &str) -> Result<()> {
         let paper_init = InitColor { do_initialize: true, alpha: 0xffff_ffff, image_values: vec![0; 4] };
         let init = matches!(kind, NewLayer::Paper(_)).then_some(&paper_init);
-        let mipmap = self.new_mipmap(id, init)?;
+        let mipmap = self.new_mipmap(id, init, kind == NewLayer::Raster)?;
         let thumbnail = self.new_thumbnail(id)?;
         let int = Value::Integer;
         let (layer_type, folder, masking) = match kind {

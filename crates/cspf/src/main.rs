@@ -29,6 +29,11 @@ USAGE:
   cspf roundtrip FILE OUT           save FILE unchanged to OUT and confirm the bytes are equal
   cspf new OUT.clip [--size WxH] [--dpi D] [--paper RRGGBB|none] [--image PNG]
                                     a new file: paper and one raster layer (with PNG's pixels)
+  cspf new-work DIR NAME [--trim WxH] [--bleed MM] [--dpi D] [--pages N] [--spreads]
+                   [--bind right|left] [--start left|right] [--title T] [--author A]
+                                    a new comic work: DIR/NAME.cmc and one page file per page
+                                    or spread (sizes in mm; default B5 trim, 5 mm bleed, 600 dpi,
+                                    4 pages, right binding, first page on the left)
   cspf add-layer FILE PNG OUT [--name NAME] [--at X,Y] [--parent ID]
                                     add a raster layer on top holding PNG at canvas X,Y
                                     (in folder ID; default: the root folder)
@@ -73,6 +78,7 @@ fn main() -> ExitCode {
         "check" | "verify" => check(rest),
         "roundtrip" => two(rest).and_then(|(file, out)| roundtrip(&file, &out)),
         "new" => new_file(rest),
+        "new-work" => new_work(rest),
         "add-layer" => add_layer(rest),
         "add-folder" => add_folder(rest),
         "set" => set_attributes(rest),
@@ -280,6 +286,52 @@ fn new_file(args: &[String]) -> Result<bool> {
     print_json(
         &json!({"file": out, "width": canvas.width, "height": canvas.height, "layers": file.layers.layers.len()}),
     );
+    Ok(true)
+}
+
+fn new_work(args: &[String]) -> Result<bool> {
+    use csp_format::work::{Binding, NewWork, StartSide};
+    let (found, positional) =
+        options(args, &["--trim", "--bleed", "--dpi", "--pages", "--bind", "--start", "--title", "--author"]);
+    let mut work = NewWork::default();
+    let (flags, positional): (Vec<&str>, Vec<&str>) = positional.into_iter().partition(|arg| *arg == "--spreads");
+    work.spreads = !flags.is_empty();
+    let [dir, name] = positional.as_slice() else { return Err(bad("expected DIR NAME")) };
+    let number = |value: &str, what: &str| value.parse::<f64>().map_err(|_| bad(format!("{what} is a number")));
+    for (option, value) in found {
+        match option {
+            "--trim" => {
+                let (w, h) = value.split_once('x').ok_or_else(|| bad("--trim is WxH (mm)"))?;
+                (work.trim_width, work.trim_height) = (number(w, "--trim")?, number(h, "--trim")?);
+            }
+            "--bleed" => work.bleed = number(value, "--bleed")?,
+            "--dpi" => work.resolution = number(value, "--dpi")?,
+            "--pages" => work.pages = value.parse().map_err(|_| bad("--pages is a count"))?,
+            "--bind" => {
+                work.binding = match value {
+                    "right" => Binding::Right,
+                    "left" => Binding::Left,
+                    _ => return Err(bad("--bind is right or left")),
+                }
+            }
+            "--start" => {
+                work.start = match value {
+                    "left" => StartSide::Left,
+                    "right" => StartSide::Right,
+                    _ => return Err(bad("--start is left or right")),
+                }
+            }
+            "--title" => work.title = value.to_owned(),
+            _ => work.author = value.to_owned(),
+        }
+    }
+    let cmc = work.write(Path::new(dir), name)?;
+    let slots: Vec<Value> = work
+        .layout()
+        .iter()
+        .map(|slot| json!({"position": slot.position, "spread": slot.spread, "left": slot.left}))
+        .collect();
+    print_json(&json!({"file": cmc, "pages": slots}));
     Ok(true)
 }
 
