@@ -861,7 +861,7 @@ pub fn psnr(a: &RgbaImage, b: &RgbaImage) -> f64 {
         [0, 1, 2].map(|c| p[c] as f64 * alpha + 255.0 * (1.0 - alpha))
     };
     let mut sum = 0.0;
-    for (pa, pb) in a.pixels.chunks_exact(4).zip(b.pixels.chunks_exact(4)) {
+    for (pa, pb) in a.pixels.as_chunks::<4>().0.iter().zip(b.pixels.as_chunks::<4>().0.iter()) {
         let (x, y) = (flatten(pa), flatten(pb));
         for c in 0..3 {
             sum += (x[c] - y[c]).powi(2);

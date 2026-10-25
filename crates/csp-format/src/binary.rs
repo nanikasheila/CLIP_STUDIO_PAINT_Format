@@ -119,7 +119,8 @@ impl<'a> Reader<'a> {
     pub fn utf16_name(&mut self) -> Result<String> {
         let length = self.be_u32()? as usize;
         let bytes = self.bytes(length.checked_mul(2).ok_or_else(|| Error::format("String too long"))?)?;
-        let units: Vec<u16> = bytes.chunks_exact(2).map(|pair| u16::from_be_bytes([pair[0], pair[1]])).collect();
+        let units: Vec<u16> =
+            bytes.as_chunks::<2>().0.iter().map(|pair| u16::from_be_bytes([pair[0], pair[1]])).collect();
         Ok(String::from_utf16_lossy(&units))
     }
 

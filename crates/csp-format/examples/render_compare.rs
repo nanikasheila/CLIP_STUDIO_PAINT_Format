@@ -28,8 +28,10 @@ fn main() -> Result<()> {
         }
         let mut diffs: Vec<u8> = image
             .pixels
-            .chunks_exact(4)
-            .zip(export.pixels.chunks_exact(4))
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .zip(export.pixels.as_chunks::<4>().0.iter())
             .flat_map(|(a, b)| {
                 let (x, y) = (over_white(a), over_white(b));
                 (0..4).map(move |c| x[c].abs_diff(y[c]))

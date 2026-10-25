@@ -17,7 +17,7 @@ impl RgbaImage {
     }
 
     pub fn fill(&mut self, pixel: [u8; 4]) {
-        for chunk in self.pixels.chunks_exact_mut(4) {
+        for chunk in self.pixels.as_chunks_mut::<4>().0.iter_mut() {
             chunk.copy_from_slice(&pixel);
         }
     }
@@ -212,17 +212,19 @@ pub fn decode_png(data: &[u8]) -> Result<RgbaImage> {
     match info.color_type {
         png::ColorType::Rgba => image.pixels.copy_from_slice(&pixels[..count * 4]),
         png::ColorType::Rgb => {
-            for (target, source) in image.pixels.chunks_exact_mut(4).zip(pixels.chunks_exact(3)) {
+            for (target, source) in image.pixels.as_chunks_mut::<4>().0.iter_mut().zip(pixels.as_chunks::<3>().0.iter())
+            {
                 target.copy_from_slice(&[source[0], source[1], source[2], 255]);
             }
         }
         png::ColorType::GrayscaleAlpha => {
-            for (target, source) in image.pixels.chunks_exact_mut(4).zip(pixels.chunks_exact(2)) {
+            for (target, source) in image.pixels.as_chunks_mut::<4>().0.iter_mut().zip(pixels.as_chunks::<2>().0.iter())
+            {
                 target.copy_from_slice(&[source[0], source[0], source[0], source[1]]);
             }
         }
         png::ColorType::Grayscale => {
-            for (target, source) in image.pixels.chunks_exact_mut(4).zip(pixels.iter()) {
+            for (target, source) in image.pixels.as_chunks_mut::<4>().0.iter_mut().zip(pixels.iter()) {
                 target.copy_from_slice(&[*source, *source, *source, 255]);
             }
         }

@@ -119,8 +119,13 @@ fn sections(data: &[u8]) -> Vec<(String, &[u8])> {
     let total = word(data, 0).map(|t| t as usize).unwrap_or(0).min(data.len());
     let name_at = |at: usize| -> Option<(String, usize)> {
         let n = word(data, at).ok()? as usize;
-        let units: Vec<u16> =
-            data.get(at + 4..at + 4 + 2 * n)?.chunks_exact(2).map(|u| u16::from_be_bytes([u[0], u[1]])).collect();
+        let units: Vec<u16> = data
+            .get(at + 4..at + 4 + 2 * n)?
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|u| u16::from_be_bytes([u[0], u[1]]))
+            .collect();
         let name = String::from_utf16(&units).ok()?;
         (n >= 3 && name.starts_with("Gradation") && name.chars().all(|c| c.is_ascii_alphanumeric()))
             .then_some((name, at + 4 + 2 * n))

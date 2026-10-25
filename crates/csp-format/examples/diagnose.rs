@@ -66,7 +66,7 @@ fn main() -> Result<()> {
         let effects = layer.row.truthy("LayerEffectAttached");
         // Stored pixels with any alpha (0 = nothing stored to draw).
         let covered = match file.layer_pixels(&layer) {
-            Ok(Some((pixels, _))) => pixels.pixels.chunks_exact(4).filter(|p| p[3] > 0).count(),
+            Ok(Some((pixels, _))) => pixels.pixels.as_chunks::<4>().0.iter().filter(|p| p[3] > 0).count(),
             _ => 0,
         };
         rows.push((

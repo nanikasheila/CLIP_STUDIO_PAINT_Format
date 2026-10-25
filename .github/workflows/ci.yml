@@ -22,4 +22,4 @@ jobs:
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --all
       - name: Python tools compile
-        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py
+        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py tools/corpus/value_census.py tools/corpus/schema_doc.py

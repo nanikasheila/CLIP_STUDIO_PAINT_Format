@@ -35,7 +35,9 @@ pub struct Curve {
 impl Curve {
     pub fn parse(data: &[u8]) -> Self {
         let mut points: Vec<(f64, f64)> = data
-            .chunks_exact(16)
+            .as_chunks::<16>()
+            .0
+            .iter()
             .map(|pair| {
                 let x = f64::from_be_bytes(pair[..8].try_into().expect("8"));
                 let y = f64::from_be_bytes(pair[8..].try_into().expect("8"));
