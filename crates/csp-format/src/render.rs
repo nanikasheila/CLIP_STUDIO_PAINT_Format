@@ -19,12 +19,13 @@ use crate::correction::Correction;
 use crate::effect::{Border, LayerEffects, draw_border};
 use crate::error::Result;
 use crate::gradient::Gradient;
-use crate::image::{GrayImage, RgbaImage};
+use crate::image::{GrayImage, RgbaImage, luma};
 use crate::material::Placement;
 use crate::model::{Layer, LayerKind, LayerNode};
 use crate::offscreen::Offscreen;
 use crate::stroke::draw_layer;
 use crate::text::read_blocks;
+use crate::tone::Tone;
 
 /// Blending modes, numbered as in `LayerComposite`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
@@ -374,6 +375,8 @@ pub struct RenderReport {
     /// and how many of them only approximately (the 知覚的 mix).
     pub gradient_layers: usize,
     pub gradients_approximate: usize,
+    /// Tones with settings whose drawing was not measured.
+    pub tones_approximate: usize,
     /// Correction layers applied (see [`crate::correction`]), and how many
     /// of them only approximately.
     pub correction_layers: usize,
@@ -584,15 +587,14 @@ impl Renderer<'_> {
             let opaque = gradient.fill && gradient.ramp.stops.first().is_some_and(|stop| stop.color[3] >= 1.0)
                 || gradient.ramp.stops.iter().all(|stop| stop.color[3] >= 1.0);
             let canvas_pixels = self.file.canvas.width_px as u64 * self.file.canvas.height_px as u64;
-            if let Some((border, apply_opacity)) = self.effects(layer)
-                // A border shows only where the layer has holes. It needs the
-                // full-size image (see `pixels`), which very large canvases
-                // cannot afford: those are drawn without it.
-                && (layer.mask_enabled || !opaque)
-                && canvas_pixels <= BORDER_PIXELS_MAX
-            {
+            let effects = self.effects(layer);
+            // A border shows only where the layer has holes. Effects need the
+            // full-size image (see `pixels`), which very large canvases
+            // cannot afford: those are drawn without them.
+            let shown = effects.tone.is_some() || effects.border.is_some() && (layer.mask_enabled || !opaque);
+            if shown && canvas_pixels <= EFFECT_PIXELS_MAX {
                 let image = gradient.draw(self.file.canvas.width_px, self.file.canvas.height_px, 1.0);
-                let (buffer, masked) = self.bordered(layer, image, (0, 0), &border, apply_opacity)?;
+                let (buffer, masked) = self.with_effects(layer, image, (0, 0), &effects)?;
                 return Ok(Some(Content { buffer, mode: Some(mode), masked }));
             }
             let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
@@ -757,48 +759,54 @@ impl Renderer<'_> {
         if layer.render_mipmap == 0 {
             return Ok(None);
         }
-        let border = self.effects(layer);
-        // A border is drawn at full size (its width is in canvas pixels),
-        // then scaled with the layer.
-        let scale = if border.is_some() { 1.0 } else { self.scale };
+        let effects = self.effects(layer);
+        // Borders and tones are drawn at full size (their widths and screens
+        // are in canvas pixels), then scaled with the layer.
+        let scale = if effects.any() { 1.0 } else { self.scale };
         let Some((offscreen, level_scale)) = self.level(layer.render_mipmap, scale)? else { return Ok(None) };
         if offscreen.data.is_none() {
             return Ok(None);
         }
-        if let Some((border, apply_opacity)) = border {
-            return Ok(Some(self.bordered(
-                layer,
-                offscreen.to_rgba()?,
-                layer.pixel_origin(),
-                &border,
-                apply_opacity,
-            )?));
+        if effects.any() {
+            return Ok(Some(self.with_effects(layer, offscreen.to_rgba()?, layer.pixel_origin(), &effects)?));
         }
         // Halve block by block when the wanted scale is a power of two
         // below the level (large canvases read for a preview).
         let halvings = exact_halvings(self.scale / level_scale);
-        let (image, level_scale) = if halvings > 0 {
+        let (mut image, level_scale) = if halvings > 0 {
             (offscreen.to_rgba_halved(halvings)?, level_scale / 2f64.powi(halvings as i32))
         } else {
             (offscreen.to_rgba()?, level_scale)
         };
+        if let Some(colors) = layer_colors(layer) {
+            recolor(&mut image, colors);
+        }
         Ok(Some((self.place(image, layer.pixel_origin(), level_scale), false)))
     }
 
-    /// Draw a border around a full-size layer image whose top-left is at
-    /// canvas `origin`. The mask is applied first, so the border follows
-    /// the masked shape (CSP draws the border of a masked fill layer around
-    /// the mask's hole), and the result is not masked again.
-    fn bordered(
+    /// Draw the effects of a full-size layer image whose top-left is at
+    /// canvas `origin`: the tone, then the border. For a border the mask is
+    /// applied first, so the border follows the masked shape (CSP draws
+    /// the border of a masked fill layer around the mask's hole), and the
+    /// result is not masked again.
+    fn with_effects(
         &self,
         layer: &Layer,
         mut image: RgbaImage,
         origin: (i64, i64),
-        border: &Border,
-        apply_opacity: bool,
+        effects: &Effects,
     ) -> Result<(Buffer, bool)> {
+        if let Some(tone) = &effects.tone {
+            image = tone.draw(&image, origin);
+        }
+        if let Some(colors) = layer_colors(layer) {
+            recolor(&mut image, colors);
+        }
+        let Some((border, apply_opacity)) = &effects.border else {
+            return Ok((self.place(image, origin, 1.0), false));
+        };
         let masked = layer.mask_enabled && self.fold_mask(layer, &mut image, origin)?;
-        let (bordered, margin) = draw_border(&image, border, apply_opacity);
+        let (bordered, margin) = draw_border(&image, border, *apply_opacity);
         let origin = (origin.0 - margin as i64, origin.1 - margin as i64);
         Ok((self.place(bordered, origin, 1.0), masked))
     }
@@ -828,21 +836,34 @@ impl Renderer<'_> {
         Ok(true)
     }
 
-    /// The layer's switched-on effects: returns the border to draw and
-    /// counts the others (not drawn yet) in the report.
-    fn effects(&mut self, layer: &Layer) -> Option<(Border, bool)> {
+    /// The layer's switched-on effects that are drawn (border and tone);
+    /// the others are counted in the report.
+    fn effects(&mut self, layer: &Layer) -> Effects {
+        let mut drawn = Effects::default();
         if !layer.row.truthy("LayerEffectAttached") {
-            return None;
+            return drawn;
         }
-        let effects = LayerEffects::parse(layer.row.blob("LayerEffectInfo")?).ok()?;
+        let Some(effects) = layer.row.blob("LayerEffectInfo").and_then(|blob| LayerEffects::parse(blob).ok()) else {
+            return drawn;
+        };
+        drawn.tone = effects.section("EffectTone").and_then(Tone::parse);
+        drawn.border = effects
+            .border()
+            .filter(|border| border.enabled && border.width > 0.0)
+            .map(|border| (border, effects.apply_opacity()));
         for name in effects.enabled() {
-            if name != "EffectEdge" {
-                *self.report.effects_skipped.entry(name.to_owned()).or_default() += 1;
-            }
+            let shown = match name {
+                "EffectEdge" => drawn.border.is_some(),
+                "EffectTone" => drawn.tone.is_some(),
+                _ => false,
+            };
+            let counts = if shown { &mut self.report.effects } else { &mut self.report.effects_skipped };
+            *counts.entry(name.to_owned()).or_default() += 1;
         }
-        let border = effects.border().filter(|border| border.enabled && border.width > 0.0)?;
-        *self.report.effects.entry("EffectEdge".to_owned()).or_default() += 1;
-        Some((border, effects.apply_opacity()))
+        if drawn.tone.is_some_and(|tone| tone.is_approximate()) {
+            self.report.tones_approximate += 1;
+        }
+        drawn
     }
 
     /// The mask as coverage 0..1 per output pixel (outside the mask image:
@@ -865,9 +886,47 @@ impl Renderer<'_> {
     }
 }
 
-/// The largest canvas (pixels) on which a gradient layer's border is drawn
-/// (it needs several full-size buffers).
-const BORDER_PIXELS_MAX: u64 = 40_000_000;
+/// The layer colour (レイヤーカラー, `DrawColorEnable`): the main and sub
+/// colours (white when the sub colour is unset). Not for the paper, whose
+/// colour is drawn from the same columns.
+fn layer_colors(layer: &Layer) -> Option<([u8; 3], [u8; 3])> {
+    if layer.kind == LayerKind::Paper || !layer.row.truthy("DrawColorEnable") {
+        return None;
+    }
+    Some((layer.color("DrawColorMain")?, layer.color("DrawColorSub").unwrap_or([255; 3])))
+}
+
+/// Show dark parts in the main colour and light parts in the sub colour,
+/// mixed by luminance (black is all main, white all sub); alpha is kept.
+fn recolor(image: &mut RgbaImage, (main, sub): ([u8; 3], [u8; 3])) {
+    for p in image.pixels.as_chunks_mut::<4>().0 {
+        if p[3] == 0 {
+            continue;
+        }
+        let light = luma(p[0], p[1], p[2]) as u32;
+        for c in 0..3 {
+            p[c] = ((main[c] as u32 * (255 - light) + sub[c] as u32 * light + 127) / 255) as u8;
+        }
+    }
+}
+
+/// The effects a layer is drawn with.
+#[derive(Default)]
+struct Effects {
+    /// The border and whether it follows the layer's alpha.
+    border: Option<(Border, bool)>,
+    tone: Option<Tone>,
+}
+
+impl Effects {
+    fn any(&self) -> bool {
+        self.border.is_some() || self.tone.is_some()
+    }
+}
+
+/// The largest canvas (pixels) on which a gradient layer's effects are
+/// drawn (they need several full-size buffers).
+const EFFECT_PIXELS_MAX: u64 = 40_000_000;
 
 /// `n` when `factor` is 1/2ⁿ (n ≥ 1), else 0.
 fn exact_halvings(factor: f64) -> u32 {

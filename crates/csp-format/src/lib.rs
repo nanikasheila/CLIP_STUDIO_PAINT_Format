@@ -25,6 +25,7 @@ pub mod render;
 pub mod schema;
 pub mod stroke;
 pub mod text;
+pub mod tone;
 pub mod vector;
 pub mod verify;
 pub mod zlib;
