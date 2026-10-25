@@ -1,0 +1,38 @@
+kind	menu	parameters	certainty	note
+92015820-D5B9-44D4-81B6-1F674762E420	フィルター（プラグイン）	1, 2, 3, 4, input1, 3D7F32A9-…	未解明	UUID で指定されるフィルター。パラメーターは番号付き
+FFD22A25-ABB3-4fdf-A6F2-596CC0E24BEF	フィルター（プラグイン）	1, input1, 3D7F32A9-…	未解明	同上
+adjustmentactionToneCurve	色調補正 > トーンカーブ	channelred, channelgreen, channelblue	推測
+adjustmentactiongradientmap	色調補正 > グラデーションマップ	gradation	推測	gradation は GradationData（gradient.rs）
+adjustmentactionhsv	色調補正 > 色相・彩度・明度	hue, saturation, value	推測
+applicationactionchangecurrentcolor	描画色の変更	currentcolor	推測
+editactionbordering	編集 > 選択範囲をフチどり	borderingtype, borderingsize, borderexpandtype, isdrawcanvasedge	推測
+editactionchangelinecolor	編集 > 線の色を描画色に変更		推測
+editactioncut	編集 > 切り取り	cutlayer	推測
+editactiondetailpaint	編集 > 塗りつぶし（詳細設定）	antialias, colormargin, compositemode, expandsize, isrefermultilayer, isshrink, opacity, paintexpandtype	推測
+editactionpaint	編集 > 塗りつぶし		推測
+editactionpaste	編集 > 貼り付け		推測
+layeractionchangebelowclip	下のレイヤーでクリッピング	belowclip	推測
+layeractionchangedraftlayer	下描きレイヤーに設定	draftlayer	推測
+layeractionchangename	レイヤー名の変更	layername	推測
+layeractioncopy	レイヤーを複製		推測
+layeractiondelete	レイヤーを削除		推測
+layeractionfoldernewandinsert	新規レイヤーフォルダーを作成してレイヤーを挿入	duplicate	推測
+layeractionmergealllayer	画像を統合		推測
+layeractionmergelowerlayer	下のレイヤーに結合	keepmask	推測
+layeractionmergeselectedlayer	選択中のレイヤーを結合		推測
+layeractionmergevisiblelayercopy	表示レイヤーのコピーを結合		推測
+layeractionrasterdetailnew	新規ラスターレイヤー（詳細設定）	layername, colortype, compositemode, channelorder, addnumbertoname	推測
+layeractionrasterize	ラスタライズ		推測
+layeractionrasternew	新規ラスターレイヤー		推測
+layeractionselectcontinuouslayer	レイヤーを連続選択	layername	推測
+layeractionselectlowerlayer	下のレイヤーを選択		推測
+layeractionselectupperlayer	上のレイヤーを選択		推測
+layeractionsetcompositemode	合成モードの変更	compositemode	推測
+layeractionsetcurrentlayer	レイヤーを選択（名前で）	layername	推測
+layeractionsetopacity	不透明度の変更	opacity	推測
+layeractionsetuselayercolor	レイヤーカラーを使う	use	推測
+layeractionsetusetone	トーン化	use	推測
+selectactiondeselect	選択を解除		推測
+selectactionexpand	選択範囲を拡張	expandtype, sizelength	推測
+selectactionreduce	選択範囲を縮小	reducetype, sizelength, reduceatpageedge	推測
+toolactionmovelayer	レイヤー移動（ツール操作）	movelayerx, movelayery, movetarget, inselectarea, movegrid, remainoriginal, selectlayer	推測

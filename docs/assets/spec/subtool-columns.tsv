@@ -1,0 +1,531 @@
+column	group	label	values	certainty	type	rows	kinds	min	max	blob
+AntiAlias	アンチエイリアス	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	推測	INTEGER	2048	brush,effectLines,eraser,shape,selection,balloon,vectorEdit,fill,frame,?,ruler,blend	0	3	
+BalloonFillOpacity	フキダシ	塗り 不透明度	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	100	100	
+BalloonInsertType	フキダシ	作成 方式	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	0	1	
+BalloonTailCurveKind	フキダシ	しっぽ 曲線 種類	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	2	
+BalloonTailType	フキダシ	しっぽ 方式	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	1	
+BalloonTailWidth	フキダシ	しっぽ 幅	名前からの直訳	推測（直訳）	REAL	16	balloon	20.0	94.10000000000001	
+BalloonTailWidthUnit	フキダシ	しっぽ 幅 単位	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	0	
+BalloonTone	フキダシ	トーン	名前からの直訳	推測（直訳）	INTEGER	180	effectLines,balloon,brush,?	0	1	
+BalloonUniteText	フキダシ	結合 テキスト	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	1	1	
+BrushAdjustFlowByInterval	インク	間隔に合わせて濃度を調整	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushAdjustVelocity	補正	速度の調整	0/1	推測	INTEGER	1473	brush,eraser,shape,balloon,effectLines,frame,liquify,blend,fill,vectorEdit,selection,ruler	0	1	
+BrushAtLeast1Pixel	ブラシサイズ	最小値を 1 ピクセルにする	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushAutoIntervalType	ストローク	間隔の種類	0 狭い, 1 普通, 2 広い, 3 固定（推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	3	
+BrushBlendPatternByDarken	ブラシ先端	比較(暗)で重ねる	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushBlur	水彩	ぼかし幅		推測	REAL	1578	brush,eraser,?	0.0	200.0	
+BrushBlurEffector	水彩	ぼかし幅の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
+BrushBlurKind	水彩	ぼかしの種類		推測	INTEGER	106	brush,eraser	0	1	
+BrushBlurLinkSize	水彩	ぼかし幅をブラシサイズに連動	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushBlurUnit	水彩	ぼかし幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushChangeColorTarget	色の変化	色の変化の対象		推測	INTEGER	1231	brush,eraser	0	2	
+BrushChangePatternColor	色の変化	吹き付けごとの色の変化	0/1	推測	INTEGER	1271	brush,eraser	0	1	
+BrushChangeStrokeColor	色の変化	ストロークごとの色の変化	0/1	推測	INTEGER	1271	brush,eraser	0	1	
+BrushColorMixingMode	インク	混色モード	0 RGB, 1 知覚的（推測）	推測	INTEGER	988	brush,eraser	0	1	
+BrushContinuousPlot	ストローク	連続吹き付け	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushEnableSnap	補正	スナップ可能	0/1	推測	INTEGER	1694	brush,eraser,vectorEdit,?,selection,liquify,fill,ruler,balloon,blend,frame	0	1	
+BrushEraseAllLayer	消去	複数レイヤーを消去	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushFlow	インク	ブラシ濃度	1–100 %	推測	INTEGER	1954	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	16	100	
+BrushFlowEffector	インク	ブラシ濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1954	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1954
+BrushHardness	ブラシ先端	硬さ	1–100（円形の先端）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	1	100	
+BrushHueChange	色の変化	色相（吹き付けごと）		推測	INTEGER	1271	brush,eraser	-5	200	
+BrushHueChangeEffector	色の変化	色相（吹き付けごと）の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1271	brush,eraser			effector:1271
+BrushInLength	入り抜き	入りの長さ		推測	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	1.0	5000.0	
+BrushInLengthUnit	入り抜き	入りの長さの単位	0 px, 2 mm（推測）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
+BrushInOutBySpeed	入り抜き	速度による入り抜き	0/1	推測	INTEGER	1668	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame,common	0	1	
+BrushInOutTarget	入り抜き	入り抜きの影響先	(項目 ID, 有効, 最小値 %) の列	推測	BLOB	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common			records:1847
+BrushInOutType	入り抜き	入り抜きの指定方法	0 長さ, 1 割合（推測）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	1	
+BrushInRatio	入り抜き	入りの割合	%	推測	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0.1	100.0	
+BrushInterval	ストローク	間隔	% (先端の直径に対する)	推測	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.1	300.0	
+BrushIntervalEffector	ストローク	間隔の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
+BrushLMSLinearity	インク	知覚的混色の線形性	未解明	未解明	INTEGER	988	brush,eraser	0	4	
+BrushMixAlpha	水彩	絵の具濃度	%	推測	INTEGER	1578	brush,eraser,?	0	100	
+BrushMixAlphaEffector	水彩	絵の具濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
+BrushMixColor	水彩	絵の具量	%	推測	INTEGER	1578	brush,eraser,?	0	100	
+BrushMixColorEffector	水彩	絵の具量の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
+BrushMixColorExtension	水彩	色延び	%	推測	INTEGER	1578	brush,eraser,?	0	100	
+BrushNotUseCommonInOut	入り抜き	共通の入り抜きを使わない		推測	INTEGER	28	brush,eraser	0	0	
+BrushOpacityEffector	インク	不透明度の影響元設定		推測	BLOB	1624	brush,eraser,effectLines,shape,balloon,frame,vectorEdit,selection,blend,fill,ruler			effector:1624
+BrushOutLength	入り抜き	抜きの長さ		推測	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	1.0	5000.0	
+BrushOutLengthUnit	入り抜き	抜きの長さの単位	0 px, 2 mm（推測）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
+BrushOutRatio	入り抜き	抜きの割合	%	推測	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0.1	100.0	
+BrushPatternImageArray	ブラシ先端	先端の素材	素材の参照の列	推測	BLOB	1150	brush,?,eraser,frame,balloon			materials:1150
+BrushPatternNameVersion	ブラシ先端	素材名の形式の版	未解明	未解明	INTEGER	1122	brush,eraser,shape,balloon,frame,effectLines,fill,liquify,blend,selection,common,vectorEdit	0	1	
+BrushPatternOrderType	ブラシ先端	素材の順序（複数の素材）	0 繰り返し, 1 往復, 2 ランダム, 3 筆圧（推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	3	
+BrushPatternOrderType2	ブラシ先端	素材の順序（新しい形式）		推測	INTEGER	1616	brush,eraser,effectLines,shape,balloon,frame,vectorEdit,selection,blend,fill,ruler	0	3	
+BrushPatternReverse	ブラシ先端	素材の反転（旧形式）		推測	INTEGER	993	brush,effectLines,shape,eraser,vectorEdit,balloon,?,frame,selection,ruler,fill,blend	0	0	
+BrushPatternReverseHorizontal	ブラシ先端	左右反転	0 なし, 2 ランダム, 3 進行方向（推測）	推測	INTEGER	1382	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	0	3	
+BrushPatternReverseVertical	ブラシ先端	上下反転		推測	INTEGER	1382	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	0	2	
+BrushQuality	インク	描画品質	未解明	未解明	INTEGER	836	brush,eraser	0	3	
+BrushRevision	補正	補正の強さ		推測	INTEGER	1666	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame	2	100	
+BrushRevisionBezier	補正	ベジェ曲線で補正	0/1	推測	INTEGER	1645	brush,eraser,vectorEdit,?,selection,ruler,balloon,blend,frame,fill	0	1	
+BrushRevisionBySpeed	補正	速度で補正	0/1	推測	INTEGER	1666	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame	0	1	
+BrushRevisionByViewScale	補正	表示倍率で補正	0/1	推測	INTEGER	1666	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame	0	1	
+BrushRibbon	ストローク	リボン	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushRotation	ブラシ先端	ブラシ先端の向き	度	推測	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.0	360.0	
+BrushRotationEffector	ブラシ先端	向きの影響元	ビット: 筆圧・傾き・進行方向・ランダムなど（.clip 側の RotationEffector と同じ）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	1	195	
+BrushRotationEffectorInSpray	散布効果	粒子の向きの影響元	ビット	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	1	513	
+BrushRotationInSpray	散布効果	粒子の向き	度	推測	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.0	360.0	
+BrushRotationRandomInSpray	散布効果	粒子の向きのランダムの幅	%	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	100	
+BrushRotationRandomScale	ブラシ先端	向きのランダムの幅	%	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	100	
+BrushSaturationChange	色の変化	彩度（吹き付けごと）		推測	INTEGER	1271	brush,eraser	-10	50	
+BrushSaturationChangeEffector	色の変化	彩度（吹き付けごと）の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1271	brush,eraser			effector:1271
+BrushSharpenCorner	補正	角を鋭く	0/1	推測	INTEGER	1811	brush,eraser,shape,balloon,vectorEdit,frame,?,selection,fill,ruler,blend	0	1	
+BrushSize	ブラシサイズ	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	推測	REAL	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0.5	2000.0	
+BrushSizeEffector	ブラシサイズ	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend			effector:1962
+BrushSizeSyncViewScale	ブラシサイズ	表示倍率に連動	0/1	推測	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	1	
+BrushSizeUnit	ブラシサイズ	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	2	
+BrushSprayBias	散布効果	散布偏り	-100–100	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	-100	100	
+BrushSprayDensity	散布効果	粒子密度	1–16	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	1	16	
+BrushSprayDensityEffector	散布効果	粒子密度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
+BrushSprayFixedPointArray	散布効果	固定の散布位置	点の列（標本では空）	推測		0				
+BrushSpraySize	散布効果	粒子サイズ		推測	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.78	1150.0	
+BrushSpraySizeEffector	散布効果	粒子サイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
+BrushSpraySizeSyncBrushSize	散布効果	粒子サイズをブラシサイズに連動	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+BrushSpraySizeUnit	散布効果	粒子サイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	2	
+BrushSprayUseFixedPoint	散布効果	固定の散布位置を使う	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	0	
+BrushStrokeHueChange	色の変化	色相（ストロークごと）		推測	INTEGER	1271	brush,eraser	0	10	
+BrushStrokeSaturationChange	色の変化	彩度（ストロークごと）		推測	INTEGER	1271	brush,eraser	0	3	
+BrushStrokeSubColor	色の変化	サブカラー（ストロークごと）		推測	INTEGER	1271	brush,eraser	0	0	
+BrushStrokeValueChange	色の変化	明度（ストロークごと）		推測	INTEGER	1271	brush,eraser	0	1	
+BrushSubColor	色の変化	サブカラー混合率	%	推測	INTEGER	1578	brush,eraser,?	0	100	
+BrushSubColorEffector	色の変化	サブカラー混合率の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
+BrushThickness	ブラシ先端	厚さ	%	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	11	150	
+BrushThicknessEffector	ブラシ先端	厚さの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
+BrushUseIn	入り抜き	入り	0/1	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	1	
+BrushUseOut	入り抜き	抜き	0/1	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	1	
+BrushUsePatternImage	ブラシ先端	先端形状: 素材	0 円形, 1 素材	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushUseReferLayer	補正	参照レイヤーを使う		推測	INTEGER	1556	brush,eraser,?,blend	0	0	
+BrushUseRevision	補正	ベクター吸着/補正を使う	0/1	推測	INTEGER	1666	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame	0	1	
+BrushUseSpray	散布効果	散布効果	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushUseVectorEraser	消去	ベクター消去	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushUseVectorMagnet	補正	ベクター吸着	0/1	推測	INTEGER	1666	brush,eraser,shape,?	0	1	
+BrushUseWaterColor	水彩	絵の具量・絵の具濃度を使う	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushUseWaterColor2	水彩	混色（新しい形式）	0/1	推測	INTEGER	1097	brush,eraser	0	1	
+BrushUseWaterEdge	水彩境界	水彩境界	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushValueChange	色の変化	明度（吹き付けごと）		推測	INTEGER	1271	brush,eraser	-20	100	
+BrushValueChangeEffector	色の変化	明度（吹き付けごと）の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1271	brush,eraser			effector:1271
+BrushVectorEraserReferAllLayer	消去	ベクター消去で複数レイヤーを参照	0/1	推測	INTEGER	1578	brush,eraser,?	1	1	
+BrushVectorEraserType	消去	ベクター消去の方式	0 触れた部分, 1 交点まで, 2 線全体	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushVectorMagnetPower	補正	ベクター吸着の強さ		推測	INTEGER	1666	brush,eraser,shape,?	8	40	
+BrushVerticalThicknes	ブラシ先端	厚さの向き（縦）	0 横, 1 縦	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+BrushWaterColor	水彩	混色の方式	0 ブレンド, 1 絵の具量, 2 ?（推測）	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushWaterEdgeAfterDrag	水彩境界	描画後に処理	0/1	推測	INTEGER	1578	brush,eraser,?	0	1	
+BrushWaterEdgeAlphaPower	水彩境界	透明度の影響		推測	INTEGER	1578	brush,eraser,?	3	50	
+BrushWaterEdgeBlur	水彩境界	ぼかし幅		推測	REAL	1548	brush,eraser,?	0.0	5.0	
+BrushWaterEdgeBlurUnit	水彩境界	ぼかし幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1548	brush,eraser,?	0	0	
+BrushWaterEdgeRadius	水彩境界	範囲		推測	REAL	1578	brush,eraser,?	0.1	8.5	
+BrushWaterEdgeRadiusUnit	水彩境界	範囲の単位	0 px, 2 mm（推測）	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushWaterEdgeStrength	水彩境界	強さ（新しい形式）		推測	INTEGER	12	brush	40	100	
+BrushWaterEdgeStyle	水彩境界	スタイル（新しい形式）		推測	INTEGER	12	brush	0	1	
+BrushWaterEdgeValuePower	水彩境界	明度の影響		推測	INTEGER	1578	brush,eraser,?	0	70	
+BrushWaterEdgeVividness	水彩境界	鮮やかさ（新しい形式）		推測	INTEGER	12	brush	50	50	
+ChangeRGBByDual	デュアルブラシ	2 つ目の先端で色を変える		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+CloseFillReferColorType	塗りつぶし	囲って塗る: 参照する色		推測	INTEGER	28	fill,selection	0	8	
+ComicFrameBaseChannel	コマ枠	基準 チャンネル	名前からの直訳	推測（直訳）	INTEGER	16	frame,?	0	0	
+ComicFrameDrawLine	コマ枠	描画 線	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	0	1	
+ComicFrameInsertType	コマ枠	作成 方式	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	0	1	
+ComicFrameMakeBaseLayer	コマ枠	作成 基準 レイヤー	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	1	1	
+ComicFrameMakeFillLayer	コマ枠	作成 塗り レイヤー	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	0	1	
+CompositeMode	インク	合成モード	CSP のレイヤー合成モード番号（.clip の LayerComposite と同じ表）	推測	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	0	31	
+ConcentrateStreamBasePointType	集中線	線 基準 点 方式	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	2	
+ConcentrateStreamFillOpacity	集中線	線 塗り 不透明度	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	100	100	
+ConcentrateStreamIntervalAngle	集中線	線 間隔 角度	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	2.0	30.0	
+ConcentrateStreamIntervalDistance	集中線	線 間隔 距離	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	5.0	60.0	
+ConcentrateStreamIntervalDistanceUnit	集中線	線 間隔 距離 単位	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	0	
+ConcentrateStreamIntervalType	集中線	線 間隔 方式	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
+ConcentrateStreamMakeLayer	集中線	線 作成 レイヤー	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	1	2	
+ConcentrateStreamUseFill	集中線	線 使う 塗り	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
+ConcentrateStreamUseRuler	集中線	線 使う 定規	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
+ContourFillBlendGraph	等高線塗り	等高線の混合の曲線	点の列	推測	BLOB	24	gradient			records:24
+ContourFillUseBlack	等高線塗り	黒を使う		推測	INTEGER	24	gradient	0	2	
+ContourFillUseTrans	等高線塗り	透明を使う		推測	INTEGER	24	gradient	0	2	
+CutFrameCurveKind	コマ枠カット	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	0	
+CutFrameCutFolderType	コマ枠カット	分割 フォルダー 方式	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	2	
+CutFrameHorizontalGap	コマ枠カット	横 間隔	名前からの直訳	推測（直訳）	REAL	16	frame	8.0	80.0	
+CutFrameHorizontalGapUnit	コマ枠カット	横 間隔 単位	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	0	
+CutFrameUsePreferenceGap	コマ枠カット	使う 環境設定 間隔	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	1	
+CutFrameVerticalGap	コマ枠カット	縦 間隔	名前からの直訳	推測（直訳）	REAL	16	frame	15.0	180.0	
+CutFrameVerticalGapUnit	コマ枠カット	縦 間隔 単位	名前からの直訳	推測（直訳）	INTEGER	16	frame	0	0	
+DualAdjustFlowByInterval	インク（デュアルブラシ）	間隔に合わせて濃度を調整	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualAntiAlias	アンチエイリアス（デュアルブラシ）	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
+DualAutoIntervalType	ストローク（デュアルブラシ）	間隔の種類	0 狭い, 1 普通, 2 広い, 3 固定（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
+DualBlendPatternByDarken	ブラシ先端（デュアルブラシ）	比較(暗)で重ねる	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualBlendPatternByDarken2		Dual Blend Pattern で Darken2	名前からの直訳	未解明	INTEGER	1178	brush,eraser,shape,balloon,effectLines,frame,fill,blend,vectorEdit,selection	0	1	
+DualBrushCompositeMode	デュアルブラシ	合成モード		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	12	
+DualContinuousPlot	ストローク（デュアルブラシ）	連続吹き付け	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualFlow	インク（デュアルブラシ）	ブラシ濃度	1–100 %	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
+DualFlowEffector	インク（デュアルブラシ）	ブラシ濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualHardness	ブラシ先端（デュアルブラシ）	硬さ	1–100（円形の先端）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	100	
+DualInterval	ストローク（デュアルブラシ）	間隔	% (先端の直径に対する)	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	150.0	
+DualIntervalEffector	ストローク（デュアルブラシ）	間隔の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualPatternImageArray	ブラシ先端（デュアルブラシ）	先端の素材	素材の参照の列	推測		147	brush			materials:147
+DualPatternOrderType	ブラシ先端（デュアルブラシ）	素材の順序（複数の素材）	0 繰り返し, 1 往復, 2 ランダム, 3 筆圧（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
+DualPatternReverseHorizontal	ブラシ先端（デュアルブラシ）	左右反転	0 なし, 2 ランダム, 3 進行方向（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	2	
+DualPatternReverseVertical	ブラシ先端（デュアルブラシ）	上下反転		推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	2	
+DualRibbon	ストローク（デュアルブラシ）	リボン	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualRotation	ブラシ先端（デュアルブラシ）	ブラシ先端の向き	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
+DualRotationEffector	ブラシ先端（デュアルブラシ）	向きの影響元	ビット: 筆圧・傾き・進行方向・ランダムなど（.clip 側の RotationEffector と同じ）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	163	
+DualRotationEffectorInSpray	散布効果（デュアルブラシ）	粒子の向きの影響元	ビット	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1	257	
+DualRotationInSpray	散布効果（デュアルブラシ）	粒子の向き	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	260.0	
+DualRotationRandomInSpray	散布効果（デュアルブラシ）	粒子の向きのランダムの幅	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	100	
+DualRotationRandomScale	ブラシ先端（デュアルブラシ）	向きのランダムの幅	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	2	100	
+DualSize	ブラシサイズ（デュアルブラシ）	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	6.0	800.0000000000001	
+DualSizeEffector	ブラシサイズ（デュアルブラシ）	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualSizeUnit	ブラシサイズ（デュアルブラシ）	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
+DualSprayBias	散布効果（デュアルブラシ）	散布偏り	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	100	
+DualSprayDensity	散布効果（デュアルブラシ）	粒子密度	1–16	推測	INTEGER	1272	brush,eraser,balloon,effectLines,shape,frame,blend,selection	1	16	
+DualSprayDensityEffector	散布効果（デュアルブラシ）	粒子密度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualSprayFixedPointArray	散布効果（デュアルブラシ）	固定の散布位置	点の列（標本では空）	推測		0				
+DualSpraySize	散布効果（デュアルブラシ）	粒子サイズ		推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	450.0	
+DualSpraySizeEffector	散布効果（デュアルブラシ）	粒子サイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualSpraySizeSyncBrushSize	散布効果（デュアルブラシ）	粒子サイズをブラシサイズに連動	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualSpraySizeUnit	散布効果（デュアルブラシ）	粒子サイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
+DualSprayUseFixedPoint	散布効果（デュアルブラシ）	固定の散布位置を使う	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
+DualTextureBrightness	紙質（デュアルブラシ）	明るさ	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	50	
+DualTextureCompositeMode	紙質（デュアルブラシ）	紙質の適用方法	0 乗算, 1 比較(暗), 2 減算, 3 除算, …（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	6	
+DualTextureContrast	紙質（デュアルブラシ）	コントラスト	-100–100	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-50	0	
+DualTextureDensity	紙質（デュアルブラシ）	紙質濃度	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	20	100	
+DualTextureDensityEffector	紙質（デュアルブラシ）	紙質濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualTextureForPlot	紙質（デュアルブラシ）	ブラシ先端ごとに紙質を適用	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualTextureImage	紙質（デュアルブラシ）	紙質の素材	素材の参照の列	推測		73	brush			materials:73
+DualTextureReverseDensity	紙質（デュアルブラシ）	濃度を反転	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualTextureRotate	紙質（デュアルブラシ）	回転角	度	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0.0	0.0	
+DualTextureScale	紙質（デュアルブラシ）	拡大率（旧形式）	%	推測	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	25.0	100.0	
+DualTextureStressDensity	紙質（デュアルブラシ）	濃度を強調	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualThickness	ブラシ先端（デュアルブラシ）	厚さ	%	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	60	200	
+DualThicknessEffector	ブラシ先端（デュアルブラシ）	厚さの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
+DualUsePatternImage	ブラシ先端（デュアルブラシ）	先端形状: 素材	0 円形, 1 素材	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualUseSpray	散布効果（デュアルブラシ）	散布効果	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DualVerticalThicknes	ブラシ先端（デュアルブラシ）	厚さの向き（縦）	0 横, 1 縦	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+DustMode	ゴミ取り	モード		推測	INTEGER	17	vectorEdit,?	0	2	
+DustModeForSelect	ゴミ取り	選択範囲のモード		推測	INTEGER	9	selection,?	0	0	
+DustSize	ゴミ取り	ゴミサイズ		推測	REAL	26	vectorEdit,selection,?	4.0	10.0	
+DustSizeUnit	ゴミ取り	ゴミサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	26	vectorEdit,selection,?	0	0	
+EnableSnapSymmetry	対称定規	対称	名前からの直訳	推測（直訳）	INTEGER	72	selection,gradient,fill,vectorEdit	1	1	
+FillAntiAlias	塗りつぶし	アンチエイリアス		推測	INTEGER	192	gradient,fill,selection	0	1	
+FillCloseGap	塗りつぶし	隙間閉じの大きさ		推測	REAL	96	fill,selection,gradient	1.0	50.0	
+FillCloseGapUnit	塗りつぶし	隙間閉じの大きさの単位	0 px, 2 mm（推測）	推測	INTEGER	96	fill,selection,gradient	0	0	
+FillColorMargin	塗りつぶし	色の誤差	%	推測	REAL	1652	brush,eraser,fill,selection,gradient,?,blend	0.0	80.0	
+FillContinuousPixel	塗りつぶし	隣接ピクセルをたどる		推測	INTEGER	68	selection,gradient,fill	1	1	
+FillExpandLength	塗りつぶし	領域拡縮の幅		推測	REAL	1652	brush,eraser,fill,selection,gradient,?,blend	0.0	10.0	
+FillExpandLengthUnit	塗りつぶし	領域拡縮の幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	0	0	
+FillExpandType	塗りつぶし	領域拡縮の方法		推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	2	2	
+FillIncludeVectorCenter	塗りつぶし	ベクターの中心線を含める		推測	INTEGER	58	fill,selection,gradient	0	1	
+FillNotReferBalloon	塗りつぶし	フキダシを参照しない		推測	INTEGER	1	fill	1	1	
+FillNotReferCurrent	塗りつぶし	編集レイヤーを参照しない		推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	0	0	
+FillNotReferDraft	塗りつぶし	下描きレイヤーを参照しない		推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	0	1	
+FillNotReferLocked	塗りつぶし	ロックしたレイヤーを参照しない		推測	INTEGER	116	fill,selection,gradient,vectorEdit,?	0	0	
+FillNotReferPaper	塗りつぶし	用紙を参照しない		推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	1	1	
+FillNotReferText	塗りつぶし	テキストを参照しない		推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	0	1	
+FillNotStartColorBlue	塗りつぶし	塗りつぶさない色 B		推測	INTEGER	36	fill,selection,gradient	0	0	
+FillNotStartColorGreen	塗りつぶし	塗りつぶさない色 G		推測	INTEGER	36	fill,selection,gradient	0	0	
+FillNotStartColorRed	塗りつぶし	塗りつぶさない色 R		推測	INTEGER	36	fill,selection,gradient	0	0	
+FillReferDrawFrame	塗りつぶし	描画中のコマ枠を参照		推測	INTEGER	58	fill,selection,gradient	0	0	
+FillReferFrame	塗りつぶし	コマ枠を参照		推測	INTEGER	28	fill,selection	1	1	
+FillReferLayerType	塗りつぶし	参照するレイヤー		推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	0	1	
+FillReferMultiLayer	塗りつぶし	複数参照	0/1	推測	INTEGER	122	fill,selection,gradient,vectorEdit,?	0	1	
+FillReferVectorCenter	塗りつぶし	ベクターの中心線で塗る	0/1	推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	0	1	
+FillSoakIntoNarrowArea	塗りつぶし	狭い領域にしみ込む		推測	INTEGER	92	fill,selection,gradient	0	1	
+FillUseCloseGap	塗りつぶし	隙間閉じ	0/1	推測	INTEGER	96	fill,selection,gradient	0	1	
+FillUseExpand	塗りつぶし	領域拡縮	0/1	推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	0	1	
+FillUseNotStartColor	塗りつぶし	塗りつぶさない色を指定		推測	INTEGER	36	fill,selection,gradient	0	0	
+FixedShapeAspectType	図形	縦横比 方式	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
+FixedShapeHeight	図形	高さ	名前からの直訳	推測（直訳）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	100.0	100.0	
+FixedShapeHeightRate	図形	高さ 比率	名前からの直訳	推測（直訳）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	1.0	1.0	
+FixedShapeHeightUnit	図形	高さ 単位	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
+FixedShapeKind	図形	種類	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	2	
+FixedShapeRoundRate	図形	角丸 比率	名前からの直訳	推測（直訳）	REAL	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	10.0	100.0	
+FixedShapeRoundSize	図形	角丸 サイズ	名前からの直訳	推測（直訳）	REAL	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	5.0	60.0	
+FixedShapeRoundSizeUnit	図形	角丸 サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	2	
+FixedShapeRoundValueType	図形	角丸 値 方式	名前からの直訳	推測（直訳）	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	1	
+FixedShapeUseAspect	図形	使う 縦横比	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	1	
+FixedShapeUseRoundCorner	図形	使う 角丸 角	名前からの直訳	推測（直訳）	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	1	
+FixedShapeVertexNumber	図形	頂点 数	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	6	7	
+FixedShapeWidth	図形	幅	名前からの直訳	推測（直訳）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	100.0	100.0	
+FixedShapeWidthRate	図形	幅 比率	名前からの直訳	推測（直訳）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	1.0	1.0	
+FixedShapeWidthUnit	図形	幅 単位	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
+FlickerReduction	補正	手ブレ補正	0–100	推測	INTEGER	1745	brush,eraser,selection,vectorEdit,fill,?,liquify,ruler,balloon,blend,frame,common	0	100	
+FlickerReductionBySpeed	補正	速度による手ブレ補正	0/1	推測	INTEGER	1745	brush,eraser,selection,vectorEdit,fill,?,liquify,ruler,balloon,blend,frame,common	0	1	
+FlickerReductionBySpeedType	補正	速度による手ブレ補正の方式		推測	INTEGER	1430	brush,eraser,fill,selection,liquify,blend,vectorEdit,common,ruler,balloon,frame	0	1	
+GradationData	グラデーション	グラデーションの色の点	GradationData（gradient.rs）	推測	BLOB	96	gradient			gradation:96
+GradationDither	グラデーション	ディザリング		推測	INTEGER	96	gradient	0	1	
+GradationMakeLayer	グラデーション	作成先	0 描画レイヤー, 1 グラデーションレイヤー（推測）	推測	INTEGER	96	gradient	0	1	
+GradationRepeatType	グラデーション	端の形状	0 繰り返さない, 1 繰り返し, 3 折り返し（推測）	推測	INTEGER	96	gradient	0	3	
+GradationReverseSaved	グラデーション	反転を保存した印	未解明	未解明	INTEGER	83	gradient	1	1	
+GradationShapeKind	グラデーション	形状	0 直線, 1 円（推測）	推測	INTEGER	96	gradient	0	1	
+IncludeFill	塗りつぶし	塗り残し部分に塗る		推測	INTEGER	58	fill,selection,gradient	0	0	
+IncludeFillColor	塗りつぶし	塗り残しの色	16 バイトのレコード（未解明）	未解明	BLOB	58	fill,selection,gradient			records:58
+IncludeFillTouchVectorLine	塗りつぶし	ベクター線に触れた部分		推測	INTEGER	17	fill	0	0	
+IncludeFillUseTouchVectorLine	塗りつぶし	ベクター線に触れた部分を使う		推測	INTEGER	58	fill,selection,gradient	0	0	
+LayerMoveClicked	レイヤー移動	クリックした	名前からの直訳	推測（直訳）	INTEGER	24	operation	0	0	
+LayerMoveGrid	レイヤー移動	グリッド	名前からの直訳	推測（直訳）	INTEGER	24	operation	0	0	
+LayerMoveInSelectArea	レイヤー移動	の中 選択 範囲	名前からの直訳	推測（直訳）	INTEGER	24	operation	0	0	
+LayerMoveRemainOriginal	レイヤー移動	残す 元	名前からの直訳	推測（直訳）	INTEGER	24	operation	0	0	
+LayerMoveSelectLayer	レイヤー移動	選択 レイヤー	名前からの直訳	推測（直訳）	INTEGER	24	operation	0	0	
+LayerMoveTarget	レイヤー移動	対象	名前からの直訳	推測（直訳）	INTEGER	56	operation,eyedropper	0	2	
+LayerMoveTone	レイヤー移動	トーン	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
+LightTableClickOperation	ライトテーブル	クリック 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
+LightTableDragOperation	ライトテーブル	ドラッグ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
+LightTableTouchOperation	ライトテーブル	タッチ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
+LineCurveKind	線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	43	shape,brush,ruler	0	1	
+LineLockAngle	線	固定 角度	名前からの直訳	推測（直訳）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	0	0	
+LineLockAngleStep	線	固定 角度 刻み	名前からの直訳	推測（直訳）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	42	45	
+LineWidthAddValue	線	幅 加算 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	1.0	6.5	
+LineWidthAddValueUnit	線	幅 加算 値 単位	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthConstantValue	線	幅 一定 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	4.0	20.0	
+LineWidthConstantValueUnit	線	幅 一定 値 単位	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthDivideValue	線	幅 除算 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	0.8	0.9	
+LineWidthMultiplyValue	線	幅 乗算 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	1.1	1.2	
+LineWidthOperation	線	幅 操作	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	3	
+LineWidthRemainCoreLine	線	幅 残す 芯 線	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthSmoothLengthUnit	線	幅 滑らか 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	20	brush,vectorEdit	0	0	
+LineWidthSmoothLengthValue	線	幅 滑らか 長さ 値	名前からの直訳	推測（直訳）	REAL	20	brush,vectorEdit	70.0	70.0	
+LineWidthSubtractValue	線	幅 減算 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	1.0	10.0	
+LineWidthSubtractValueUnit	線	幅 減算 値 単位	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	0	
+LiquifyDensity	ゆがみ	密度	名前からの直訳	推測（直訳）	INTEGER	12	liquify	20	50	
+LiquifyOperation	ゆがみ	操作	名前からの直訳	推測（直訳）	INTEGER	12	liquify	0	0	
+LiquifyReferDraggedArea	ゆがみ	参照 ドラッグした 範囲	名前からの直訳	推測（直訳）	INTEGER	12	liquify	0	0	
+LiquifyStrength	ゆがみ	強さ	名前からの直訳	推測（直訳）	INTEGER	12	liquify	25	70	
+LiquifyStrengthEffector	ゆがみ	強さ Effector	名前からの直訳	推測（直訳）	BLOB	12	liquify			effector:12
+Object3DAutoAdjustTargetDistance	3D	自動 調整 対象 距離	名前からの直訳	推測（直訳）	INTEGER	1	operation	0	0	
+Object3DGestureControlCamera	3D	ジェスチャー 操作 カメラ	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
+Object3DGestureDoubleSwipe	3D	ジェスチャー 2 本指 スワイプ	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DGestureMagnify	3D	ジェスチャー 拡大	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DGestureRotate	3D	ジェスチャー 回転	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DManipulatorVisibleMove	3D	マニピュレーター 表示 移動	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DManipulatorVisibleRotate	3D	マニピュレーター 表示 回転	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DManipulatorVisibleScale	3D	マニピュレーター 表示 拡縮	名前からの直訳	推測（直訳）	INTEGER	5	operation	1	1	
+Object3DMoveOrientation	3D	移動 向き	名前からの直訳	推測（直訳）	INTEGER	11	operation	0	0	
+Object3DOperationMouseLButton	3D	操作 マウス 左 ボタン	名前からの直訳	推測（直訳）	INTEGER	1	operation	1	1	
+Object3DOperationMouseMButton	3D	操作 マウス 中 ボタン	名前からの直訳	推測（直訳）	INTEGER	1	operation	0	0	
+Object3DOperationMouseRButton	3D	操作 マウス 右 ボタン	名前からの直訳	推測（直訳）	INTEGER	1	operation	2	2	
+Object3DOperationMouseWheel	3D	操作 マウス ホイール	名前からの直訳	推測（直訳）	INTEGER	1	operation	6	6	
+Object3DPivotPoint	3D	回転の中心 点	名前からの直訳	推測（直訳）	INTEGER	11	operation	0	1	
+Object3DPosingModelAngleLimit	3D	ポーズ モデル 角度 制限	名前からの直訳	推測（直訳）	INTEGER	1	operation	1	1	
+Object3DRotateOrientation	3D	回転 向き	名前からの直訳	推測（直訳）	INTEGER	11	operation	0	1	
+Object3DSnap	3D	スナップ	名前からの直訳	推測（直訳）	INTEGER	11	operation	0	1	
+Object3DSnapFlag	3D	スナップ フラグ	名前からの直訳	推測（直訳）	INTEGER	11	operation	2147483647	2147483647	
+Object3DSnapRotationGridInterval	3D	スナップ 回転 グリッド 間隔	名前からの直訳	推測（直訳）	INTEGER	11	operation	72	72	
+Object3DUsePersAutoPos	3D	使う パース 自動 位置	名前からの直訳	推測（直訳）	INTEGER	1	operation	1	1	
+ObjectAllLayer	操作	すべての レイヤー	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
+ObjectAlwaysShowFrame	操作	常に 表示 枠	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
+ObjectComicFrameLink	操作	コマ 枠 連動	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	1	
+ObjectComicFrameSnap	操作	コマ 枠 スナップ	名前からの直訳	推測（直訳）	INTEGER	12	operation	1	1	
+ObjectOperationAtBlank	操作	操作 で 空白	名前からの直訳	推測（直訳）	INTEGER	8	operation	257	257	
+ObjectOperationAtBlank2	操作	操作 で 空白 2	名前からの直訳	推測（直訳）	INTEGER	5	operation	272	273	
+ObjectResizableTransformOperation	操作	拡縮可能 変形 操作	名前からの直訳	推測（直訳）	INTEGER	11	operation	1	1	
+ObjectSelectFolder	操作	選択 フォルダー	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
+ObjectSelectType	操作	選択 方式	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
+ObjectSelectable	操作	選択できる対象	名前からの直訳	推測（直訳）	INTEGER	12	operation	2147483647	2147483647	
+ObjectUseSnap	操作	使う スナップ	名前からの直訳	推測（直訳）	INTEGER	4	text,operation	1	1	
+ObjectVectorChangeWidth	操作	ベクター 変更 幅	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
+ObjectVectorOperation	操作	ベクター 操作	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	1	
+Opacity	不透明度	不透明度	0–100 %	推測	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	49	100	
+ParallelStreamBasePointType	流線	線 基準 点 方式	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	2	
+ParallelStreamInterval	流線	線 間隔	名前からの直訳	推測（直訳）	REAL	34	effectLines	0.3	30.0	
+ParallelStreamIntervalUnit	流線	線 間隔 単位	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	0	2	
+ParallelStreamLineAngle	流線	線 線 角度	名前からの直訳	推測（直訳）	REAL	34	effectLines	-180.0	90.0	
+ParallelStreamMakeLayer	流線	線 作成 レイヤー	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	2	
+ParallelStreamMaxLineNumber	流線	線 最大 線 数	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	200	300	
+ParallelStreamUseRuler	流線	線 使う 定規	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	1	
+PerspectiveRulerChangeType	パース定規	変更 方式	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
+PerspectiveRulerOperation	パース定規	操作	名前からの直訳	推測（直訳）	INTEGER	8	ruler	0	0	
+PolylineAddAndDeletePoint	折れ線	加算 と Delete 点	名前からの直訳	推測（直訳）	INTEGER	60	shape,brush,effectLines,frame,ruler,balloon,selection	1	1	
+PolylineClose	折れ線	閉じる	名前からの直訳	推測（直訳）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	0	1	
+PolylineCurveKind	折れ線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	80	shape,brush,selection,frame,ruler,balloon	0	3	
+PolylineCurveKindWithoutCubic	折れ線	曲線 種類 なし 3 次	名前からの直訳	推測（直訳）	INTEGER	42	effectLines	1	1	
+PolylineDesignationType	折れ線	指定 方式	名前からの直訳	推測（直訳）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	1	1	
+PolylineShowPrediction	折れ線	表示 予測	名前からの直訳	推測（直訳）	INTEGER	54	shape,brush,effectLines,frame,selection,ruler,balloon	1	1	
+RotateDoubleClick	回転	2 本指 クリック	名前からの直訳	推測（直訳）	INTEGER	12	view	1	1	
+RotateLockAngle	回転	固定 角度	名前からの直訳	推測（直訳）	INTEGER	12	view	0	0	
+RotateLockAngleStep	回転	固定 角度 刻み	名前からの直訳	推測（直訳）	INTEGER	12	view	45	45	
+RotateShape	回転	図形	名前からの直訳	推測（直訳）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	1	
+RulerCurrentLayer	定規	編集中 レイヤー	名前からの直訳	推測（直訳）	INTEGER	64	ruler	0	1	
+RulerGraduationNumber	定規	目盛り 数	名前からの直訳	推測（直訳）	INTEGER	32	ruler	4	4	
+RulerGraduationType	定規	目盛り 方式	名前からの直訳	推測（直訳）	INTEGER	32	ruler	2	2	
+RulerUseGraduation	定規	使う 目盛り	名前からの直訳	推測（直訳）	INTEGER	32	ruler	0	0	
+SelectCreateType	選択範囲	作成 方式	名前からの直訳	推測（直訳）	INTEGER	107	selection,?	0	2	
+SelectLayerNotSelectDraft	選択範囲	レイヤー しない 選択 下描き	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
+SelectLayerNotSelectLocked	選択範囲	レイヤー しない 選択 ロック	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
+SelectLayerNotSelectMonochromeFill	選択範囲	レイヤー しない 選択 モノクロ 塗り	名前からの直訳	推測（直訳）	INTEGER	12	operation	1	1	
+SelectLayerNotSelectText	選択範囲	レイヤー しない 選択 テキスト	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
+SelectMoveImage	選択範囲	移動 画像	名前からの直訳	推測（直訳）	INTEGER	107	selection,?	0	0	
+SelectOperationMethod	選択範囲	操作 方法	名前からの直訳	推測（直訳）	INTEGER	18	selection,fill	0	1	
+SelectSnapOffCondition	選択範囲	スナップ 解除 条件	名前からの直訳	推測（直訳）	INTEGER	18	selection,fill	0	0	
+SelectSnapSize	選択範囲	スナップ サイズ	名前からの直訳	推測（直訳）	REAL	18	selection,fill	100.0	200.0	
+SelectSnapSizeUnit	選択範囲	スナップ サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	18	selection,fill	0	0	
+SelectSnapToVectorCenter	選択範囲	スナップ へ ベクター 中心	名前からの直訳	推測（直訳）	INTEGER	18	selection,fill	0	1	
+SelectUseSnap	選択範囲	使う スナップ	名前からの直訳	推測（直訳）	INTEGER	18	selection,fill	0	1	
+ShapeEnableSnap	図形	有効 スナップ	名前からの直訳	推測（直訳）	INTEGER	406	effectLines,shape,selection,balloon,ruler,fill,frame,brush,vectorEdit,?	0	1	
+ShapeFillColorBlue	図形	塗り 色 B	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	4294967295	4294967295	
+ShapeFillColorGreen	図形	塗り 色 G	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	4294967295	4294967295	
+ShapeFillColorRed	図形	塗り 色 R	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	4294967295	4294967295	
+ShapeFillColorType	図形	塗り 色 方式	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	1	1	
+ShapeLineColorBlue	図形	線 色 B	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	0	0	
+ShapeLineColorGreen	図形	線 色 G	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	0	0	
+ShapeLineColorRed	図形	線 色 R	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	0	0	
+ShapeLineColorType	図形	線 色 方式	名前からの直訳	推測（直訳）	INTEGER	215	effectLines,shape,balloon,brush,?	0	0	
+ShapeLockAngle	図形	固定 角度	名前からの直訳	推測（直訳）	INTEGER	279	shape,effectLines,balloon,selection,frame,brush,ruler,vectorEdit,?	0	0	
+ShapeLockAngleStep	図形	固定 角度 刻み	名前からの直訳	推測（直訳）	INTEGER	279	shape,effectLines,balloon,selection,frame,brush,ruler,vectorEdit,?	45	45	
+ShapeSavedVer4	図形	保存 （版 4）	名前からの直訳	推測（直訳）	INTEGER	22	gradient,selection,shape,frame,balloon	1	1	
+ShapeSnapInnerFrame	図形	スナップ 内側 枠	名前からの直訳	推測（直訳）	INTEGER	301	effectLines,shape,balloon,selection,frame,brush,ruler,?,vectorEdit	0	1	
+ShapeStartCenter	図形	開始 中心	名前からの直訳	推測（直訳）	INTEGER	295	gradient,effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	1	
+ShapeStrokeAndFillType	図形	線 と 塗り 方式	名前からの直訳	推測（直訳）	INTEGER	130	shape,balloon,brush	0	2	
+SpecialRulerCurveKind	特殊定規	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	12	ruler	1	1	
+SpecialRulerFixAspect	特殊定規	固定 縦横比	名前からの直訳	推測（直訳）	INTEGER	16	ruler	0	0	
+SpecialRulerHeightRate	特殊定規	高さ 比率	名前からの直訳	推測（直訳）	REAL	16	ruler	1.0	1.0	
+SpecialRulerKind	特殊定規	種類	名前からの直訳	推測（直訳）	INTEGER	16	ruler	0	4	
+SpecialRulerLockAngle	特殊定規	固定 角度	名前からの直訳	推測（直訳）	INTEGER	24	ruler	0	0	
+SpecialRulerLockAngleStep	特殊定規	固定 角度 刻み	名前からの直訳	推測（直訳）	INTEGER	24	ruler	45	45	
+SpecialRulerRotate	特殊定規	回転	名前からの直訳	推測（直訳）	INTEGER	16	ruler	1	1	
+SpecialRulerWidthRate	特殊定規	幅 比率	名前からの直訳	推測（直訳）	REAL	16	ruler	1.0	1.0	
+SpuitAroundPixel	スポイト	周囲 ピクセル	名前からの直訳	推測（直訳）	REAL	28	eyedropper	5.0	5.0	
+SpuitAroundPixelUnit	スポイト	周囲 ピクセル 単位	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+SpuitNotReferDraft	スポイト	しない 参照 下描き	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+SpuitNotReferLocked	スポイト	しない 参照 ロック	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+SpuitNotReferPaper	スポイト	しない 参照 用紙	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+SpuitNotReferText	スポイト	しない 参照 テキスト	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+SpuitReferType	スポイト	参照 方式	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	2	
+SpuitShowColorCursorByPen	スポイト	表示 色 カーソル で ペン	名前からの直訳	推測（直訳）	INTEGER	24	eyedropper	1	1	
+SpuitUseAroundPixel	スポイト	使う 周囲 ピクセル	名前からの直訳	推測（直訳）	INTEGER	28	eyedropper	0	0	
+StampAdjustPosition	コピースタンプ	調整 位置	名前からの直訳	推測（直訳）	INTEGER	8	blend	1	1	
+StampSetReferPointMode	コピースタンプ	設定 参照 点 モード	名前からの直訳	推測（直訳）	INTEGER	8	blend	0	0	
+Stickness	補正	ポストスムージング	0–10	推測	INTEGER	1678	brush,eraser,vectorEdit,?,selection,liquify,fill,ruler,balloon,blend,frame	0	10	
+StreamBrushSize	効果線	Brush サイズ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	0.5	50.0	
+StreamBrushSizeDisturb	効果線	Brush サイズ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	25	100	
+StreamBrushSizeUnit	効果線	Brush サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	2	
+StreamExtendToFrame	効果線	伸ばす へ 枠	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamGroupDisturb	効果線	まとまり 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	25	75	
+StreamGroupGap	効果線	まとまり 間隔	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	4	10	
+StreamGroupSize	効果線	まとまり サイズ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	3	10	
+StreamIntervalDisturb	効果線	間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	10	75	
+StreamJagLength	効果線	ギザギザ 長さ	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	20.0	300.0	
+StreamJagLengthUnit	効果線	ギザギザ 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	0	
+StreamJagNumber	効果線	ギザギザ 数	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	24	36	
+StreamLineLength	効果線	線 長さ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	30.0	2000.0	
+StreamLineLengthDisturb	効果線	線 長さ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	10	50	
+StreamLineLengthUnit	効果線	線 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	0	
+StreamMakeCurve	効果線	作成 曲線	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamStartGapDisturb	効果線	開始 間隔 乱れ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	10.0	1000.0	
+StreamStartGapDisturbUnit	効果線	開始 間隔 乱れ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	2	
+StreamUseBrushSizeDisturb	効果線	使う Brush サイズ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamUseGroup	効果線	使う まとまり	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamUseGroupDisturb	効果線	使う まとまり 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	1	1	
+StreamUseIntervalDisturb	効果線	使う 間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamUseJag	効果線	使う ギザギザ	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
+StreamUseLineLengthDisturb	効果線	使う 線 長さ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamUseStartGapDisturb	効果線	使う 開始 間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+SymmetryRulerLineNumber	対称定規	線 数	名前からの直訳	推測（直訳）	INTEGER	8	ruler	2	11	
+SymmetryRulerLineSymmetry	対称定規	線 対称	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
+SyncDualBrushSize	デュアルブラシ	ブラシサイズを連動	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+TextAlignment	テキスト	揃え	名前からの直訳	推測（直訳）	INTEGER	20	text	0	2	
+TextAlignmentJustify	テキスト	揃え 均等	名前からの直訳	推測（直訳）	INTEGER	15	text	0	2	
+TextAlternateHalfMetrics	テキスト	代替 半角 メトリクス	名前からの直訳	推測（直訳）	INTEGER	20	text	1	1	
+TextAntiAlias	テキスト	アンチ エイリアス	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextBackgroundAlpha	テキスト	背景 不透明度	名前からの直訳	推測（直訳）	INTEGER	20	text	100	100	
+TextBackgroundColorBlue	テキスト	背景 色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextBackgroundColorGreen	テキスト	背景 色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextBackgroundColorRed	テキスト	背景 色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextBackgroundEnabled	テキスト	背景 有効	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextColorBlue	テキスト	色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextColorGreen	テキスト	色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextColorRed	テキスト	色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextColorType	テキスト	色 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextContextualAlternate	テキスト	前後関係に依存する 代替	名前からの直訳	推測（直訳）	INTEGER	12	text	1	1	
+TextDragOperationType	テキスト	ドラッグ 操作 方式	名前からの直訳	推測（直訳）	INTEGER	19	text	0	2	
+TextEdgeColorBlue	テキスト	フチ 色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
+TextEdgeColorGreen	テキスト	フチ 色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
+TextEdgeColorRed	テキスト	フチ 色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
+TextEdgeEnabled	テキスト	フチ 有効	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextEdgeWidth	テキスト	フチ 幅	名前からの直訳	推測（直訳）	REAL	20	text	1.0	1.0	
+TextEdgeWidthUnit	テキスト	フチ 幅 単位	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextEnableHandle	テキスト	有効 ハンドル	名前からの直訳	推測（直訳）	INTEGER	21	text,operation	1	1	
+TextFastPreview	テキスト	高速 プレビュー	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextFixAspect	テキスト	固定 縦横比	名前からの直訳	推測（直訳）	INTEGER	31	text,operation	0	1	
+TextFontName	テキスト	フォント 名	名前からの直訳	推測（直訳）	TEXT	4	text			
+TextFontSize	テキスト	フォント サイズ	名前からの直訳	推測（直訳）	REAL	20	text	14.0	30.0	
+TextFontStyle	テキスト	フォント スタイル	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextFontUniqueName	テキスト	フォント 固有 名	名前からの直訳	推測（直訳）	TEXT	4	text			
+TextHorizontalRatio	テキスト	横 比率	名前からの直訳	推測（直訳）	REAL	20	text	100.0	100.0	
+TextHorizontalReverse	テキスト	横 反転	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextHorizontalSkewAngle	テキスト	横 斜体 角度	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextInsertType	テキスト	作成 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	2	2	
+TextKerningMethod	テキスト	カーニング 方法	名前からの直訳	推測（直訳）	INTEGER	15	text	0	0	
+TextLatestVersion	テキスト	最新 版	名前からの直訳	推測（直訳）	INTEGER	15	text	6	6	
+TextLayoutCircularDirection	テキスト	レイアウト 円形 方向	名前からの直訳	推測（直訳）	INTEGER	12	text	0	0	
+TextLayoutCircularEnabled	テキスト	レイアウト 円形 有効	名前からの直訳	推測（直訳）	INTEGER	12	text	0	1	
+TextLayoutCircularJustify	テキスト	レイアウト 円形 均等	名前からの直訳	推測（直訳）	INTEGER	12	text	0	0	
+TextLayoutCircularRadius	テキスト	レイアウト 円形 半径	名前からの直訳	推測（直訳）	REAL	12	text	100.0	100.0	
+TextLineSpace	テキスト	線 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	4.0	
+TextLineSpacePercent	テキスト	線 間隔 %	名前からの直訳	推測（直訳）	REAL	20	text	120.0	125.0	
+TextLineSpaceType	テキスト	線 間隔 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	1	1	
+TextOutline	テキスト	輪郭	名前からの直訳	推測（直訳）	INTEGER	16	text	1	1	
+TextOutlineEnable	テキスト	輪郭 有効	名前からの直訳	推測（直訳）	INTEGER	16	text	0	0	
+TextRotation	テキスト	回転	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextRubyAlignment	テキスト	ルビ 揃え	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextRubyDistance	テキスト	ルビ 距離	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextRubyFontName	テキスト	ルビ フォント 名	名前からの直訳	推測（直訳）	TEXT	4	text			
+TextRubyPosition	テキスト	ルビ 位置	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextRubySize	テキスト	ルビ サイズ	名前からの直訳	推測（直訳）	INTEGER	20	text	50	50	
+TextRubyWordSpace	テキスト	ルビ 字 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextRubyWordSpaceJustify	テキスト	ルビ 字 間隔 均等	名前からの直訳	推測（直訳）	INTEGER	20	text	4	4	
+TextSelectType	テキスト	選択 方式	名前からの直訳	推測（直訳）	INTEGER	19	text	0	1	
+TextStandardLigature	テキスト	標準 合字	名前からの直訳	推測（直訳）	INTEGER	19	text	1	1	
+TextTateChuYoko	テキスト	縦中横	名前からの直訳	推測（直訳）	INTEGER	20	text	2	2	
+TextTextAlignment	テキスト	テキスト 揃え	名前からの直訳	推測（直訳）	INTEGER	18	text	0	0	
+TextToolPropertyKind	テキスト	ツール プロパティ 種類	名前からの直訳	推測（直訳）	INTEGER	19	text	1	1	
+TextTransformType	テキスト	変形 方式	名前からの直訳	推測（直訳）	INTEGER	31	text,operation	0	0	
+TextTsume	テキスト	ツメ	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextVersion	テキスト	版	名前からの直訳	推測（直訳）	INTEGER	19	text	4	6	
+TextVertical	テキスト	縦	名前からの直訳	推測（直訳）	INTEGER	20	text	0	1	
+TextVerticalRatio	テキスト	縦 比率	名前からの直訳	推測（直訳）	REAL	20	text	100.0	100.0	
+TextVerticalReverse	テキスト	縦 反転	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextVerticalSkewAngle	テキスト	縦 斜体 角度	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextWordSpace	テキスト	字 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextWrapping	テキスト	折り返し	名前からの直訳	推測（直訳）	INTEGER	20	text	0	1	
+TextureBrightness	紙質	明るさ	-100–100	推測	INTEGER	1383	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	-50	80	
+TextureCompositeMode	紙質	紙質の適用方法	0 乗算, 1 比較(暗), 2 減算, 3 除算, …（推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	9	
+TextureContrast	紙質	コントラスト	-100–100	推測	INTEGER	1383	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	-70	55	
+TextureDensity	紙質	紙質濃度	%	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	8	100	
+TextureDensityEffector	紙質	紙質濃度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
+TextureForPlot	紙質	ブラシ先端ごとに紙質を適用	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+TextureImage	紙質	紙質の素材	素材の参照の列	推測	BLOB	371	brush,eraser			materials:371
+TextureReverseDensity	紙質	濃度を反転	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
+TextureRotate	紙質	回転角	度	推測	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.0	106.0	
+TextureScale	紙質	拡大率（旧形式）	%	推測	REAL	718	brush,shape,eraser,vectorEdit,balloon,frame,?,selection,ruler,fill,blend	100.0	200.0	
+TextureScale2	紙質	拡大率	%	推測	REAL	1914	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	9.0	112.0	
+TextureStressDensity	紙質	濃度を強調	0/1	推測	INTEGER	1921	brush,effectLines,eraser,shape,balloon,frame,?,vectorEdit,selection,ruler,blend,fill	0	1	
+TimeLineDragType	タイムライン	ドラッグ 方式	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
+TimeLineNext	タイムライン	次	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
+UseDualBrush	デュアルブラシ	デュアルブラシ	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
+VariantID	（内部）	設定行の ID	Node.NodeVariantID / NodeInitVariantID から参照	推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	2	1606	
+VariantShowParam	（内部）	ツールプロパティに表示する項目	項目 ID の列、subtool-items.tsv	推測	BLOB	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common			records:2515
+VariantShowSeparator	（内部）	ツールプロパティの区切り線		推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	0	0	
+VectorAddVeretexByPinch	ベクター線	加算 頂点 で つまむ	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	1	
+VectorAddVertexByLineWidth	ベクター線	加算 頂点 で 線 幅	名前からの直訳	推測（直訳）	INTEGER	20	brush,vectorEdit	1	1	
+VectorAllLayer	ベクター線	すべての レイヤー	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	1	1	
+VectorChangeCurveKind	ベクター線	変更 曲線 種類	名前からの直訳	推測（直訳）	INTEGER	2	vectorEdit	0	0	
+VectorConnectByPinch	ベクター線	連結 で つまむ	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
+VectorConnectDifferent	ベクター線	連結 異なる	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
+VectorConnectLevel	ベクター線	連結 レベル	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	10	10	
+VectorCurveKindToChange	ベクター線	曲線 種類 へ 変更	名前からの直訳	推測（直訳）	INTEGER	2	vectorEdit	1	1	
+VectorDustSize	ベクター線	ゴミ サイズ	名前からの直訳	推測（直訳）	REAL	16	vectorEdit	5.0	5.0	
+VectorDustSizeUnit	ベクター線	ゴミ サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
+VectorPinchArea	ベクター線	つまむ 範囲	名前からの直訳	推測（直訳）	REAL	8	vectorEdit	30.0	85.0	
+VectorPinchAreaUnit	ベクター線	つまむ 範囲 単位	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	0	
+VectorPinchLevel	ベクター線	つまむ レベル	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	10	50	
+VectorPinchOperation	ベクター線	つまむ 操作	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	2	
+VectorPointOperation	ベクター線	点 操作	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	1	
+VectorPointSavedAsRadio	ベクター線	点 保存 As ラジオボタン	名前からの直訳	推測（直訳）	INTEGER	1	vectorEdit	1	1	
+VectorPressureForPinchLevel	ベクター線	筆圧 の つまむ レベル	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	1	1	
+VectorSmoothCorner	ベクター線	滑らか 角	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
+VectorSmoothLevel	ベクター線	滑らか レベル	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	5	10	
+VectorUseConnect	ベクター線	使う 連結	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
+VectorUseDust	ベクター線	使う ゴミ	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
+VectorUseSmooth	ベクター線	使う 滑らか	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	0	1	
+VectorWhole	ベクター線	線全体	名前からの直訳	推測（直訳）	INTEGER	40	vectorEdit,brush	0	1	
+VectorWholeForSmooth	ベクター線	線全体 の 滑らか	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
+ZoomDragType	虫めがね	ドラッグ 方式	名前からの直訳	推測（直訳）	INTEGER	32	view	1	1	
+ZoomExpand	虫めがね	拡大	名前からの直訳	推測（直訳）	INTEGER	32	view	0	1	
+_PW_ID	（内部）	行番号		推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	1	694	
