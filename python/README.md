@@ -9,7 +9,7 @@ pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_
 ```
 
 ```python
-from csp_format import read_clip, read_cmc
+from csp_format import read_animation, read_clip, read_cmc
 
 with read_clip("page.clip") as clip:
     print(clip.canvas.width_px, clip.canvas.height_px)
@@ -23,6 +23,12 @@ with read_clip("page.clip") as clip:
             print(item.brush_size, len(item.raw_points))
         for block in clip.text_blocks(layer):     # テキスト（吹き出しごと）
             print(block.text, block.attributes.font_size)
+
+with read_clip("anim.clip") as clip:
+    animation = read_animation(clip)              # タイムラインがなければ None
+    timeline = animation.timelines[animation.current]
+    state = animation.frame_state(clip, animation.current, frame=0)   # フレームは 0 始まり
+    print(timeline.name, timeline.frame_rate, state.cels)            # フォルダー → 表示するセル
 
 with read_cmc("work.cmc") as work:
     for path in work.page_file_paths():
@@ -38,6 +44,8 @@ with read_cmc("work.cmc") as work:
 | ベクター・テキスト | `clip.vector_payloads(layer)`, `clip.vector_objects(layer)`, `clip.text_blocks(layer)` |
 | 任意のテーブル | `clip.database`（メモリー上の複製）, `clip.row(table, id)` |
 | .cmc のページ順・ページのサムネイル | `work.pages()`, `work.page_file_paths()`, `work.page_thumbnail(node)` |
+| アニメーション（タイムライン・セル・キーフレーム・2D カメラ） | `read_animation(clip)`, `animation.frame_state(clip, index, frame)`（[08 章](../docs/spec/08-animation.md)） |
+| トラックのキー（"cmt " 文書の読み書き） | `csp_format.animation.parse_document`, `document_bytes`, `unpack_chunk` |
 
 画像は `Image(width, height, rgba)`（RGBA、非乗算）。Pillow へは
 `PIL.Image.frombytes("RGBA", (image.width, image.height), bytes(image.rgba))`。
