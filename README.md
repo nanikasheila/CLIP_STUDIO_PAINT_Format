@@ -35,6 +35,7 @@ cargo build --release -p cspf
 cspf inspect FILE            # 構造の要約（JSON）。.cmc はページ一覧
 cspf layers FILE             # レイヤー一覧
 cspf schema FILE             # ファイルが持つスキーマ登録（ParamScheme）
+cspf version FILE...         # 保存した CSP の世代と、古い版でロックされる機能
 cspf check FILE...           # 自己検査（全項目）
 cspf extract FILE OUT_DIR    # レイヤー画像とマスクを PNG で
 cspf preview FILE OUT.png    # 保存されたプレビュー

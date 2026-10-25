@@ -114,6 +114,11 @@ impl ClipFile {
         Schema::read(&self.database)
     }
 
+    /// Which CSP generation saved the file (see [`crate::version`]).
+    pub fn version_info(&self) -> Result<crate::VersionInfo> {
+        crate::VersionInfo::read(&self.database, self.container.sqlite().ok())
+    }
+
     /// Re-read the typed views after changing the database.
     pub fn reload(&mut self) -> Result<()> {
         self.project = select_all(&self.database, "Project")?

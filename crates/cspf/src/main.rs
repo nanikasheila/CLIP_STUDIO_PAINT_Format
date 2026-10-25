@@ -23,6 +23,7 @@ USAGE:
   cspf inspect FILE                 structure summary as JSON (.clip / .cmc)
   cspf layers FILE                  layer tree as text
   cspf schema FILE                  CSP's schema registry (ParamScheme) as JSON
+  cspf version FILE...              which CSP generation saved each file, and what locks it
   cspf check FILE...                self-check (.clip: container, database, pixels, vectors,
                                     text, references; .cmc: page list and page files)
   cspf verify FILE...               the same as check
@@ -75,6 +76,7 @@ fn main() -> ExitCode {
         "inspect" => one_file(rest).and_then(inspect),
         "layers" => one_file(rest).and_then(layers),
         "schema" => one_file(rest).and_then(schema),
+        "version" => version(rest),
         "check" | "verify" => check(rest),
         "roundtrip" => two(rest).and_then(|(file, out)| roundtrip(&file, &out)),
         "new" => new_file(rest),
@@ -189,6 +191,24 @@ fn layers(path: PathBuf) -> Result<bool> {
             layer.opacity,
             layer.blend
         );
+    }
+    Ok(true)
+}
+
+fn version(args: &[String]) -> Result<bool> {
+    if args.is_empty() {
+        return Err(bad("expected FILE..."));
+    }
+    for file in args {
+        let data = std::fs::read(file)?;
+        let info = if csp_format::container::Container::sniff(&data) {
+            let container = csp_format::container::Container::parse(data)?;
+            let image = container.sqlite()?;
+            csp_format::VersionInfo::read(&csp_format::database::open_bytes(image)?, Some(image))?
+        } else {
+            csp_format::VersionInfo::read(&csp_format::database::open_bytes(&data)?, Some(&data))?
+        };
+        print_json(&json!({"file": file, "version": info}));
     }
     Ok(true)
 }

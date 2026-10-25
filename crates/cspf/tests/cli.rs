@@ -70,6 +70,10 @@ fn new_inspect_check_render_and_roundtrip() {
     let roundtrip: serde_json::Value = serde_json::from_str(&ok(&["roundtrip", &clip, &copy])).unwrap();
     assert_eq!(roundtrip["identical"], true);
     assert_eq!(std::fs::read(&clip).unwrap(), std::fs::read(&copy).unwrap());
+
+    let version: serde_json::Value = serde_json::from_str(&ok(&["version", &clip])).unwrap();
+    assert_eq!(version["version"]["saved_by"]["csp"], csp_format::version::GENERATIONS[0].csp);
+    assert_eq!(version["version"]["resaved"], false);
 }
 
 #[test]

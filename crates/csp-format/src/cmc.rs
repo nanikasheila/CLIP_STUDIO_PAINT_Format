@@ -133,6 +133,11 @@ impl CmcFile {
         &self.connection
     }
 
+    /// Which CSP generation saved the work file (see [`crate::version`]).
+    pub fn version_info(&self) -> Result<crate::VersionInfo> {
+        crate::VersionInfo::read(&self.connection, Some(&self.original))
+    }
+
     pub fn node(&self, main_id: i64) -> Option<&CanvasNode> {
         self.nodes.iter().find(|node| node.main_id == main_id)
     }

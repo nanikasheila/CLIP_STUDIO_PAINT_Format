@@ -20,9 +20,10 @@ from .errors import CspFormatError
 from .image import Image, decode_png
 from .text import Attributes, TextBlock
 from .vector import Point, VectorObject, parse_vector_data
+from .version import VersionInfo, read_version_info
 
 __all__ = [
     "Animation", "Attributes", "Canvas", "CanvasNode", "ClipFile", "CmcFile", "CmcProject", "Container",
     "CspFormatError", "FrameState", "Image", "Layer", "PageSlot", "Point", "TextBlock", "Timeline", "Track", "VectorObject",
-    "decode_png", "parse_vector_data", "read_animation", "read_clip", "read_cmc",
+    "VersionInfo", "decode_png", "parse_vector_data", "read_animation", "read_clip", "read_cmc", "read_version_info",
 ]

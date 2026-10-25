@@ -30,6 +30,7 @@ pub mod text;
 pub mod tone;
 pub mod vector;
 pub mod verify;
+pub mod version;
 pub mod work;
 pub mod zlib;
 
@@ -39,4 +40,5 @@ pub use create::NewCanvas;
 pub use error::{Error, Result};
 pub use image::{GrayImage, RgbaImage};
 pub use model::{Canvas, Layer, LayerKind, LayerTree};
+pub use version::VersionInfo;
 pub use work::NewWork;

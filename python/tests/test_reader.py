@@ -20,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from csp_format import CspFormatError, Image, decode_png, parse_vector_data, read_clip, read_cmc  # noqa: E402
-from csp_format import offscreen  # noqa: E402
+from csp_format import offscreen, read_version_info  # noqa: E402
 from csp_format.text import Attributes, read_blocks, split_array  # noqa: E402
 
 DATA = Path(__file__).parent / "data"
@@ -254,6 +254,44 @@ class CmcTest(unittest.TestCase):
         with self.assertRaises(CspFormatError):
             from csp_format import CmcFile
             CmcFile(b"CSFCHUNK")
+
+
+class VersionTest(unittest.TestCase):
+    def test_fixture_is_newest_generation(self):
+        with read_clip(FIXTURE) as clip:
+            info = clip.version_info()
+        self.assertEqual((info.saved_by, info.created_by, info.resaved, info.format_level), ("5.1", "5.1", False, 19))
+        self.assertEqual(info.locking_features, ())
+
+    def test_resaved_older_file_with_a_set_marker(self):
+        db = sqlite3.connect(":memory:")
+        db.executescript("""
+            CREATE TABLE ParamScheme(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, TableName TEXT, LabelName TEXT,
+                                     DataType INTEGER, Flag INTEGER, OwnerType INTEGER, LockType INTEGER,
+                                     LockSpecified INTEGER, LinkTable TEXT);
+            INSERT INTO ParamScheme(TableName, LabelName, Flag, LockType, LinkTable) VALUES
+                ('Layer', 'LayerName', 0, 0, ''), ('Layer', 'WebCooperationLayerEditable', 0, 0, ''),
+                ('Layer', 'Has1_0_7', 0, 4, ''), ('Canvas', 'CanvasWidth', 0, 0, ''),
+                ('Layer', 'Has1_0_8', 0, 4, ''), ('BrushStyle', 'BrushColorMixingMode', 0, 0, '');
+            CREATE TABLE Layer(MainId INTEGER, LayerName TEXT, Has1_0_7 INTEGER);
+            INSERT INTO Layer VALUES (1, 'a', NULL), (2, 'b', 1);
+        """)
+        info = read_version_info(db)
+        self.assertEqual((info.saved_by, info.created_by, info.resaved), ("2.1-2.x", "2.0", True))
+        self.assertEqual((info.format_level, info.needs_format_level), (8, 7))
+        self.assertEqual(info.locking_features, ("Layer.Has1_0_7",))
+
+    def test_rewritten_older_file_keeps_a_retired_label(self):
+        db = sqlite3.connect(":memory:")
+        db.executescript("""
+            CREATE TABLE ParamScheme(_PW_ID INTEGER PRIMARY KEY AUTOINCREMENT, TableName TEXT, LabelName TEXT,
+                                     Flag INTEGER, LockType INTEGER, LinkTable TEXT);
+            INSERT INTO ParamScheme(TableName, LabelName, Flag, LockType, LinkTable) VALUES
+                ('CameraInfo', 'CameraZoomWithDolly', 0, 0, ''), ('Canvas', 'CanvasWorkTime', 0, 0, ''),
+                ('Layer', 'Has1_0_12', 0, 4, '');
+        """)
+        info = read_version_info(db)
+        self.assertEqual((info.saved_by, info.created_by, info.resaved), ("3.0-4.1", None, True))
 
 
 if __name__ == "__main__":

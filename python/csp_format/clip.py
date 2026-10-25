@@ -294,6 +294,11 @@ class ClipFile:
     def close(self) -> None:
         self.database.close()
 
+    def version_info(self):
+        """Which CSP generation saved the file (:mod:`csp_format.version`)."""
+        from .version import read_version_info
+        return read_version_info(self.database, self.container.sqlite())
+
     def __enter__(self) -> "ClipFile":
         return self
 

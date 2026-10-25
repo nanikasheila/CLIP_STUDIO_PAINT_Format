@@ -86,6 +86,7 @@ class CmcFile:
         if not data.startswith(SQLITE_MAGIC):
             raise CspFormatError("not a .cmc (SQLite) file")
         self.path = path
+        self._data = data
         self.database = open_database(data)
         row = self.database.execute("SELECT * FROM Project LIMIT 1").fetchone()
         if row is None:
@@ -120,6 +121,11 @@ class CmcFile:
     def open(cls, path: str | os.PathLike) -> "CmcFile":
         path = Path(path)
         return cls(path.read_bytes(), path)
+
+    def version_info(self):
+        """Which CSP generation saved the work file (:mod:`csp_format.version`)."""
+        from .version import read_version_info
+        return read_version_info(self.database, self._data)
 
     def close(self) -> None:
         self.database.close()
