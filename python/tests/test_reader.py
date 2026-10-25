@@ -246,6 +246,9 @@ class CmcTest(unittest.TestCase):
                 first, second = work.pages()
                 self.assertIsInstance(work.page_thumbnail(first), Image)
                 self.assertIsNone(work.page_thumbnail(second))  # its file is missing
+                # Starts on the right: the single page is a right page, the spread starts on the left.
+                self.assertEqual([(s.position, s.spread, s.left) for s in work.positions()],
+                                 [(0, False, False), (1, True, True)])
 
     def test_not_a_cmc(self):
         with self.assertRaises(CspFormatError):

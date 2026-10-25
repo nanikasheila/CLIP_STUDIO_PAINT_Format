@@ -351,6 +351,28 @@ mod tests {
     }
 
     #[test]
+    fn empty_raster_layers_store_empty_blocks_like_csp() {
+        // CSP reports a raster layer whose base offscreen has no block data as
+        // damaged; its own empty layers store every block as an empty record
+        // and leave the smaller levels without (V8).
+        let file = ClipFile::create(&NewCanvas { width: 600, height: 400, ..Default::default() }).unwrap();
+        let file = ClipFile::from_bytes(file.to_bytes().unwrap()).unwrap();
+        for (layer, _) in file.layers.flatten() {
+            let mipmap = file.mipmap(layer.render_mipmap).unwrap().unwrap();
+            for (level, info) in mipmap.levels.iter().enumerate() {
+                let offscreen = file.offscreen(info.offscreen).unwrap().unwrap();
+                let stored = layer.kind == LayerKind::Raster && level == 0;
+                assert_eq!(offscreen.data.is_some(), stored, "{:?} level {level}", layer.kind);
+                if let Some(data) = &offscreen.data {
+                    assert_eq!(data.blocks.len(), 6);
+                    assert!(data.record_sizes().iter().all(|&size| size == crate::offscreen::EMPTY_RECORD_SIZE));
+                    assert_eq!(offscreen.attribute.block_sizes().unwrap(), &data.record_sizes()[..]);
+                }
+            }
+        }
+    }
+
+    #[test]
     fn layer_thumbnails_are_read_through_their_offscreen() {
         let mut file = ClipFile::create(&NewCanvas { width: 64, height: 48, ..Default::default() }).unwrap();
         let mut image = RgbaImage::new(8, 6);
