@@ -11,9 +11,18 @@
 //! are blended as premultiplied `f32` in the stored (sRGB) values. The
 //! mapping of `LayerComposite` values to modes is in [`BlendMode`]; its
 //! confidence is recorded in `docs/spec/`.
+//!
+//! Animated files are drawn at a frame ([`render_frame`], R17): only the
+//! cel an animation folder shows at that frame, keyframed layers moved by
+//! their transform and cameras applied to their folders. [`render`] draws
+//! the current frame as CSP's canvas shows it, without the camera (a
+//! keyframed layer's `LayerRenderMipmap` is not stored: CSP rebuilds it
+//! from `TimeLineOriginalMipmap`). Light-table reference layers are never
+//! drawn.
 
 use std::collections::BTreeMap;
 
+use crate::animation::{Affine, Animation, FrameState, LAYER_TYPE_LIGHT_TABLE};
 use crate::clip::ClipFile;
 use crate::correction::Correction;
 use crate::effect::{Border, LayerEffects, draw_border};
@@ -389,10 +398,31 @@ struct Renderer<'a> {
     width: usize,
     height: usize,
     report: RenderReport,
+    frame: &'a FrameState,
+    /// Inside a 2D camera folder: output canvas position → the canvas
+    /// position shown there. Pixel layers are then sampled once through
+    /// the camera (and their keyframe transform).
+    camera: Option<Affine>,
 }
 
 /// Render the canvas. The image has the canvas size × `options.scale`.
+/// An animated file is drawn at its current frame (see the module notes).
 pub fn render(file: &ClipFile, options: RenderOptions) -> Result<(RgbaImage, RenderReport)> {
+    let mut state = match Animation::read(file) {
+        Ok(Some(animation)) => {
+            let frame = animation.current_timeline().map_or(0.0, |t| t.current_frame);
+            animation.frame_state(file, animation.current, frame).unwrap_or_default()
+        }
+        _ => FrameState::default(),
+    };
+    state.cameras.clear();
+    render_frame(file, &state, options)
+}
+
+/// Render the canvas as a frame's state changes it (see
+/// [`Animation::frame_state`]). Crop to [`Animation::frame`] for what an
+/// image-sequence export shows.
+pub fn render_frame(file: &ClipFile, frame: &FrameState, options: RenderOptions) -> Result<(RgbaImage, RenderReport)> {
     let scale = options.scale.clamp(1e-3, 1.0);
     let (width, height) = match options.size {
         Some((width, height)) => (width.max(1) as usize, height.max(1) as usize),
@@ -401,7 +431,7 @@ pub fn render(file: &ClipFile, options: RenderOptions) -> Result<(RgbaImage, Ren
             ((file.canvas.height_px as f64 * scale).floor() as usize).max(1),
         ),
     };
-    let mut renderer = Renderer { file, scale, width, height, report: RenderReport::default() };
+    let mut renderer = Renderer { file, scale, width, height, report: RenderReport::default(), frame, camera: None };
     let mut canvas = Buffer::new(width, height);
     renderer.children(&file.layers.root, &mut canvas)?;
     let mut report = renderer.report;
@@ -456,7 +486,10 @@ impl Renderer<'_> {
             {
                 done.flush(target);
             }
-            if !layer.visible {
+            if !layer.visible
+                || layer.layer_type == LAYER_TYPE_LIGHT_TABLE
+                || self.frame.hidden.contains(&layer.main_id)
+            {
                 self.report.hidden += 1;
                 if !layer.clipping {
                     group = Some(Group::Empty);
@@ -473,7 +506,11 @@ impl Renderer<'_> {
                 }
                 continue;
             };
-            let mut coverage = vec![layer.opacity_fraction() as f32; self.width * self.height];
+            let opacity = match self.frame.transforms.get(&layer.main_id).and_then(|t| t.opacity) {
+                Some(opacity) => opacity as f64 / 256.0,
+                None => layer.opacity_fraction(),
+            };
+            let mut coverage = vec![opacity as f32; self.width * self.height];
             if layer.mask_enabled
                 && !content.masked
                 && let Some(mask) = self.mask(layer)?
@@ -530,6 +567,28 @@ impl Renderer<'_> {
             BlendMode::Normal
         });
         if layer.kind.is_folder() {
+            if let Some(camera) = self.frame.cameras.get(&layer.main_id).copied()
+                && self.camera.is_none()
+            {
+                // A camera shows its folder's content through its frame.
+                // Each layer is sampled through the camera on its own, as
+                // CSP does (warping the composite blurs keyframed layers
+                // twice); with layer masks inside, the composite is warped.
+                let mode = if mode == BlendMode::PassThrough { BlendMode::Normal } else { mode };
+                let mut masks = false;
+                node.walk(0, &mut |n, _| masks |= n.layer.mask_enabled && n.layer.has_mask());
+                let mut buffer = Buffer::new(self.width, self.height);
+                if masks {
+                    self.children(node, &mut buffer)?;
+                    buffer = self.warp_buffer(&buffer, &camera);
+                } else {
+                    self.camera = Some(camera);
+                    let result = self.children(node, &mut buffer);
+                    self.camera = None;
+                    result?;
+                }
+                return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
+            }
             // Pass-through (30) folders blend their children with what is
             // below; any other mode makes the folder an isolated group.
             if mode == BlendMode::PassThrough {
@@ -603,6 +662,26 @@ impl Renderer<'_> {
                 mode: Some(mode),
                 masked: false,
             }));
+        }
+        if let Some(camera) = self.camera {
+            let transform = self.frame.transforms.get(&layer.main_id).map(|t| t.map);
+            let plain = layer.kind == LayerKind::Raster && !self.effects(layer).any() && layer_colors(layer).is_none();
+            if transform.is_some() || plain {
+                let map = transform.unwrap_or(Affine::IDENTITY);
+                if let Some(buffer) = self.keyframed(layer, &map, Some(&camera))? {
+                    return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
+                }
+            }
+            // Other layers are drawn as usual and then seen through the camera.
+            self.camera = None;
+            let content = self.content(node, backdrop);
+            self.camera = Some(camera);
+            return Ok(content?.map(|c| Content { buffer: self.warp_buffer(&c.buffer, &camera), ..c }));
+        }
+        if let Some(transform) = self.frame.transforms.get(&layer.main_id)
+            && let Some(buffer) = self.keyframed(layer, &transform.map, None)?
+        {
+            return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
         }
         let effects = self.effects(layer);
         if let Some((buffer, masked)) = self.pixels(layer, &effects)? {
@@ -772,6 +851,58 @@ impl Renderer<'_> {
         }
         let Some(first) = mipmap.levels.first() else { return Ok(None) };
         Ok(self.file.offscreen(first.offscreen)?.map(|offscreen| (offscreen, first.scale / 100.0)))
+    }
+
+    /// A keyframed layer: its untransformed pixels (`TimeLineOriginalMipmap`,
+    /// placed at the layer's pixel origin) moved by `map` (original canvas
+    /// position → canvas position), sampled bilinearly, and through a
+    /// camera (output position → canvas position) when given.
+    fn keyframed(&self, layer: &Layer, map: &Affine, camera: Option<&Affine>) -> Result<Option<Buffer>> {
+        let original = layer.row.int("TimeLineOriginalMipmap");
+        let keyframed = layer.row.truthy("TimeLineLayerKeyFrameEnabled") && original != 0;
+        let mipmap = if keyframed { original } else { layer.render_mipmap };
+        let Some(offscreen) = self.file.mipmap_base(mipmap)? else { return Ok(None) };
+        if offscreen.data.is_none() {
+            return Ok(None);
+        }
+        let Some(mut inverse) = map.inverse() else { return Ok(Some(Buffer::new(self.width, self.height))) };
+        if let Some(camera) = camera {
+            inverse = inverse.then_after(camera);
+        }
+        let image = offscreen.to_rgba()?;
+        let origin = layer.pixel_origin();
+        let (w, h) = (image.width as usize, image.height as usize);
+        let fetch = |x: usize, y: usize| {
+            let p = image.pixel(x as u32, y as u32);
+            let a = p[3] as f32 / 255.0;
+            [p[0] as f32 / 255.0 * a, p[1] as f32 / 255.0 * a, p[2] as f32 / 255.0 * a, a]
+        };
+        let mut buffer = Buffer::new(self.width, self.height);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let canvas = ((x as f64 + 0.5) / self.scale, (y as f64 + 0.5) / self.scale);
+                let (sx, sy) = inverse.apply(canvas);
+                let (sx, sy) = (sx - origin.0 as f64 - 0.5, sy - origin.1 as f64 - 0.5);
+                buffer.data[y * self.width + x] = bilinear(w, h, &fetch, sx, sy);
+            }
+        }
+        Ok(Some(buffer))
+    }
+
+    /// `buffer` seen through a camera: each output position shows the
+    /// buffer at `map(position)` (canvas coordinates), sampled bilinearly.
+    fn warp_buffer(&self, buffer: &Buffer, map: &Affine) -> Buffer {
+        let fetch = |x: usize, y: usize| buffer.data[y * buffer.width + x];
+        let mut out = Buffer::new(self.width, self.height);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let canvas = ((x as f64 + 0.5) / self.scale, (y as f64 + 0.5) / self.scale);
+                let (sx, sy) = map.apply(canvas);
+                out.data[y * self.width + x] =
+                    bilinear(buffer.width, buffer.height, &fetch, sx * self.scale - 0.5, sy * self.scale - 0.5);
+            }
+        }
+        out
     }
 
     /// Place an image read at `level_scale` with its top-left at canvas
@@ -1045,6 +1176,32 @@ fn mix(target: &mut Buffer, source: &Buffer, coverage: &[f32]) {
             pixel[c] += (s[c] - pixel[c]) * k;
         }
     }
+}
+
+/// Bilinear sample of premultiplied pixels at pixel-centre coordinates
+/// (`x` = 0 is the centre of the first column); transparent outside.
+fn bilinear(width: usize, height: usize, fetch: &impl Fn(usize, usize) -> [f32; 4], x: f64, y: f64) -> [f32; 4] {
+    if !(x > -1.0 && y > -1.0 && x < width as f64 && y < height as f64) {
+        return [0.0; 4];
+    }
+    let (x0, y0) = (x.floor(), y.floor());
+    let (fx, fy) = ((x - x0) as f32, (y - y0) as f32);
+    let (x0, y0) = (x0 as i64, y0 as i64);
+    let mut out = [0.0f32; 4];
+    for (dy, wy) in [(0, 1.0 - fy), (1, fy)] {
+        for (dx, wx) in [(0, 1.0 - fx), (1, fx)] {
+            let (sx, sy) = (x0 + dx, y0 + dy);
+            let w = wx * wy;
+            if w <= 0.0 || sx < 0 || sy < 0 || sx >= width as i64 || sy >= height as i64 {
+                continue;
+            }
+            let p = fetch(sx as usize, sy as usize);
+            for c in 0..4 {
+                out[c] += p[c] * w;
+            }
+        }
+    }
+    out
 }
 
 fn gray_to_rgba(gray: &GrayImage) -> RgbaImage {

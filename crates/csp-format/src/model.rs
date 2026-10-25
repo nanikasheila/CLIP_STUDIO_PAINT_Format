@@ -336,6 +336,14 @@ impl LayerNode {
             child.walk(depth + 1, visit);
         }
     }
+
+    /// The node of a layer in this subtree.
+    pub fn find(&self, main_id: i64) -> Option<&LayerNode> {
+        if self.layer.main_id == main_id {
+            return Some(self);
+        }
+        self.children.iter().find_map(|child| child.find(main_id))
+    }
 }
 
 /// All layers and the tree they form.

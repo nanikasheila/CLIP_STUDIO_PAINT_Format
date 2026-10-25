@@ -41,6 +41,15 @@ USAGE:
   cspf render FILE OUT.png [--scale S]
                                     composite the layers (default: the preview's size)
   cspf compare FILE...              render at the preview's size and report PSNR (dB)
+  cspf anim FILE                    timelines, tracks, keys, labels and onion skin as JSON
+  cspf frames FILE OUT_DIR [--timeline N] [--from F] [--to F] [--camera yes|no] [--area frame|canvas]
+                                    render animation frames as NNNN.png (N: timeline number from 1,
+                                    default the current one; F: frame numbers as CSP shows them,
+                                    default the playback range; area: the reference frame, as
+                                    CSP's image-sequence export, or the whole canvas)
+  cspf anim-set FILE OUT [--timeline N] [--fps F] [--range FIRST-LAST] [--cels FOLDER_ID F:NAME,...]
+                                    change a timeline's frame rate or playback range (frames as
+                                    CSP shows them), or replace an animation folder's cel keys
   cspf corpus ROOT OUT.jsonl [--seconds N] [--no-reencode] [--shard K/N] [--list PATHS.txt] [--render]
                                     check every .clip / .cmc under ROOT (resumable);
                                     --render compares renders with the stored previews instead
@@ -69,6 +78,9 @@ fn main() -> ExitCode {
         "corpus" => corpus(rest),
         "render" => render(rest),
         "compare" => compare(rest),
+        "anim" => one_file(rest).and_then(anim),
+        "frames" => frames(rest),
+        "anim-set" => anim_set(rest),
         "-h" | "--help" | "help" => {
             print!("{USAGE}");
             Ok(true)
@@ -424,6 +436,107 @@ fn compare(args: &[String]) -> Result<bool> {
         println!("{}", serde_json::to_string(&result).expect("JSON"));
     }
     Ok(true)
+}
+
+fn anim(path: PathBuf) -> Result<bool> {
+    let file = ClipFile::open(&path)?;
+    match file.animation()? {
+        Some(animation) => print_json(&serde_json::to_value(&animation).expect("JSON")),
+        None => print_json(&json!(null)),
+    }
+    Ok(true)
+}
+
+/// The timeline index (0-based) for `--timeline N` (from 1), or the current one.
+fn timeline_index(animation: &csp_format::animation::Animation, value: Option<&str>) -> Result<usize> {
+    match value {
+        None => Ok(animation.current),
+        Some(text) => {
+            let n: usize = text.parse().map_err(|_| bad("--timeline is a number from 1"))?;
+            if n == 0 || n > animation.timelines.len() {
+                return Err(bad(format!("--timeline: the file has {} timelines", animation.timelines.len())));
+            }
+            Ok(n - 1)
+        }
+    }
+}
+
+fn frames(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--timeline", "--from", "--to", "--camera", "--area"]);
+    let [file, out] = positional.as_slice() else { return Err(bad("expected FILE OUT_DIR")) };
+    let get = |name: &str| found.iter().find(|(n, _)| *n == name).map(|(_, v)| *v);
+    let clip = ClipFile::open(file)?;
+    let animation = clip.animation()?.ok_or_else(|| bad("the file has no timeline"))?;
+    let index = timeline_index(&animation, get("--timeline"))?;
+    let timeline = &animation.timelines[index];
+    let number = |name: &str, default: i64| -> Result<i64> {
+        get(name).map_or(Ok(default), |v| v.parse().map_err(|_| bad(format!("{name} is a frame number"))))
+    };
+    let first = number("--from", timeline.start_frame as i64 + 1)?;
+    let last = number("--to", timeline.end_frame as i64)?;
+    let camera = !matches!(get("--camera"), Some("no" | "off" | "false" | "0"));
+    let canvas_area = get("--area") == Some("canvas");
+    std::fs::create_dir_all(out)?;
+    let mut written = 0;
+    let mut unknown = std::collections::BTreeSet::new();
+    for (n, frame) in (first..=last).enumerate() {
+        let mut state = animation.frame_state(&clip, index, (frame - 1) as f64)?;
+        if !camera {
+            state.cameras.clear();
+        }
+        unknown.extend(state.unknown_interp.iter().cloned());
+        let (image, _) = csp_format::render::render_frame(&clip, &state, Default::default())?;
+        let image = if canvas_area {
+            image
+        } else {
+            let area = animation.frame;
+            let mut cropped = csp_format::RgbaImage::new(area.width.round() as u32, area.height.round() as u32);
+            cropped.paste(&image, -(area.x.round() as i64), -(area.y.round() as i64));
+            cropped
+        };
+        std::fs::write(Path::new(out).join(format!("{n:04}.png")), image.to_png()?)?;
+        written += 1;
+    }
+    print_json(&json!({
+        "timeline": timeline.name, "frames": written, "first": first, "last": last,
+        "camera": camera, "unknown_interpolation": unknown,
+    }));
+    Ok(true)
+}
+
+fn anim_set(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--timeline", "--fps", "--range", "--cels"]);
+    let get = |name: &str| found.iter().find(|(n, _)| *n == name).map(|(_, v)| *v);
+    let mut positional = positional.into_iter();
+    let (Some(file), Some(out)) = (positional.next(), positional.next()) else {
+        return Err(bad("expected FILE OUT"));
+    };
+    let mut clip = ClipFile::open(file)?;
+    let animation = clip.animation()?.ok_or_else(|| bad("the file has no timeline"))?;
+    let index = timeline_index(&animation, get("--timeline"))?;
+    let timeline_id = animation.timelines[index].main_id;
+    if let Some(value) = get("--fps") {
+        clip.set_frame_rate(timeline_id, value.parse().map_err(|_| bad("--fps is a number"))?)?;
+    }
+    if let Some(value) = get("--range") {
+        let (a, b) = value.split_once('-').ok_or_else(|| bad("--range is FIRST-LAST"))?;
+        let first: i64 = a.parse().map_err(|_| bad("--range is FIRST-LAST"))?;
+        let last: i64 = b.parse().map_err(|_| bad("--range is FIRST-LAST"))?;
+        clip.set_frame_range(timeline_id, first - 1, last)?;
+    }
+    if let Some(folder) = get("--cels") {
+        let folder: i64 = folder.parse().map_err(|_| bad("--cels FOLDER_ID F:NAME,..."))?;
+        let list = positional.next().ok_or_else(|| bad("--cels FOLDER_ID F:NAME,..."))?;
+        let mut keys = Vec::new();
+        for item in list.split(',') {
+            let (frame, name) = item.split_once(':').ok_or_else(|| bad("cel keys are F:NAME"))?;
+            let frame: i64 = frame.parse().map_err(|_| bad("cel keys are F:NAME"))?;
+            keys.push((frame - 1, name.to_owned()));
+        }
+        clip.set_cel_keys(timeline_id, folder, &keys)?;
+    }
+    clip.reload()?;
+    finish(clip, out, json!({"file": out, "timeline": timeline_id}))
 }
 
 /// Stable short key of a path relative to the corpus root (FNV-1a).
