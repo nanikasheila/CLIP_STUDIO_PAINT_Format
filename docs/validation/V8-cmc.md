@@ -95,6 +95,7 @@ e5 で操作し、そのたびに `.cmc` とページのファイルを比べた
 - そのほか: `Canvas3DModelDataLoaderIndex` が 2 に、`CanvasSimulate*`・`CanvasUseColorAdjustment` が NULL に（CSP の保存の既定）。`.cmc` には `Link*` の列が足される
 
 作品情報のレイヤーは、ページを開いただけでは作られない（w1 の 1 ページ目を開いて保存しても、ページのファイルは変わらなかった）。
+ページの `Canvas` に `Comic(Story|Nombre)(Right)?LayerCreated` を 0 で書いた作品（w4、350 dpi、4 ページ、見開き）でも、ページを開いて作られることはなかった。
 
 ### 見つかった誤り（直した）
 
