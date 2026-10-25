@@ -8,8 +8,8 @@
 
 | 範囲 | 列 | 確認済み | 推測 | 未解明 |
 |---|---|---|---|---|
-| コア（Project、Canvas、Layer、Offscreen、VOffscreen、Mipmap、MipmapInfo、LayerThumbnail、CanvasPreview、VectorObjectList、ExternalChunk、CanvasNode） | 618 | 242 | 376 | 0 |
-| すべて | 1385 | 393 | 754 | 238 |
+| コア（Project、Canvas、Layer、Offscreen、VOffscreen、Mipmap、MipmapInfo、LayerThumbnail、CanvasPreview、VectorObjectList、ExternalChunk、CanvasNode） | 618 | 246 | 372 | 0 |
+| すべて | 1385 | 427 | 756 | 202 |
 
 ## 見方
 
@@ -28,10 +28,10 @@
 |---|---|---|---|---|---|---|---|
 | _PW_ID | 未登録 |  | .clip 719/719 | 1 | ○ | 確認済み | SQLite の行 ID（AUTOINCREMENT）。参照には使われない |
 | MainId | 未登録 |  | .clip 719/719 | 2 | ○ | 確認済み | 行の ID。ほかの表のリンク列はこの値を指す。ElemScheme.MaxIndex が次の値の上限を持つ（飛び番あり） |
-| CurrentIndex | 整数 |  | .clip 719/0 | 0 | ○ | 推測 | アニメーションのカット: 選んでいるカット、使うか、最初のシナリオとタイムライン、1.5.5 の機能の印。コーパスでは常に 0 |
-| Enable | 整数 |  | .clip 719/0 | 0 | ○ | 推測 | アニメーションのカット: 選んでいるカット、使うか、最初のシナリオとタイムライン、1.5.5 の機能の印。コーパスでは常に 0 |
+| CurrentIndex | 整数 |  | .clip 719/0 | 0 | ○ | 確認済み | 今のタイムライン（FirstTimeLine からの連結リストの 0 始まりの位置） |
+| Enable | 整数 |  | .clip 719/0 | 0 | ○ | 推測 | アニメーションを使うファイルで 1 |
 | FirstScenario | 整数 | Scenario | .clip 719/0 | 0 | ○ | 推測 | アニメーションのカット: 選んでいるカット、使うか、最初のシナリオとタイムライン、1.5.5 の機能の印。コーパスでは常に 0 |
-| FirstTimeLine | 整数 | TimeLine | .clip 719/0 | 0 | ○ | 推測 | アニメーションのカット: 選んでいるカット、使うか、最初のシナリオとタイムライン、1.5.5 の機能の印。コーパスでは常に 0 |
+| FirstTimeLine | 整数 | TimeLine | .clip 719/0 | 0 | ○ | 確認済み | 最初のタイムライン（TimeLine.MainId）。アニメーションのないファイルでは 0 |
 | FlagScenarioV155 | 整数 |  | .clip 719/0 |  |  | 推測 | アニメーションのカット: 選んでいるカット、使うか、最初のシナリオとタイムライン、1.5.5 の機能の印。コーパスでは常に 0 |
 
 ## BrushEffectorGraphData
@@ -44,7 +44,7 @@
 | MainId | 未登録 |  | .clip 479/475 | 1〜85（40+ 種） | ○ | 確認済み | 行の ID。ほかの表のリンク列はこの値を指す。ElemScheme.MaxIndex が次の値の上限を持つ（飛び番あり） |
 | CanvasId | 整数 |  | .clip 479/475 | 1〜2（2 種） | ○ | 確認済み | 属するキャンバス（Canvas.MainId）。.clip ではふつう 1、まれに 2 |
 | ControlDataSize | 整数 |  | .clip 479/475 | 16 |  | 推測 | 影響のグラフの制御点の数、1 点の大きさ（16 バイト）、制御点（BLOB） |
-| ControlNumber | 整数 |  | .clip 479/475 | 2〜11（9 種） |  | 推測 | 影響のグラフの制御点の数、1 点の大きさ（16 バイト）、制御点（BLOB） |
+| ControlNumber | 整数 |  | .clip 479/475 | 2〜11（9 種） | ○ | 推測 | 影響のグラフの制御点の数、1 点の大きさ（16 バイト）、制御点（BLOB） |
 | ControlPoints | BLOB |  | .clip 479/475 | 長さ ≤ 176 | ○ | 推測 | 影響のグラフの制御点の数、1 点の大きさ（16 バイト）、制御点（BLOB） |
 | NextIndex | 整数 |  | .clip 479/418 | 0〜85（40+ 種） | ○ | 確認済み | 同じ並びの次の行の MainId（連結リスト、0 で終わり） |
 
@@ -70,7 +70,7 @@
 | MainId | 未登録 |  | .clip 389/389 | 1〜37（32 種） | ○ | 確認済み | 行の ID。ほかの表のリンク列はこの値を指す。ElemScheme.MaxIndex が次の値の上限を持つ（飛び番あり） |
 | CanvasId | 整数 |  | .clip 389/389 | 1〜2（2 種） | ○ | 確認済み | 属するキャンバス（Canvas.MainId）。.clip ではふつう 1、まれに 2 |
 | Mipmap | 整数 | Mipmap | .clip 389/389 | 6〜2021（40+ 種） | ○ | 推測 | ブラシ先端・紙質の画像（Mipmap.MainId）、名前、UUID |
-| Name | 文字列 |  | .clip 389/389 | 長さ ≤ 18 |  | 推測 | ブラシ先端・紙質の画像（Mipmap.MainId）、名前、UUID |
+| Name | 文字列 |  | .clip 389/389 | 長さ ≤ 18 | ○ | 推測 | ブラシ先端・紙質の画像（Mipmap.MainId）、名前、UUID |
 | NextIndex | 整数 |  | .clip 389/127 | 0〜37（29 種） | ○ | 確認済み | 同じ並びの次の行の MainId（連結リスト、0 で終わり） |
 | Uuid | BLOB |  | .clip 389/389 | 長さ ≤ 16 |  | 推測 | ブラシ先端・紙質の画像（Mipmap.MainId）、名前、UUID |
 
@@ -128,11 +128,11 @@
 | OpacityEffector | 未登録 |  | .clip 526/526 | 長さ ≤ 16 | ○ | 推測 | サイズ・不透明度への筆圧などの影響（BLOB: u32 フラグ、0x10 筆圧なら f32 最小値と u32 グラフ BrushEffectorGraphData.MainId）。ベクターの描画の近似で使う |
 | PatternStyle | 整数 | BrushPatternStyle | .clip 526/232 | 0〜18（18 種） |  | 推測 | ブラシ先端の画像（BrushPatternStyle）、点に使うミップマップの段、固定の散布 |
 | PenRadius | 実数 |  | .clip 460/39 | 0〜125（40+ 種） |  | 推測 | ペンの半径 |
-| RotationBase | 実数 |  | .clip 526/413 | 0〜360（40+ 種） |  | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
-| RotationEffector | 整数 |  | .clip 526/525 | 0〜195（8 種） |  | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
+| RotationBase | 実数 |  | .clip 526/413 | 0〜360（40+ 種） | ○ | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
+| RotationEffector | 整数 |  | .clip 526/525 | 0〜195（8 種） | ○ | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
 | RotationEffectorInSpray | 整数 |  | .clip 526/524 | 0〜195（6 種） |  | 推測 | 散布の粒子の向き |
 | RotationInSprayBase | 実数 |  | .clip 526/227 | 0〜360（18 種） |  | 推測 | 散布の粒子の向き |
-| RotationRandom | 実数 |  | .clip 526/526 | 0〜1（16 種） |  | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
+| RotationRandom | 実数 |  | .clip 526/526 | 0〜1（16 種） | ○ | 推測 | 先端の向き、向きの影響（ビット）、ランダムの量 |
 | RotationRandomInSpray | 実数 |  | .clip 526/526 | 0.47〜1（2 種） |  | 推測 | 散布の粒子の向き |
 | SaturationChangeBase | 実数 |  | .clip 513/0 | 0 |  | 推測 | 色の揺らぎ（色相・彩度・明度）とその影響 |
 | SaturationChangeEffector | BLOB |  | .clip 513/513 | 長さ ≤ 8 |  | 推測 | 色の揺らぎ（色相・彩度・明度）とその影響 |
@@ -143,7 +143,7 @@
 | SprayFlag | 整数 |  | .clip 526/10 | 0〜17（3 種） |  | 推測 | 散布（粒子の大きさ・密度・偏り・設定のビット）とその影響 |
 | SpraySizeBase | 実数 |  | .clip 526/526 | 0.7167〜8.3（17 種） |  | 推測 | 散布（粒子の大きさ・密度・偏り・設定のビット）とその影響 |
 | SpraySizeEffector | BLOB |  | .clip 526/526 | 長さ ≤ 8 |  | 推測 | 散布（粒子の大きさ・密度・偏り・設定のビット）とその影響 |
-| StyleFlag | 整数 |  | .clip 526/526 | 49152〜770048（32 種） |  | 推測 | 設定のビット（49152〜770048） |
+| StyleFlag | 整数 |  | .clip 526/526 | 49152〜770048（32 種） | ○ | 推測 | 設定のビット（49152〜770048） |
 | SubColorBase | 実数 |  | .clip 526/0 | 0 |  | 推測 | 混色（下の色を混ぜる量）、色延び、サブ色の混ぜ方とその影響 |
 | SubColorEffector | BLOB |  | .clip 526/526 | 長さ ≤ 12 |  | 推測 | 混色（下の色を混ぜる量）、色延び、サブ色の混ぜ方とその影響 |
 | TextureBrightness | 実数 |  | .clip 513/175 | -0.5〜0.5（8 種） |  | 推測 | 紙質（テクスチャの画像 BrushPatternImage、濃度・倍率・回転・明るさ・コントラスト・合成） |
@@ -157,8 +157,8 @@
 | TexturePattern | 整数 | BrushPatternImage | .clip 526/286 | 0〜36（20 種） |  | 推測 | 紙質（テクスチャの画像 BrushPatternImage、濃度・倍率・回転・明るさ・コントラスト・合成） |
 | TextureRotate | 実数 |  | .clip 526/88 | 0〜360（40+ 種） |  | 推測 | 紙質（テクスチャの画像 BrushPatternImage、濃度・倍率・回転・明るさ・コントラスト・合成） |
 | TextureScale | 実数 |  | .clip 526/526 | 0.03446〜1.45（40+ 種） |  | 推測 | 紙質（テクスチャの画像 BrushPatternImage、濃度・倍率・回転・明るさ・コントラスト・合成） |
-| ThicknessBase | 実数 |  | .clip 526/526 | 0.05〜2.39（27 種） |  | 推測 | ブラシサイズの倍率（Base）と、筆圧などの影響（Effector、BLOB） |
-| ThicknessEffector | BLOB |  | .clip 526/526 | 長さ ≤ 24 |  | 推測 | ブラシサイズの倍率（Base）と、筆圧などの影響（Effector、BLOB） |
+| ThicknessBase | 実数 |  | .clip 526/526 | 0.05〜2.39（27 種） | ○ | 推測 | ブラシサイズの倍率（Base）と、筆圧などの影響（Effector、BLOB） |
+| ThicknessEffector | BLOB |  | .clip 526/526 | 長さ ≤ 24 | ○ | 推測 | ブラシサイズの倍率（Base）と、筆圧などの影響（Effector、BLOB） |
 | UseWaterColor | 整数 |  | .clip 526/0 | 0 |  | 推測 | 水彩境界（半径・強さ・透明度と明るさの影響・ぼかし）と水彩の種類 |
 | ValueChangeBase | 実数 |  | .clip 513/2 | -0.05〜0.1（3 種） |  | 推測 | 色の揺らぎ（色相・彩度・明度）とその影響 |
 | ValueChangeEffector | BLOB |  | .clip 513/513 | 長さ ≤ 12 |  | 推測 | 色の揺らぎ（色相・彩度・明度）とその影響 |
@@ -339,16 +339,16 @@
 | ComicStoryXPageNombreOffsetUnit | 未登録 |  | .clip 534/534 | 2 | ○ | 推測 | ノンブルの仕上がり線からの距離と単位 |
 | ComicStoryYPageNombreOffset | 実数 |  | .clip 534/534 | 5 | ○ | 推測 | ノンブルの仕上がり線からの距離と単位 |
 | ComicStoryYPageNombreOffsetUnit | 整数 |  | .clip 534/534 | 2 | ○ | 推測 | ノンブルの仕上がり線からの距離と単位 |
-| CropFrameCropOffsetX | 整数 |  | .clip 467/2 | 0〜0.1654（2 種） |  | 推測 | 仕上がりの位置のずれ |
-| CropFrameCropOffsetY | 整数 |  | .clip 467/2 | 0〜0.2126（2 種） |  | 推測 | 仕上がりの位置のずれ |
+| CropFrameCropOffsetX | 整数 |  | .clip 467/2 | 0〜0.1654（2 種） | ○ | 推測 | 仕上がりの位置のずれ |
+| CropFrameCropOffsetY | 整数 |  | .clip 467/2 | 0〜0.2126（2 種） | ○ | 推測 | 仕上がりの位置のずれ |
 | CropFrameDesignationType | 整数 |  | .clip 467/465 | 1 |  | 推測 | トンボの指定の方法 |
 | CropFrameDitch | 実数 |  | .clip 467/463 | 0〜118（6 種） |  | 確認済み | 裁ち落とし幅 |
-| CropFrameHeight | 実数 |  | .clip 467/465 | 55〜7016（17 種） |  | 確認済み | 仕上がりの大きさ（CropFrameUnitKind の単位） |
-| CropFrameInnerHeight | 実数 |  | .clip 467/465 | 49〜6331（16 種） |  | 確認済み | 基本枠の大きさ |
+| CropFrameHeight | 実数 |  | .clip 467/465 | 55〜7016（17 種） | ○ | 確認済み | 仕上がりの大きさ（CropFrameUnitKind の単位） |
+| CropFrameInnerHeight | 実数 |  | .clip 467/465 | 49〜6331（16 種） | ○ | 確認済み | 基本枠の大きさ |
 | CropFrameInnerOffsetBasePosition | 整数 |  | .clip 467/402 | 0〜4（3 種） |  | 推測 | 基本枠の位置（基準の位置とずれ） |
-| CropFrameInnerOffsetX | 実数 |  | .clip 467/0 | 0 |  | 推測 | 基本枠の位置（基準の位置とずれ） |
-| CropFrameInnerOffsetY | 実数 |  | .clip 467/0 | 0 |  | 推測 | 基本枠の位置（基準の位置とずれ） |
-| CropFrameInnerWidth | 実数 |  | .clip 467/465 | 85〜4252（15 種） |  | 確認済み | 基本枠の大きさ |
+| CropFrameInnerOffsetX | 実数 |  | .clip 467/0 | 0 | ○ | 推測 | 基本枠の位置（基準の位置とずれ） |
+| CropFrameInnerOffsetY | 実数 |  | .clip 467/0 | 0 | ○ | 推測 | 基本枠の位置（基準の位置とずれ） |
+| CropFrameInnerWidth | 実数 |  | .clip 467/465 | 85〜4252（15 種） | ○ | 確認済み | 基本枠の大きさ |
 | CropFrameMergeDitch | 実数 |  | .clip 467/73 | -1〜2.34（6 種） |  | 推測 | 見開きの合わせの幅（−1 は既定） |
 | CropFrameOptionFlag | 整数 |  | .clip 467/464 | 0〜514（8 種） |  | 推測 | トンボの細かい設定（ビット）。単ページの左 2、右 4、見開き 17 |
 | CropFrameSafeMarginBottom | 整数 |  | .clip 467/0 | 0 |  | 推測 | 安全マージン（上下左右） |
@@ -356,8 +356,8 @@
 | CropFrameSafeMarginRight | 整数 |  | .clip 467/0 | 0 |  | 推測 | 安全マージン（上下左右） |
 | CropFrameSafeMarginTop | 整数 |  | .clip 467/0 | 0 |  | 推測 | 安全マージン（上下左右） |
 | CropFrameShow | 整数 |  | .clip 541/440 | 0〜1（2 種） |  | 推測 | トンボを表示する |
-| CropFrameUnitKind | 整数 |  | .clip 467/459 | 0〜2（2 種） |  | 確認済み | トンボの単位（CanvasUnit と同じ番号） |
-| CropFrameWidth | 実数 |  | .clip 467/465 | 91〜4961（20 種） |  | 確認済み | 仕上がりの大きさ（CropFrameUnitKind の単位） |
+| CropFrameUnitKind | 整数 |  | .clip 467/459 | 0〜2（2 種） | ○ | 確認済み | トンボの単位（CanvasUnit と同じ番号） |
+| CropFrameWidth | 実数 |  | .clip 467/465 | 91〜4961（20 種） | ○ | 確認済み | 仕上がりの大きさ（CropFrameUnitKind の単位） |
 | GridDitch | 実数 |  | .clip 19/19 | 5〜1000（6 種） |  | 推測 | グリッド（間隔・分割数・原点と単位） |
 | GridDitchUnit | 整数 |  | .clip 19/13 | 0〜2（2 種） |  | 推測 | グリッド（間隔・分割数・原点と単位） |
 | GridDivide | 整数 |  | .clip 19/19 | 1〜10（4 種） |  | 推測 | グリッド（間隔・分割数・原点と単位） |
@@ -372,21 +372,21 @@
 | LightTableReferCommonOpacity | 整数 |  | — |  |  | 推測 | ライトテーブル（アニメーション）の設定と回転の中心 |
 | LightTableRotateCenterX | 実数 |  | .clip 1/1 | 1654 |  | 推測 | ライトテーブル（アニメーション）の設定と回転の中心 |
 | LightTableRotateCenterY | 実数 |  | .clip 1/1 | 2338 |  | 推測 | ライトテーブル（アニメーション）の設定と回転の中心 |
-| OnionSkinBehindColorBlue | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinBehindColorGreen | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinBehindColorRed | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinFrontColorBlue | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinFrontColorGreen | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinFrontColorRed | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinHalfColor | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinNextDisplayCount | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinPrevDisplayCount | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinBehindColorBlue | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinBehindColorGreen | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinBehindColorRed | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinFrontColorBlue | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinFrontColorGreen | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinFrontColorRed | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinHalfColor | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinNextDisplayCount | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinPrevDisplayCount | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
 | OnionSkinSettingRegisted | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinStartOpacity | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinStatus | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinStepOpaciy | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinUseColor | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
-| OnionSkinUseOpacity | 整数 |  | — |  |  | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinStartOpacity | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinStatus | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinStepOpaciy | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinUseColor | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
+| OnionSkinUseOpacity | 整数 |  | — |  | ○ | 推測 | オニオンスキン（前後のセルの色・数・不透明度） |
 | RulerRotateCenterX | 実数 |  | — |  |  | 推測 | 定規の回転の中心 |
 | RulerRotateCenterY | 実数 |  | — |  |  | 推測 | 定規の回転の中心 |
 | SafeFrameShow | 未登録 |  | .clip 540/95 | 0〜1（2 種） |  | 推測 | 安全マージンの枠を表示する |
@@ -482,7 +482,7 @@
 |---|---|---|---|---|---|---|---|
 | BankId | 整数 |  | — |  |  | 未解明 |  |
 | ItemBinaryData | BLOB | 外部チャンク | — |  | ○ | 未解明 |  |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
+| ItemId | 整数 |  | — |  | ○ | 未解明 |  |
 
 ## CanvasNode
 
@@ -511,7 +511,7 @@
 | LinkWriteSecond | 整数 |  | .cmc 25/25 | 0〜813641830（40+ 種） |  | 推測 | ページのファイルの保存日時（年月日時分秒）。古い形式では値が崩れていることがある |
 | LinkWriteYear | 整数 |  | .cmc 25/25 | 0〜816591073（8 種） |  | 推測 | ページのファイルの保存日時（年月日時分秒）。古い形式では値が崩れていることがある |
 | Memo | 文字列 |  | .cmc 42/0 |  |  | 推測 | ページのメモと製本のメモ。コーパスでは空 |
-| Name | 文字列 |  | — |  |  | 推測 | ページの名前とサムネイル。コーパスでは未設定 |
+| Name | 文字列 |  | — |  | ○ | 推測 | ページの名前とサムネイル。コーパスでは未設定 |
 | NextIndex | 整数 |  | .cmc 42/42 | 0〜47（40+ 種） | ○ | 確認済み | 同じ並びの次の行の MainId（連結リスト、0 で終わり） |
 | PageFlag | 整数 |  | .cmc 42/40 | 0〜1（2 種） | ○ | 確認済み | 1 で見開きのページ |
 | SelectedIndex | 整数 |  | .cmc 42/42 | 0〜4（4 種） | ○ | 確認済み | 選んでいるページ（CanvasNode.MainId） |
@@ -590,7 +590,7 @@
 | CanvasId | 整数 |  | .clip 199/199 | 1 | ○ | 確認済み | 属するキャンバス（Canvas.MainId）。.clip ではふつう 1、まれに 2 |
 | CompositeMode | 整数 |  | .clip 199/183 | 0〜31（3 種） |  | 推測 | 塗りのアンチエイリアス・合成モード・設定のビット・テクスチャの濃度 |
 | NextIndex | 整数 |  | .clip 199/172 | 0〜87（12 種） | ○ | 確認済み | 同じ並びの次の行の MainId（連結リスト、0 で終わり） |
-| StyleFlag | 整数 |  | .clip 199/0 | 0 |  | 推測 | 塗りのアンチエイリアス・合成モード・設定のビット・テクスチャの濃度 |
+| StyleFlag | 整数 |  | .clip 199/0 | 0 | ○ | 推測 | 塗りのアンチエイリアス・合成モード・設定のビット・テクスチャの濃度 |
 | TextureDensity | 整数 |  | .clip 199/199 | 1 |  | 推測 | 塗りのアンチエイリアス・合成モード・設定のビット・テクスチャの濃度 |
 
 ## FolderInfo
@@ -619,7 +619,7 @@
 | AnimationCaptionAttribute | BLOB |  | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
 | AnimationCaptionUseAttributeType | 整数 |  | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
 | AnimationCelCurrentUuid | 文字列 |  | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
-| AnimationFolder | 整数 |  | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
+| AnimationFolder | 整数 |  | — |  | ○ | 確認済み | アニメーションフォルダー（子のレイヤーがセル） |
 | AudioLayer | 整数 |  | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
 | BankItemUuid | 文字列 |  | .clip 15/10 | 長さ ≤ 144 |  | 推測 | 素材として登録したときの UUID |
 | Camera2DApplyTransform | 整数 |  | — |  |  | 推測 | 2D カメラ（アニメーション） |
@@ -736,7 +736,7 @@
 | LayerUuid | 文字列 |  | .clip 719/719 | 長さ ≤ 36 | ○ | 確認済み | レイヤーの UUID（36 文字） |
 | LayerVisibility | 整数 |  | .clip 719/719 | 0〜7（7 種） | ○ | 確認済み | ビット 0 表示、ビット 1 マスクを使う、ビット 2 パレットでマスクを選んでいる（推測） |
 | LightTableInfo | BLOB |  | .clip 171/171 | 長さ ≤ 15 | ○ | 確認済み | ライトテーブルの設定（BLOB、15 バイト）。CSP は新しいレイヤーでは NULL にする |
-| LightTableReferCell | 整数 |  | — |  |  | 推測 | 参照レイヤー（塗りの参照先）とライトテーブルの参照 |
+| LightTableReferCell | 整数 |  | — |  |  | 確認済み | ライトテーブルの参照レイヤー（LayerType 10016、パレットに出ない。描かない）の印 |
 | LinkLayerInfo | BLOB |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
 | LinkLayerItemUUID | 文字列 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
 | LinkLayerLastModifiedCount | 整数 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
@@ -747,7 +747,7 @@
 | LinkLayerTime | 実数 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
 | LinkLayerTimeForTimeLine | 実数 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
 | LinkLayerTimeLine | 文字列 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
-| LinkLayerUUID | 文字列 |  | — |  |  | 推測 | リンクしたレイヤー（他のファイルの参照） |
+| LinkLayerUUID | 文字列 |  | — |  |  | 推測 | ライトテーブルの参照レイヤーが指すレイヤーの LayerUuid |
 | Manager3D | 整数 | Manager3D | — |  |  | 推測 | 3D 空間（Manager3D / Manager3DOd の MainId） |
 | Manager3DOd | 整数 | Manager3DOd | .clip 15/10 | 1〜4（4 種） | ○ | 推測 | 3D 空間（Manager3D / Manager3DOd の MainId） |
 | MaskBoundForLayerMoveType | 整数 |  | .clip 195/180 | 40 |  | 推測 | マスクの描き方の種類（コマ枠フォルダーで 21・10・40） |
@@ -771,7 +771,7 @@
 | ResizableBlackIndex | 整数 |  | .clip 58/15 | 0〜3（4 種） |  | 推測 | 画像素材の黒の扱いと変形のロック |
 | ResizableImageInfo | BLOB |  | .clip 130/127 | 長さ ≤ 184 | ○ | 確認済み | 画像素材の変形（BLOB: 元の大きさ、変形の行列） |
 | ResizableLockFlag | 整数 |  | — |  |  | 推測 | 画像素材の黒の扱いと変形のロック |
-| ResizableOriginalMipmap | 整数 | Mipmap | .clip 130/127 | 6〜1384（40+ 種） |  | 確認済み | 画像素材の元の画素（Mipmap.MainId） |
+| ResizableOriginalMipmap | 整数 | Mipmap | .clip 130/127 | 6〜1384（40+ 種） | ○ | 確認済み | 画像素材の元の画素（Mipmap.MainId） |
 | RulerRange | 整数 |  | .clip 223/19 | 0〜2（3 種） |  | 推測 | 定規の表示範囲（0〜2、値の意味は未確認） |
 | RulerVectorIndex | 整数 | VectorObjectList | .clip 1/0 |  |  | 推測 | 定規のベクター（VectorObjectList.MainId） |
 | SetMaskThumbnailInfoType | 整数 |  | — |  |  | 推測 | マスクの描き方の種類（コマ枠フォルダーで 21・10・40） |
@@ -791,7 +791,7 @@
 | TextLayerStringArray | BLOB |  | .clip 486/412 | 長さ ≤ 5237 | ○ | 確認済み | テキストの文字列の配列（複数の文字列） |
 | TextLayerType | 整数 |  | .clip 486/427 | 0〜2（3 種） |  | 推測 | テキストの形式の版、種類（0〜2、値の意味は未確認）、レイヤー名を文字列に合わせる |
 | TextLayerVersion | 整数 |  | .clip 486/88 | 16814081 |  | 推測 | テキストの形式の版、種類（0〜2、値の意味は未確認）、レイヤー名を文字列に合わせる |
-| TimeLineLayerKeyFrameEnabled | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
+| TimeLineLayerKeyFrameEnabled | 整数 |  | — |  | ○ | 確認済み | レイヤーのキーフレームが有効（変形は TimeLineOriginalMipmap に掛ける） |
 | TimeLineMaskExtentBottom | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineMaskExtentLeft | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineMaskExtentRight | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
@@ -803,9 +803,9 @@
 | TimeLineMaskOriginalOffsetY | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineMaskOriginalRight | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineMaskOriginalTop | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
-| TimeLineOriginalLayerOpacity | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
+| TimeLineOriginalLayerOpacity | 整数 |  | — |  |  | 推測 | キーフレームを有効にする前の不透明度 |
 | TimeLineOriginalMaskMipmap | 整数 | Mipmap | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
-| TimeLineOriginalMipmap | 整数 | Mipmap | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
+| TimeLineOriginalMipmap | 整数 | Mipmap | — |  | ○ | 確認済み | キーフレームの変形前の画素（Mipmap.MainId）。LayerRenderMipmap は保存されず CSP が開くときに作る |
 | TimeLineRenderExtentBottom | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineRenderExtentLeft | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
 | TimeLineRenderExtentRight | 整数 |  | — |  |  | 推測 | タイムラインのキーフレームと、変形前の範囲・画素 |
@@ -825,7 +825,7 @@
 | VectorNormalFill | BLOB |  | — |  |  | 推測 | ベクターのデータ（旧形式、BLOB）。コーパスでは未設定 |
 | VectorNormalFillIndex | 整数 | VectorObjectList | .clip 604/22 | 0〜69（36 種） |  | 確認済み | ベクターの線・塗り・フキダシのデータ（VectorObjectList.MainId） |
 | VectorNormalStroke | BLOB |  | — |  |  | 推測 | ベクターのデータ（旧形式、BLOB）。コーパスでは未設定 |
-| VectorNormalStrokeIndex | 整数 | VectorObjectList | .clip 604/511 | 0〜243（40+ 種） |  | 確認済み | ベクターの線・塗り・フキダシのデータ（VectorObjectList.MainId） |
+| VectorNormalStrokeIndex | 整数 | VectorObjectList | .clip 604/511 | 0〜243（40+ 種） | ○ | 確認済み | ベクターの線・塗り・フキダシのデータ（VectorObjectList.MainId） |
 | VectorNormalType | 整数 |  | .clip 604/202 | 0〜3（4 種） |  | 推測 | ベクターレイヤーの種類（0〜3、値の意味は未確認） |
 | VoiceSpeakParam | 整数 | SpeechSynthesis | — |  |  | 推測 | アニメーションのフォルダー・セル・字幕・音声 |
 | WebCooperationLayerEditable | 整数 |  | — |  |  | 推測 | Web 連携で編集できるレイヤー |
@@ -1512,7 +1512,7 @@
 |---|---|---|---|---|---|---|---|
 | BankId | 整数 |  | — |  |  | 未解明 |  |
 | NextScenario | 整数 | Scenario | — |  |  | 未解明 |  |
-| NextTimeLine | 整数 | TimeLine | — |  |  | 未解明 |  |
+| NextTimeLine | 整数 | TimeLine | — |  | ○ | 未解明 |  |
 | PhysicsLayerGroundHeight | 実数 |  | — |  |  | 未解明 |  |
 | PhysicsLayerObjectSkirtBendSpring | 実数 |  | — |  |  | 未解明 |  |
 | PhysicsLayerObjectSkirtGravity | 実数 |  | — |  |  | 未解明 |  |
@@ -1556,7 +1556,7 @@
 | Character | 文字列 |  | — |  |  | 未解明 |  |
 | Face | 文字列 |  | — |  |  | 未解明 |  |
 | Hair | 文字列 |  | — |  |  | 未解明 |  |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
+| ItemId | 整数 |  | — |  | ○ | 未解明 |  |
 | NextIndex | 整数 |  | — |  | ○ | 確認済み | 同じ並びの次の行の MainId（連結リスト、0 で終わり） |
 | SpeakParam | 整数 | SpeechSynthesis | — |  |  | 未解明 |  |
 
@@ -1569,7 +1569,7 @@
 | BankId | 整数 |  | — |  |  | 未解明 |  |
 | CanvasId | 整数 |  | — |  | ○ | 確認済み | 属するキャンバス（Canvas.MainId）。.clip ではふつう 1、まれに 2 |
 | FirstCast | 整数 | SituationCast | — |  |  | 未解明 |  |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
+| ItemId | 整数 |  | — |  | ○ | 未解明 |  |
 | Room | 文字列 |  | — |  |  | 未解明 |  |
 | Situation | 文字列 |  | — |  |  | 未解明 |  |
 
@@ -1623,7 +1623,7 @@
 |---|---|---|---|---|---|---|---|
 | BankId | 整数 |  | — |  |  | 未解明 |  |
 | CanvasId | 整数 |  | — |  | ○ | 確認済み | 属するキャンバス（Canvas.MainId）。.clip ではふつう 1、まれに 2 |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
+| ItemId | 整数 |  | — |  | ○ | 未解明 |  |
 | LayerId | 整数 |  | — |  | ○ | 確認済み | 属するレイヤー（Layer.MainId）。0 はキャンバス全体のもの（用紙など） |
 | SpeakParamAitIntonation | 実数 |  | — |  |  | 未解明 |  |
 | SpeakParamAitPitch | 実数 |  | — |  |  | 未解明 |  |
@@ -1749,22 +1749,22 @@
 
 | 列 | 型 | リンク | ファイル | 値 | コード | 状態 | 意味 |
 |---|---|---|---|---|---|---|---|
-| BankId | 整数 |  | — |  |  | 未解明 |  |
-| BiggestEndFrame | 実数 |  | — |  |  | 未解明 |  |
-| CurrentFrame | 実数 |  | — |  |  | 未解明 |  |
-| CutIndexForName | 整数 |  | — |  |  | 未解明 |  |
-| EndFrame | 実数 |  | — |  |  | 未解明 |  |
-| FirstTrack | 整数 | Track | — |  |  | 未解明 |  |
-| FrameRate | 実数 |  | — |  |  | 未解明 |  |
-| GuidelineFrameRate | 整数 |  | — |  |  | 未解明 |  |
-| LabelFirstIndex | 整数 | TimeLineLabel | — |  |  | 未解明 |  |
-| NextScenario | 整数 | Scenario | — |  |  | 未解明 |  |
-| NextTimeLine | 整数 | TimeLine | — |  |  | 未解明 |  |
-| SceneIndexForName | 整数 |  | — |  |  | 未解明 |  |
-| SmallestStartFrame | 実数 |  | — |  |  | 未解明 |  |
-| StartFrame | 実数 |  | — |  |  | 未解明 |  |
-| TimeLineName | 文字列 |  | — |  |  | 未解明 |  |
-| TimeLineUuid | BLOB |  | — |  |  | 推測 | UUID |
+| BankId | 整数 |  | — |  |  | 推測 | AnimationCutBank.MainId |
+| BiggestEndFrame | 実数 |  | — |  | ○ | 推測 | これまでの最大の終了フレーム（新しいトラックのクリップの長さ） |
+| CurrentFrame | 実数 |  | — |  | ○ | 確認済み | 今のフレーム（0 始まり）。TrackValueMap はこのフレームの値 |
+| CutIndexForName | 整数 |  | — |  | ○ | 確認済み | カット番号（名前の書式用） |
+| EndFrame | 実数 |  | — |  | ○ | 確認済み | 再生範囲の終わり（最後のフレームの次、0 始まり = CSP の表示の最後のフレーム） |
+| FirstTrack | 整数 | Track | — |  | ○ | 確認済み | 最初のトラック（Track.MainId、TrackNextIndex で続く） |
+| FrameRate | 実数 |  | — |  | ○ | 確認済み | フレームレート。変えると各トラックの TimeClip が 旧/新 倍に伸び、キーはフレームに留まる |
+| GuidelineFrameRate | 整数 |  | — |  | ○ | 確認済み | タイムラインの区切り線の間隔（フレーム） |
+| LabelFirstIndex | 整数 | TimeLineLabel | — |  | ○ | 確認済み | 最初のタイムラインラベル（TimeLineLabel.MainId） |
+| NextScenario | 整数 | Scenario | — |  |  | 推測 | シナリオ機能の連結（観察では 0） |
+| NextTimeLine | 整数 | TimeLine | — |  | ○ | 確認済み | 次のタイムライン（0 で終わり） |
+| SceneIndexForName | 整数 |  | — |  | ○ | 確認済み | シーン番号（名前の書式用） |
+| SmallestStartFrame | 実数 |  | — |  |  | 推測 | これまでの最小の開始フレーム |
+| StartFrame | 実数 |  | — |  | ○ | 確認済み | 再生範囲の最初のフレーム（0 始まり。CSP の表示は +1） |
+| TimeLineName | 文字列 |  | — |  | ○ | 確認済み | タイムラインの名前 |
+| TimeLineUuid | BLOB |  | — |  | ○ | 推測 | UUID |
 
 ## TimeLineLabel
 
@@ -1772,14 +1772,14 @@
 
 | 列 | 型 | リンク | ファイル | 値 | コード | 状態 | 意味 |
 |---|---|---|---|---|---|---|---|
-| BankId | 整数 |  | — |  |  | 未解明 |  |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
-| LabelFrame | 実数 |  | — |  |  | 未解明 |  |
-| LabelLength | 実数 |  | — |  |  | 未解明 |  |
-| LabelName | 文字列 |  | — |  | ○ | 未解明 |  |
-| LabelNextIndex | 整数 |  | — |  |  | 未解明 |  |
-| LabelType | 整数 |  | — |  |  | 未解明 |  |
-| TrackId | 整数 |  | — |  |  | 未解明 |  |
+| BankId | 整数 |  | — |  |  | 推測 | AnimationCutBank.MainId |
+| ItemId | 整数 |  | — |  | ○ | 確認済み | タイムライン（TimeLine.MainId） |
+| LabelFrame | 実数 |  | — |  | ○ | 確認済み | フレーム（0 始まり） |
+| LabelLength | 実数 |  | — |  | ○ | 確認済み | トラックのラベルの長さ（フレーム） |
+| LabelName | 文字列 |  | — |  | ○ | 確認済み | ラベルの名前（中割り記号は空） |
+| LabelNextIndex | 整数 |  | — |  | ○ | 確認済み | 次のラベル（0 で終わり） |
+| LabelType | 整数 |  | — |  | ○ | 確認済み | 0 = タイムラインのラベル、1 = 中割り記号（○）、3 = トラックの名前付きラベル（長さあり） |
+| TrackId | 整数 |  | — |  |  | 確認済み | トラック（Track.MainId）。タイムラインのラベルは 0 |
 
 ## Track
 
@@ -1788,23 +1788,23 @@
 | 列 | 型 | リンク | ファイル | 値 | コード | 状態 | 意味 |
 |---|---|---|---|---|---|---|---|
 | ActionMixerPlayType | 整数 |  | — |  |  | 未解明 |  |
-| BankId | 整数 |  | — |  |  | 未解明 |  |
-| ItemId | 整数 |  | — |  |  | 未解明 |  |
-| LayerUuidWithTrack | BLOB |  | — |  |  | 推測 | UUID |
+| BankId | 整数 |  | — |  |  | 推測 | AnimationCutBank.MainId |
+| ItemId | 整数 |  | — |  | ○ | 確認済み | タイムライン（TimeLine.MainId） |
+| LayerUuidWithTrack | BLOB |  | — |  | ○ | 確認済み | 対象レイヤーの LayerUuid（16 バイト） |
 | PoseCorrectionObject | BLOB |  | — |  |  | 未解明 |  |
-| TrackActionMixer | BLOB | 外部チャンク | — |  | ○ | 未解明 |  |
-| TrackActionMixer2 | BLOB | 外部チャンク | — |  | ○ | 未解明 |  |
-| TrackActionMixer2Size | 整数 |  | — |  |  | 未解明 |  |
-| TrackActionMixerSize | 整数 |  | — |  |  | 未解明 |  |
-| TrackContentOpen | 整数 |  | — |  |  | 未解明 |  |
-| TrackKind | 整数 |  | — |  |  | 未解明 |  |
-| TrackLabelFirstIndex | 整数 | TimeLineLabel | — |  |  | 未解明 |  |
+| TrackActionMixer | BLOB | 外部チャンク | — |  | ○ | 確認済み | キーの "cmt " 文書（版 0100、単精度）の外部チャンク。08 章 |
+| TrackActionMixer2 | BLOB | 外部チャンク | — |  | ○ | 確認済み | 同じ内容の "cmt " 文書（版 0110、倍精度）の外部チャンク |
+| TrackActionMixer2Size | 整数 |  | — |  |  | 確認済み | TrackActionMixer2 の文書の大きさ（展開後のバイト数） |
+| TrackActionMixerSize | 整数 |  | — |  |  | 確認済み | TrackActionMixer の文書の大きさ（展開後のバイト数） |
+| TrackContentOpen | 整数 |  | — |  |  | 推測 | トラックの中身を開いているか |
+| TrackKind | 整数 |  | — |  | ○ | 確認済み | 2000 セル（アニメーションフォルダー）、2001 レイヤーのキーフレーム、2003 用紙、2005 2D カメラ |
+| TrackLabelFirstIndex | 整数 | TimeLineLabel | — |  | ○ | 確認済み | 最初のトラックのラベル（TimeLineLabel.MainId） |
 | TrackLayerObjectUuid | BLOB |  | — |  |  | 推測 | UUID |
-| TrackNextIndex | 整数 |  | — |  |  | 未解明 |  |
-| TrackOpen | 整数 |  | — |  |  | 未解明 |  |
-| TrackOptionFlag | 整数 |  | — |  |  | 未解明 |  |
+| TrackNextIndex | 整数 |  | — |  | ○ | 確認済み | 同じタイムラインの次のトラック（0 で終わり） |
+| TrackOpen | 整数 |  | — |  |  | 推測 | タイムラインでトラックを開いているか |
+| TrackOptionFlag | 整数 |  | — |  | ○ | 推測 | 256、アニメーションフォルダーは 768 |
 | TrackUuid | BLOB |  | — |  |  | 推測 | UUID |
-| TrackValueMap | BLOB |  | — |  |  | 未解明 |  |
+| TrackValueMap | BLOB |  | — |  | ○ | 確認済み | 今のフレームの値（名前・タグ・型・値、ビッグエンディアン）。08 章 |
 
 ## VOffscreen
 
