@@ -59,7 +59,11 @@ fn main() -> Result<()> {
                         object.brush_styles(),
                         object.header[64..].iter().map(|b| format!("{b:02x}")).collect::<String>()
                     );
-                    for index in 0..object.points.len().min(6) {
+                    for index in 0..object
+                        .points
+                        .len()
+                        .min(std::env::var("VS_POINTS").ok().and_then(|v| v.parse().ok()).unwrap_or(6))
+                    {
                         let p = object.point(index).expect("point");
                         println!(
                             "  pt {:.2},{:.2} bbox {:?} flags {:#x} values {:?}",

@@ -115,6 +115,9 @@ fn medians(buckets: &mut [Vec<f64>]) -> String {
 fn main() -> Result<()> {
     for (index, path) in std::env::args().skip(1).enumerate() {
         let Ok(file) = ClipFile::open(&path) else { continue };
+        // The file's tag in VFIT_SAMPLES (VFIT_FILE when a driver runs one
+        // file at a time).
+        let tag = std::env::var("VFIT_FILE").unwrap_or_else(|_| index.to_string());
         let brushes = brushes(&file)?;
         for (layer, _) in file.layers.flatten() {
             if layer.kind != LayerKind::Vector || layer.render_mipmap == 0 || !layer.visible {
@@ -142,6 +145,8 @@ fn main() -> Result<()> {
             // tenth and by value-1 tenth.
             let mut width_p: Vec<Vec<f64>> = vec![Vec::new(); 10];
             let mut width_v: Vec<Vec<f64>> = vec![Vec::new(); 10];
+            // The same per point, for VFIT_SAMPLES.
+            let mut samples: Vec<String> = Vec::new();
             let origin = layer.pixel_origin();
             let shift = ((layer.offset.0 - origin.0) as f64, (layer.offset.1 - origin.1) as f64);
             for data in &vectors {
@@ -174,6 +179,25 @@ fn main() -> Result<()> {
                             let bucket = |v: f32| ((v * 10.0) as usize).min(9);
                             width_p[bucket(point.values[0])].push(r / size);
                             width_v[bucket(point.values[1])].push(r / size);
+                            let brush =
+                                object.brush_styles().into_iter().find(|id| brushes.contains_key(&(*id as i64)));
+                            let gap = |j: usize| {
+                                object.point(j).map(|q| ((q.x - point.x).powi(2) + (q.y - point.y).powi(2)).sqrt())
+                            };
+                            samples.push(format!(
+                                "s {tag} {} {} {i} {} {} {:.4} {:.4} {size} {r:.3} {:.4} {:.3} {:.2} {:.2} {:08x}",
+                                layer.main_id,
+                                brush.unwrap_or(0),
+                                object.points.len(),
+                                object.opacity(),
+                                point.values[0],
+                                point.values[1],
+                                point.values[2],
+                                point.values[10],
+                                i.checked_sub(1).and_then(gap).unwrap_or(-1.0),
+                                gap(i + 1).unwrap_or(-1.0),
+                                u32::from_be_bytes(object.header[object.header.len() - 4..].try_into().expect("4"))
+                            ));
                         }
                         if let Some(point) = object.point(i) {
                             pressure += point.values[0] as f64;
@@ -235,6 +259,27 @@ fn main() -> Result<()> {
                 layer.main_id,
                 sizes.get(sizes.len() / 2).copied().unwrap_or(0.0)
             );
+            if let Ok(out) = std::env::var("VFIT_SAMPLES") {
+                use std::io::Write;
+                let mut lines = Vec::new();
+                for id in styles.keys() {
+                    let blob: Vec<u8> = file
+                        .database()
+                        .query_row("SELECT SizeEffector FROM BrushStyle WHERE MainId = ?1", [*id], |row| row.get(0))
+                        .unwrap_or_default();
+                    let hex: String = blob.iter().map(|b| format!("{b:02x}")).collect();
+                    let points = brushes
+                        .get(&(*id as i64))
+                        .and_then(|b| b.size.pressure.as_ref())
+                        .map(|(_, c)| c.points.clone());
+                    let anti_alias = brushes.get(&(*id as i64)).map(|b| b.anti_alias).unwrap_or(-1);
+                    lines.push(format!("b {tag} {} {id} {hex} aa{anti_alias} {points:?}", layer.main_id));
+                }
+                lines.push(format!("l {tag} {} dpi {}", layer.main_id, file.canvas.resolution));
+                lines.extend(samples);
+                let mut f = std::fs::OpenOptions::new().create(true).append(true).open(out)?;
+                writeln!(f, "{}", lines.join("\n"))?;
+            }
             println!(
                 "file {index} layer {} reach/size by pressure tenth: {}",
                 layer.main_id,
