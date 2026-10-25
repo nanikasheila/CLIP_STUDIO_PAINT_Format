@@ -106,12 +106,17 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 24 | 袋文字 太、カーニング メトリクス、アンチエイリアス オフ、自動縦中横 3 文字 | `TextOutline` 1 → 2、`TextKerningMethod` 0 → 1、`TextAntiAlias` 0 → 2、`TextTateChuYoko` 2 → 3 |
 | 25 | ルビ: サイズ 63、位置 末尾揃え、位置の調整 2.5、親文字との距離 1.5、字間 自由・0.5。円形配置 オン・半径 77・反時計回り・均等配置 オン | `TextRubySize` 50 → 63、`TextRubyAlignment` 0 → 2、`TextRubyPosition` 0 → 2.5、`TextRubyDistance` 0 → 1.5、`TextRubyWordSpaceJustify` 4 → 0、`TextRubyWordSpace` 0 → 0.5、`TextLayoutCircularEnabled` 0 → 1、`TextLayoutCircularRadius` 100 → 77、`TextLayoutCircularDirection` 0 → 1、`TextLayoutCircularJustify` 0 → 1 |
 | 26 | 操作: ドラッグ テキスト選択、選択の追加 1 番目。編集設定: テキストの色 2 番目、追加方法 常にレイヤーを作成。変形設定: リサイズハンドル オフ、変形方法 拡縮回転・平行ゆがみ、縦横比固定 オフ、回転角 33。補正: 表示メニューに従いスナップ オフ | `TextDragOperationType` 2 → 1、`TextSelectType` 1 → 0、`TextColorType` 0 → 1、`TextInsertType` 2 → 0、`TextEnableHandle` 1 → 0、`TextTransformType` 0 → 4、`TextFixAspect` 1 → 0、`TextRotation` 0 → 33、`ObjectUseSnap` 1 → 0 |
+| 27 | 図形「長方形」: 図形 多角形・頂点数 7、角の丸さ オン・13・指定方法 長さ指定、線・塗り 1 番目、縦横指定 オン・横 2 | `FixedShapeKind` 0 → 2、`FixedShapeVertexNumber` 6 → 7、`FixedShapeUseRoundCorner` 0 → 1、`FixedShapeRoundRate` 10 → 13、`FixedShapeRoundValueType` 0 → 1、`ShapeStrokeAndFillType` 1 → 0、`FixedShapeUseAspect` 0 → 1、`FixedShapeWidthRate` 1 → 2 |
+| 28 | 図形: 角の丸さ 25（長さ指定）、縦横指定 長さ指定・縦 150、線・塗り 3 番目、線の色 3 番目、塗りの色 1 番目。図形操作: 中央から開始、確定後に角度を調整、角度の刻み オン・30。補正: 表示メニューに従いスナップ オン | `FixedShapeRoundSize` 20 → 25、`FixedShapeAspectType` 0 → 1、`FixedShapeHeight` 100 → 150、`ShapeStrokeAndFillType` 0 → 2、`ShapeLineColorType` 0 → 2、`ShapeFillColorType` 1 → 0、`ShapeStartCenter` 0 → 1、`RotateShape` 0 → 1、`ShapeLockAngle` 0 → 1、`ShapeLockAngleStep` 45 → 30、`ShapeEnableSnap` 0 → 1 |
+| 29 | 選択範囲「長方形選択」: 作成方法 4 番目、選択範囲と画像を連動 オン、図形 楕円、表示メニューに従いスナップ オン | `SelectCreateType` 1 → 3、`SelectMoveImage` 0 → 1、`FixedShapeKind` 0 → 1、`ShapeEnableSnap` 0 → 1 |
+| 30 | グラデーション「昼空」: 形状 楕円、端の処理 3 番目、ディザリング オフ、角度の刻み オン・15 | `GradationShapeKind` 0 → 2、`GradationRepeatType` 0 → 2、`GradationDither` 1 → 0、`LineLockAngle` 0 → 1、`LineLockAngleStep` 45 → 15 |
+| 31 | グラデーション: 反転、形状 円、端の処理 2 番目 | `GradationData` の点の並びと位置が左右反対になる（`GradationReverseSaved` は 1 のまま）、`GradationShapeKind` 2 → 1、`GradationRepeatType` 2 → 1 |
 
-2〜26 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を、21〜26 回目はテキストツール「テキスト」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた（21 回目以降は前の回の書き出しと比べる）。テキストでは、フレームで折り返すをオフにすると均等揃えとフレーム揃えが使えなくなり、縦書きではスタイルのボタンが太字と斜体だけになる。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜31 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を、21〜26 回目はテキストツール「テキスト」を、27〜31 回目は図形「長方形」・選択範囲「長方形選択」・グラデーション「昼空」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた（21 回目以降は前の回の書き出しと比べる）。テキストでは、フレームで折り返すをオフにすると均等揃えとフレーム揃えが使えなくなり、縦書きではスタイルのボタンが太字と斜体だけになる。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 154 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 179 列）。
 
 ## 残り
 
-- W4 の続き（ペン・塗りつぶし・テキスト以外のツール: 図形、選択範囲、グラデーションなど）
+- W4 の続き（まだ確かめていないツール: フキダシ、効果線・集中線、コマ枠、定規、操作、スポイト、ゆがみなど）
 - 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
