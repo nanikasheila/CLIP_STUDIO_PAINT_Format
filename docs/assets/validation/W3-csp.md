@@ -100,12 +100,18 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 19 | 参照先: 参照しないレイヤーの 5 番目 オフ・6 番目 オン、ベクターの中心線で塗り止まる オフ、塗りを開始しない色 オン（黒のまま） | `FillNotReferPaper` 1 → 0、`FillNotReferLocked` 0 → 1、`FillReferVectorCenter` 1 → 0、`FillUseNotStartColor` 0 → 1 |
 | 19 | 塗りつぶし: 隙間閉じ オフ、領域拡縮 オフ。アンチエイリアス オフ | `FillUseCloseGap` 1 → 0、`FillUseExpand` 1 → 0、`FillAntiAlias` 1 → 0 |
 | 20 | 参照先: 複数参照の対象 4 番目（フォルダー内のレイヤー）、複数参照 オフ | `FillReferLayerType` 2 → 3、`FillReferMultiLayer` 1 → 0 |
+| 21 | フォント: サイズ 21.5、太字と斜体、比率 横 87・縦 113、袋文字 オン、字間 1.5、文字詰め 23 | `TextFontSize` 16 → 21.5、`TextFontStyle` 0 → 3、`TextHorizontalRatio` 100 → 87、`TextVerticalRatio` 100 → 113、`TextOutlineEnable` 0 → 1、`TextWordSpace` 0 → 1.5、`TextTsume` 0 → 23 |
+| 22 | 行間・揃え: 行間 137.5、行揃え 3 番目のボタン、フレームで折り返す オフ | `TextLineSpacePercent` 125 → 137.5、`TextAlignment` と `TextAlignmentJustify` 0 → 1、`TextWrapping` 1 → 0 |
+| 23 | 縦書き、均等揃え 2 番目、フレームで折り返す オン、フレーム揃え 下、約物の字幅を半角にする オフ、背景 オン・不透明度 41、フチ オン・太さ 3 | `TextVertical` 0 → 1、`TextAlignment` と `TextAlignmentJustify` 1 → 5、`TextWrapping` 0 → 1、`TextTextAlignment` 0 → 2、`TextAlternateHalfMetrics` 1 → 0、`TextBackgroundEnabled` 0 → 1、`TextBackgroundAlpha` 100 → 41、`TextEdgeEnabled` 0 → 1、`TextEdgeWidth` 1 → 3 |
+| 24 | 袋文字 太、カーニング メトリクス、アンチエイリアス オフ、自動縦中横 3 文字 | `TextOutline` 1 → 2、`TextKerningMethod` 0 → 1、`TextAntiAlias` 0 → 2、`TextTateChuYoko` 2 → 3 |
+| 25 | ルビ: サイズ 63、位置 末尾揃え、位置の調整 2.5、親文字との距離 1.5、字間 自由・0.5。円形配置 オン・半径 77・反時計回り・均等配置 オン | `TextRubySize` 50 → 63、`TextRubyAlignment` 0 → 2、`TextRubyPosition` 0 → 2.5、`TextRubyDistance` 0 → 1.5、`TextRubyWordSpaceJustify` 4 → 0、`TextRubyWordSpace` 0 → 0.5、`TextLayoutCircularEnabled` 0 → 1、`TextLayoutCircularRadius` 100 → 77、`TextLayoutCircularDirection` 0 → 1、`TextLayoutCircularJustify` 0 → 1 |
+| 26 | 操作: ドラッグ テキスト選択、選択の追加 1 番目。編集設定: テキストの色 2 番目、追加方法 常にレイヤーを作成。変形設定: リサイズハンドル オフ、変形方法 拡縮回転・平行ゆがみ、縦横比固定 オフ、回転角 33。補正: 表示メニューに従いスナップ オフ | `TextDragOperationType` 2 → 1、`TextSelectType` 1 → 0、`TextColorType` 0 → 1、`TextInsertType` 2 → 0、`TextEnableHandle` 1 → 0、`TextTransformType` 0 → 4、`TextFixAspect` 1 → 0、`TextRotation` 0 → 33、`ObjectUseSnap` 1 → 0 |
 
-2〜20 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜26 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を、21〜26 回目はテキストツール「テキスト」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた（21 回目以降は前の回の書き出しと比べる）。テキストでは、フレームで折り返すをオフにすると均等揃えとフレーム揃えが使えなくなり、縦書きではスタイルのボタンが太字と斜体だけになる。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 113 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 154 列）。
 
 ## 残り
 
-- W4 の続き（塗りつぶし・ペン以外のツール: 図形、選択範囲、テキスト、グラデーションなど）
+- W4 の続き（ペン・塗りつぶし・テキスト以外のツール: 図形、選択範囲、グラデーションなど）
 - 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）

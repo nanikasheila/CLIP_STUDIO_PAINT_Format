@@ -318,7 +318,7 @@ ObjectResizableTransformOperation	操作	拡縮可能 変形 操作	名前から
 ObjectSelectFolder	操作	選択 フォルダー	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
 ObjectSelectType	操作	選択 方式	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
 ObjectSelectable	操作	選択できる対象	名前からの直訳	推測（直訳）	INTEGER	12	operation	2147483647	2147483647	
-ObjectUseSnap	操作	使う スナップ	名前からの直訳	推測（直訳）	INTEGER	4	text,operation	1	1	
+ObjectUseSnap	補正	表示メニューに従いスナップ	0/1	確認済み（W4: テキスト）	INTEGER	4	text,operation	1	1	
 ObjectVectorChangeWidth	操作	ベクター 変更 幅	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
 ObjectVectorOperation	操作	ベクター 操作	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	1	
 Opacity	不透明度	不透明度	0–100 %	確認済み（W3 表示・書き出し、W4）	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	49	100	
@@ -419,71 +419,71 @@ StreamUseStartGapDisturb	効果線	使う 開始 間隔 乱れ	名前からの�
 SymmetryRulerLineNumber	対称定規	線 数	名前からの直訳	推測（直訳）	INTEGER	8	ruler	2	11	
 SymmetryRulerLineSymmetry	対称定規	線 対称	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
 SyncDualBrushSize	2-ブラシ形状	メインのブラシサイズに連動	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-TextAlignment	テキスト	揃え	名前からの直訳	推測（直訳）	INTEGER	20	text	0	2	
-TextAlignmentJustify	テキスト	揃え 均等	名前からの直訳	推測（直訳）	INTEGER	15	text	0	2	
-TextAlternateHalfMetrics	テキスト	代替 半角 メトリクス	名前からの直訳	推測（直訳）	INTEGER	20	text	1	1	
-TextAntiAlias	テキスト	アンチ エイリアス	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextBackgroundAlpha	テキスト	背景 不透明度	名前からの直訳	推測（直訳）	INTEGER	20	text	100	100	
+TextAlignment	行間・揃え	行揃え	行揃えと均等揃えの組み合わせ（行揃えの 3 番目 1、均等揃えの 2 番目 5）	確認済み（W4: 1 と 5）	INTEGER	20	text	0	2	
+TextAlignmentJustify	行間・揃え	均等揃え	TextAlignment と同じ値	確認済み（W4: 1 と 5）	INTEGER	15	text	0	2	
+TextAlternateHalfMetrics	テキスト	約物の字幅を半角にする	0/1	確認済み（W4）	INTEGER	20	text	1	1	
+TextAntiAlias	フォント	アンチエイリアス	一覧の値（オフで 2、元の値 0。ほかは未確認）	確認済み（W4: オフ 2）	INTEGER	20	text	0	0	
+TextBackgroundAlpha	テキスト	背景の不透明度	0–100 %	確認済み（W4）	INTEGER	20	text	100	100	
 TextBackgroundColorBlue	テキスト	背景 色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextBackgroundColorGreen	テキスト	背景 色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextBackgroundColorRed	テキスト	背景 色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextBackgroundEnabled	テキスト	背景 有効	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextBackgroundEnabled	テキスト	背景	0/1	確認済み（W4）	INTEGER	20	text	0	0	
 TextColorBlue	テキスト	色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextColorGreen	テキスト	色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextColorRed	テキスト	色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextColorType	テキスト	色 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextColorType	編集設定	テキストの色	ボタンの並び順 0 1 番目, 1 2 番目	確認済み（W4: 1 番目 0、2 番目 1）	INTEGER	20	text	0	0	
 TextContextualAlternate	テキスト	前後関係に依存する 代替	名前からの直訳	推測（直訳）	INTEGER	12	text	1	1	
-TextDragOperationType	テキスト	ドラッグ 操作 方式	名前からの直訳	推測（直訳）	INTEGER	19	text	0	2	
+TextDragOperationType	操作	ドラッグ	一覧の並び順 0 テキストボックス作成, 1 テキスト選択, 2 なし（1 と 2 を確認）	確認済み（W4: テキスト選択 1、なし 2）	INTEGER	19	text	0	2	
 TextEdgeColorBlue	テキスト	フチ 色 B	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
 TextEdgeColorGreen	テキスト	フチ 色 G	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
 TextEdgeColorRed	テキスト	フチ 色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
-TextEdgeEnabled	テキスト	フチ 有効	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextEdgeWidth	テキスト	フチ 幅	名前からの直訳	推測（直訳）	REAL	20	text	1.0	1.0	
-TextEdgeWidthUnit	テキスト	フチ 幅 単位	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextEnableHandle	テキスト	有効 ハンドル	名前からの直訳	推測（直訳）	INTEGER	21	text,operation	1	1	
+TextEdgeEnabled	テキスト	フチ	0/1	確認済み（W4）	INTEGER	20	text	0	0	
+TextEdgeWidth	テキスト	フチの太さ	数値（単位は TextEdgeWidthUnit）	確認済み（W4）	REAL	20	text	1.0	1.0	
+TextEdgeWidthUnit	テキスト	フチの太さの単位	0 px, 2 mm（推測）	推測	INTEGER	20	text	0	0	
+TextEnableHandle	変形設定	リサイズハンドルを表示	0/1	確認済み（W4）	INTEGER	21	text,operation	1	1	
 TextFastPreview	テキスト	高速 プレビュー	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextFixAspect	テキスト	固定 縦横比	名前からの直訳	推測（直訳）	INTEGER	31	text,operation	0	1	
-TextFontName	テキスト	フォント 名	名前からの直訳	推測（直訳）	TEXT	4	text			
-TextFontSize	テキスト	フォント サイズ	名前からの直訳	推測（直訳）	REAL	20	text	14.0	30.0	
-TextFontStyle	テキスト	フォント スタイル	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
+TextFixAspect	変形設定	縦横比固定	0/1	確認済み（W4）	INTEGER	31	text,operation	0	1	
+TextFontName	フォント	フォント	フォント名の文字列	推測	TEXT	4	text			
+TextFontSize	フォント	サイズ	pt	確認済み（W4）	REAL	20	text	14.0	30.0	
+TextFontStyle	フォント	スタイル	ビット 1 太字, 2 斜体（太字と斜体で 3 を確認）	確認済み（W4: 太字と斜体で 3）	INTEGER	20	text	0	0	
 TextFontUniqueName	テキスト	フォント 固有 名	名前からの直訳	推測（直訳）	TEXT	4	text			
-TextHorizontalRatio	テキスト	横 比率	名前からの直訳	推測（直訳）	REAL	20	text	100.0	100.0	
+TextHorizontalRatio	フォント	比率（横）	%	確認済み（W4）	REAL	20	text	100.0	100.0	
 TextHorizontalReverse	テキスト	横 反転	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextHorizontalSkewAngle	テキスト	横 斜体 角度	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextInsertType	テキスト	作成 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	2	2	
-TextKerningMethod	テキスト	カーニング 方法	名前からの直訳	推測（直訳）	INTEGER	15	text	0	0	
+TextInsertType	編集設定	追加方法	一覧の並び順 0 常にレイヤーを作成, 1 選択中のテキストに追加, 2 挿入位置を自動判別（0 と 2 を確認）	確認済み（W4: 常にレイヤーを作成 0、挿入位置を自動判別 2）	INTEGER	20	text	2	2	
+TextKerningMethod	フォント	カーニング	0 なし（推測）, 1 メトリクス	確認済み（W4: メトリクス 1）	INTEGER	15	text	0	0	
 TextLatestVersion	テキスト	最新 版	名前からの直訳	推測（直訳）	INTEGER	15	text	6	6	
-TextLayoutCircularDirection	テキスト	レイアウト 円形 方向	名前からの直訳	推測（直訳）	INTEGER	12	text	0	0	
-TextLayoutCircularEnabled	テキスト	レイアウト 円形 有効	名前からの直訳	推測（直訳）	INTEGER	12	text	0	1	
-TextLayoutCircularJustify	テキスト	レイアウト 円形 均等	名前からの直訳	推測（直訳）	INTEGER	12	text	0	0	
-TextLayoutCircularRadius	テキスト	レイアウト 円形 半径	名前からの直訳	推測（直訳）	REAL	12	text	100.0	100.0	
+TextLayoutCircularDirection	円形配置	方向	0 時計回り, 1 反時計回り	確認済み（W4: 反時計回り 1）	INTEGER	12	text	0	0	
+TextLayoutCircularEnabled	円形配置	円形配置	0/1	確認済み（W4）	INTEGER	12	text	0	1	
+TextLayoutCircularJustify	円形配置	均等配置	0/1	確認済み（W4）	INTEGER	12	text	0	0	
+TextLayoutCircularRadius	円形配置	半径	数値	確認済み（W4）	REAL	12	text	100.0	100.0	
 TextLineSpace	テキスト	線 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	4.0	
-TextLineSpacePercent	テキスト	線 間隔 %	名前からの直訳	推測（直訳）	REAL	20	text	120.0	125.0	
+TextLineSpacePercent	行間・揃え	行間	%	確認済み（W4）	REAL	20	text	120.0	125.0	
 TextLineSpaceType	テキスト	線 間隔 方式	名前からの直訳	推測（直訳）	INTEGER	20	text	1	1	
-TextOutline	テキスト	輪郭	名前からの直訳	推測（直訳）	INTEGER	16	text	1	1	
-TextOutlineEnable	テキスト	輪郭 有効	名前からの直訳	推測（直訳）	INTEGER	16	text	0	0	
-TextRotation	テキスト	回転	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextRubyAlignment	テキスト	ルビ 揃え	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
-TextRubyDistance	テキスト	ルビ 距離	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextOutline	フォント	袋文字の太さ	太さの段階（太で 2、元の値 1）	確認済み（W4: 太 2）	INTEGER	16	text	1	1	
+TextOutlineEnable	フォント	袋文字	0/1	確認済み（W4）	INTEGER	16	text	0	0	
+TextRotation	変形設定	回転角	度	確認済み（W4）	REAL	20	text	0.0	0.0	
+TextRubyAlignment	ルビ	ルビの位置	一覧の並び順（末尾揃えで 2）	確認済み（W4: 末尾揃え 2）	INTEGER	20	text	0	0	
+TextRubyDistance	ルビ	親文字との距離	数値	確認済み（W4）	REAL	20	text	0.0	0.0	
 TextRubyFontName	テキスト	ルビ フォント 名	名前からの直訳	推測（直訳）	TEXT	4	text			
-TextRubyPosition	テキスト	ルビ 位置	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextRubySize	テキスト	ルビ サイズ	名前からの直訳	推測（直訳）	INTEGER	20	text	50	50	
-TextRubyWordSpace	テキスト	ルビ 字 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextRubyWordSpaceJustify	テキスト	ルビ 字 間隔 均等	名前からの直訳	推測（直訳）	INTEGER	20	text	4	4	
-TextSelectType	テキスト	選択 方式	名前からの直訳	推測（直訳）	INTEGER	19	text	0	1	
+TextRubyPosition	ルビ	ルビの位置の調整	数値（名前は Position だが調整量）	確認済み（W4）	REAL	20	text	0.0	0.0	
+TextRubySize	ルビ	ルビのサイズ	親文字に対する %	確認済み（W4）	INTEGER	20	text	50	50	
+TextRubyWordSpace	ルビ	ルビの字間	数値	確認済み（W4）	REAL	20	text	0.0	0.0	
+TextRubyWordSpaceJustify	ルビ	ルビの字間の方式	一覧の並び順（自由で 0、元の値 4）	確認済み（W4: 自由 0）	INTEGER	20	text	4	4	
+TextSelectType	操作	選択の追加	ボタンの並び順 0 1 番目, 1 2 番目	確認済み（W4: 1 番目 0、2 番目 1）	INTEGER	19	text	0	1	
 TextStandardLigature	テキスト	標準 合字	名前からの直訳	推測（直訳）	INTEGER	19	text	1	1	
-TextTateChuYoko	テキスト	縦中横	名前からの直訳	推測（直訳）	INTEGER	20	text	2	2	
-TextTextAlignment	テキスト	テキスト 揃え	名前からの直訳	推測（直訳）	INTEGER	18	text	0	0	
+TextTateChuYoko	テキスト	自動縦中横	文字数（3 文字で 3）	確認済み（W4: 3 文字 3）	INTEGER	20	text	2	2	
+TextTextAlignment	行間・揃え	フレーム揃え	ボタンの並び順 0 上, 1 中央, 2 下（0 と 2 を確認）	確認済み（W4: 下 2）	INTEGER	18	text	0	0	
 TextToolPropertyKind	テキスト	ツール プロパティ 種類	名前からの直訳	推測（直訳）	INTEGER	19	text	1	1	
-TextTransformType	テキスト	変形 方式	名前からの直訳	推測（直訳）	INTEGER	31	text,operation	0	0	
-TextTsume	テキスト	ツメ	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
+TextTransformType	変形設定	変形方法	一覧の並び順 0 拡大・縮小・回転, 1 拡大・縮小, 2 回転, 3 平行ゆがみ, 4 拡縮回転・平行ゆがみ（0 と 4 を確認）	確認済み（W4: 0 と 4）	INTEGER	31	text,operation	0	0	
+TextTsume	フォント	文字詰め	%	確認済み（W4）	REAL	20	text	0.0	0.0	
 TextVersion	テキスト	版	名前からの直訳	推測（直訳）	INTEGER	19	text	4	6	
-TextVertical	テキスト	縦	名前からの直訳	推測（直訳）	INTEGER	20	text	0	1	
-TextVerticalRatio	テキスト	縦 比率	名前からの直訳	推測（直訳）	REAL	20	text	100.0	100.0	
+TextVertical	テキスト	縦書き	0 横書き, 1 縦書き	確認済み（W4）	INTEGER	20	text	0	1	
+TextVerticalRatio	フォント	比率（縦）	%	確認済み（W4）	REAL	20	text	100.0	100.0	
 TextVerticalReverse	テキスト	縦 反転	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextVerticalSkewAngle	テキスト	縦 斜体 角度	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextWordSpace	テキスト	字 間隔	名前からの直訳	推測（直訳）	REAL	20	text	0.0	0.0	
-TextWrapping	テキスト	折り返し	名前からの直訳	推測（直訳）	INTEGER	20	text	0	1	
+TextWordSpace	フォント	字間	数値	確認済み（W4）	REAL	20	text	0.0	0.0	
+TextWrapping	行間・揃え	フレームで折り返す	0/1（0 のとき均等揃えとフレーム揃えは使えない）	確認済み（W4）	INTEGER	20	text	0	1	
 TextureBrightness	紙質	明るさ	-100–100	確認済み（W4）	INTEGER	1383	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	-50	80	
 TextureCompositeMode	紙質	紙質適用方法	CSP の並び順 0 通常, 1 乗算, 2 減算, 3 比較, 4 輪郭, 5 オーバーレイ, 6 覆い焼きカラー, 7 焼き込みカラー, 8 ハードミックス, 9 高さ（0、1、3 を確認）	確認済み（W4: 通常 0、比較 3）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	9	
 TextureContrast	紙質	コントラスト	-100–100	確認済み（W4）	INTEGER	1383	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection,ruler	-70	55	
