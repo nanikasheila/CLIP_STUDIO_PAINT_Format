@@ -36,7 +36,7 @@ USAGE:
                        [--clip yes|no]
                                     change a layer's attributes (MODE: a LayerComposite number)
   cspf remove-layer FILE ID OUT     remove a layer (a folder with its contents)
-  cspf extract FILE OUT_DIR         stored layer pixels and masks as PNG
+  cspf extract FILE OUT_DIR         stored layer pixels, masks and thumbnails as PNG
   cspf preview FILE OUT.png         the preview CSP saved in the file
   cspf render FILE OUT.png [--scale S]
                                     composite the layers (default: the preview's size)
@@ -363,6 +363,10 @@ fn extract(path: &Path, out: &Path) -> Result<bool> {
         if let Some((mask, origin)) = file.layer_mask(layer)? {
             let name = out.join(format!("layer{:04}_mask_{}x{}.png", layer.main_id, origin.0, origin.1));
             std::fs::write(name, mask.to_png()?)?;
+            count += 1;
+        }
+        if let Some(thumbnail) = file.layer_thumbnail(layer)? {
+            std::fs::write(out.join(format!("layer{:04}_thumbnail.png", layer.main_id)), thumbnail.to_png()?)?;
             count += 1;
         }
     }

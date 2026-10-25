@@ -163,6 +163,17 @@ impl CmcFile {
         Ok(self.pages()?.iter().filter_map(|node| node.relative_path()).map(|path| folder.join(path)).collect())
     }
 
+    /// The thumbnail CSP shows for a page in the work's page list: the page
+    /// file's `CanvasPreview` (`CanvasNode.CanvasThumbnail` is unset in every
+    /// .cmc seen). None when the page has no file or no preview.
+    pub fn page_thumbnail(&self, folder: &Path, node: &CanvasNode) -> Result<Option<crate::RgbaImage>> {
+        let Some(path) = node.relative_path().map(|path| folder.join(path)) else { return Ok(None) };
+        if !path.is_file() {
+            return Ok(None);
+        }
+        crate::ClipFile::open(path)?.preview()
+    }
+
     /// Structural problems; with `folder`, also page files that are missing.
     pub fn findings(&self, folder: Option<&Path>) -> Vec<String> {
         let mut findings = Vec::new();

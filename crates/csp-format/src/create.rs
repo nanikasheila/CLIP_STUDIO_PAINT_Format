@@ -344,5 +344,28 @@ mod tests {
         let preview = again.preview().unwrap().unwrap();
         assert_eq!(preview.pixel(15, 25), [200, 10, 20, 255]);
         assert_eq!(preview.pixel(100, 100), [255, 255, 255, 255]);
+        // New thumbnails are blank (CSP redraws them).
+        let thumbnail = again.layer_thumbnail(again.layers.get(raster).unwrap()).unwrap().unwrap();
+        assert_eq!((thumbnail.width, thumbnail.height, thumbnail.pixel(5, 5)[3]), (512, 512, 0));
+    }
+
+    #[test]
+    fn layer_thumbnails_are_read_through_their_offscreen() {
+        let mut file = ClipFile::create(&NewCanvas { width: 64, height: 48, ..Default::default() }).unwrap();
+        let mut image = RgbaImage::new(8, 6);
+        image.fill([0, 90, 200, 255]);
+        let raster = file.layers.flatten().iter().find(|(l, _)| l.kind == LayerKind::Raster).unwrap().0.main_id;
+        file.set_layer_pixels(raster, &image, (0, 0)).unwrap();
+        // Point the layer's thumbnail at an offscreen that has pixels.
+        let layer = file.layers.get(raster).unwrap().clone();
+        let base = file.mipmap(layer.render_mipmap).unwrap().unwrap().levels[0].offscreen;
+        file.database()
+            .execute(
+                "UPDATE LayerThumbnail SET ThumbnailOffscreen = ?1 WHERE MainId = ?2",
+                [base, layer.row.int("LayerRenderThumbnail")],
+            )
+            .unwrap();
+        let thumbnail = file.layer_thumbnail(&layer).unwrap().unwrap();
+        assert_eq!(thumbnail.pixel(1, 1), [0, 90, 200, 255]);
     }
 }

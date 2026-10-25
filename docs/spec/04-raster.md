@@ -75,7 +75,9 @@ V1 の Offscreen の内訳: カラー 244,260、アルファ 34,201、グレー 
 
 レイヤーごとに 1 行。`ThumbnailOffscreen` がサムネイルの画素（ふつうの Offscreen、CSP が新しく作るものは 512×512）。
 `Thumbnail…NeedRefresh` の 14 列は真偽ではなく、編集のたびに増える番号（100 万を超える値もある）。
-`ThumbnailCanvasWidth/Height` は作ったときのキャンバスの大きさ。サムネイルの画素の作り方は未確認（R9 の残り）。
+`ThumbnailCanvasWidth/Height` は作ったときのキャンバスの大きさ。
+`Layer.LayerRenderThumbnail` が行（`MainId`）を指す（`clip.rs` の `layer_thumbnail`、`cspf extract` が `layerNNNN_thumbnail.png` に書く）。
+V1 の 27,986 レイヤーすべてにあり、すべて復号でき、すべて 512 px 四方（うち 11,660 個は全面透明）。CSP がサムネイルを縮小する方法（画素の作り方）は調べていない
 
 ## プレビュー（`CanvasPreview`、確認済み）
 

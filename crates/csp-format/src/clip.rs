@@ -225,6 +225,22 @@ impl ClipFile {
         Ok(Some((offscreen.to_alpha()?, layer.mask_origin())))
     }
 
+    /// The layer palette thumbnail (`Layer.LayerRenderThumbnail` →
+    /// `LayerThumbnail.ThumbnailOffscreen`). None when there is none or it
+    /// stores no pixels.
+    pub fn layer_thumbnail(&self, layer: &Layer) -> Result<Option<RgbaImage>> {
+        let id = layer.row.int("LayerRenderThumbnail");
+        if id == 0 {
+            return Ok(None);
+        }
+        let Some(row) = self.row("LayerThumbnail", id)? else { return Ok(None) };
+        let Some(offscreen) = self.offscreen(row.int("ThumbnailOffscreen"))? else { return Ok(None) };
+        if offscreen.data.is_none() {
+            return Ok(None);
+        }
+        offscreen.to_rgba().map(Some)
+    }
+
     /// The preview CSP saved with the file (`CanvasPreview`, a PNG).
     pub fn preview(&self) -> Result<Option<RgbaImage>> {
         let rows = select_all(&self.database, "CanvasPreview")?;
