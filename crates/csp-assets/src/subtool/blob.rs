@@ -63,10 +63,7 @@ impl Records {
 
     /// Records of u32 words.
     pub fn words(&self) -> Vec<Vec<u32>> {
-        self.records
-            .iter()
-            .map(|r| r.chunks_exact(4).map(|w| u32::from_be_bytes(w.try_into().unwrap())).collect())
-            .collect()
+        self.records.iter().map(|r| r.as_chunks::<4>().0.iter().map(|w| u32::from_be_bytes(*w)).collect()).collect()
     }
 
     /// Records of (f64 x, f64 y) points.
@@ -309,7 +306,7 @@ impl MaterialRef {
 }
 
 fn utf16(bytes: &[u8]) -> String {
-    let units: Vec<u16> = bytes.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
+    let units: Vec<u16> = bytes.as_chunks::<2>().0.iter().map(|c| u16::from_le_bytes(*c)).collect();
     String::from_utf16_lossy(&units)
 }
 
