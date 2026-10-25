@@ -10,12 +10,13 @@
 //! `INDEX=VALUE` separated by commas (`1=1,10=0`). Also writes
 //! `OUT.stored.png`, the stored pixels of the same window, and
 //! `OUT.ours.png`, this library's drawing of the moved objects, for
-//! comparing with CSP's export. Test files stay with the corpus (they hold
+//! comparing with CSP's export, and `OUT.moved.png`, this library's
+//! drawing of the test file as written. Test files stay with the corpus (they hold
 //! real strokes).
 
 use std::collections::BTreeMap;
 
-use csp_format::database::value_as_text;
+use csp_format::database::{columns, quote, value_as_text};
 use csp_format::stroke::{Placement, brushes, draw_objects, layer_vectors};
 use csp_format::vector::VectorData;
 use csp_format::{ClipFile, LayerKind, Result, RgbaImage};
@@ -23,6 +24,24 @@ use rusqlite::types::Value;
 
 fn word(data: &[u8], i: usize) -> Option<u32> {
     data.get(i * 4..i * 4 + 4).map(|b| u32::from_be_bytes(b.try_into().expect("4")))
+}
+
+/// A copy of the template's curve 1 under a new id.
+fn copy_curve_row(file: &ClipFile) -> Result<i64> {
+    let id = file.next_main_id("BrushEffectorGraphData")?;
+    let names: Vec<String> = columns(file.database(), "BrushEffectorGraphData")?
+        .into_iter()
+        .filter(|(n, _)| n != "_PW_ID")
+        .map(|(n, _)| quote(&n))
+        .collect();
+    let values: Vec<String> = names.iter().map(|n| if n == "\"MainId\"" { "?1".into() } else { n.clone() }).collect();
+    let sql = format!(
+        "INSERT INTO BrushEffectorGraphData ({}) SELECT {} FROM BrushEffectorGraphData WHERE MainId = 1",
+        names.join(", "),
+        values.join(", ")
+    );
+    file.database().execute(&sql, [id])?;
+    Ok(id)
 }
 
 fn main() -> Result<()> {
@@ -141,10 +160,11 @@ fn main() -> Result<()> {
     let mut data = VectorData::parse(tmpl.external(&id).unwrap_or_default())?;
     println!("window {wx},{wy}; objects {} of brush {style}; edits {edits:?}", objects.len());
     data.objects = objects;
-    tmpl.set_external(&id, data.to_bytes());
-    // The brush style's tip and effector settings, with its size curve as
-    // curve 1. Only plain columns are copied: settings that point at other
-    // tables (textures, patterns) made CSP close when it opened the file.
+    // The brush style's tip and effector settings. Each pressure curve they
+    // follow is moved too: the first into the template's curve 1, the
+    // others into copies of that row. Only plain columns are copied:
+    // settings that point at other tables (textures, patterns) made CSP
+    // close when it opened the file.
     const COLUMNS: [&str; 11] = [
         "SizeEffector",
         "OpacityEffector",
@@ -158,9 +178,19 @@ fn main() -> Result<()> {
         "IntervalBase",
         "AutoIntervalType",
     ];
-    let mut size_curve = None;
-    let mut faithful = true;
-    for name in COLUMNS {
+    // `VT_ALL_COLUMNS=1` copies every column instead (only safe for a brush
+    // style without texture or pattern).
+    let names: Vec<String> = if std::env::var("VT_ALL_COLUMNS").is_ok() {
+        columns(src.database(), "BrushStyle")?
+            .into_iter()
+            .map(|(n, _)| n)
+            .filter(|n| !["_PW_ID", "MainId", "CanvasId", "NextIndex"].contains(&n.as_str()))
+            .collect()
+    } else {
+        COLUMNS.iter().map(|n| n.to_string()).collect()
+    };
+    let mut curves: BTreeMap<u32, i64> = BTreeMap::new();
+    for name in &names {
         let sql = format!("SELECT \"{name}\" FROM BrushStyle WHERE MainId = ?1");
         let Ok(mut value) = src.database().query_row(&sql, [style], |row| row.get::<_, Value>(0)) else {
             eprintln!("column {name} not in the source");
@@ -170,23 +200,36 @@ fn main() -> Result<()> {
             && word(blob, 0).is_some_and(|flags| flags & 0x10 != 0)
         {
             let curve = word(blob, 2).unwrap_or(0);
-            if name == "SizeEffector" {
-                size_curve = Some(curve);
-            }
-            if size_curve.is_some_and(|c| c == curve) {
-                blob[8..12].copy_from_slice(&1u32.to_be_bytes());
-            } else {
-                // Only one curve is moved: this setting loses the pressure.
-                faithful = false;
-                *blob = 1u32.to_be_bytes().to_vec();
-            }
+            let id = match curves.get(&curve) {
+                Some(id) => *id,
+                None => {
+                    let id = if curves.is_empty() { 1 } else { copy_curve_row(&tmpl)? };
+                    let (number, points): (i64, Vec<u8>) = src.database().query_row(
+                        "SELECT ControlNumber, ControlPoints FROM BrushEffectorGraphData WHERE MainId = ?1",
+                        [curve],
+                        |row| Ok((row.get(0)?, row.get(1)?)),
+                    )?;
+                    tmpl.database().execute(
+                        "UPDATE BrushEffectorGraphData SET ControlNumber = ?1, ControlPoints = ?2 WHERE MainId = ?3",
+                        (number, Value::Blob(points), id),
+                    )?;
+                    curves.insert(curve, id);
+                    id
+                }
+            };
+            blob[8..12].copy_from_slice(&(id as u32).to_be_bytes());
         }
         let sql = format!("UPDATE BrushStyle SET \"{name}\" = ?1");
         if tmpl.database().execute(&sql, [value]).is_err() {
             eprintln!("column {name} not in the template");
         }
     }
-    println!("settings copied faithfully: {faithful}");
+    let ids: Vec<i64> = tmpl
+        .database()
+        .prepare("SELECT MainId FROM BrushEffectorGraphData")?
+        .query_map([], |row| row.get(0))?
+        .collect::<std::result::Result<_, _>>()?;
+    println!("curves moved: {curves:?}; template curve rows {ids:?}");
     // `VT_SIZE_EFFECTOR=hex` replaces the size effector (to see what its
     // flags do on real strokes).
     if let Ok(hex) = std::env::var("VT_SIZE_EFFECTOR") {
@@ -195,17 +238,16 @@ fn main() -> Result<()> {
         tmpl.database().execute("UPDATE BrushStyle SET SizeEffector = ?1", [Value::Blob(blob)])?;
         println!("size effector {hex}");
     }
-    if let Some(curve) = size_curve {
-        let (number, points): (i64, Vec<u8>) = src.database().query_row(
-            "SELECT ControlNumber, ControlPoints FROM BrushEffectorGraphData WHERE MainId = ?1",
-            [curve],
-            |row| Ok((row.get(0)?, row.get(1)?)),
-        )?;
-        tmpl.database().execute(
-            "UPDATE BrushEffectorGraphData SET ControlNumber = ?1, ControlPoints = ?2",
-            (number, Value::Blob(points)),
-        )?;
+    // `VT_SQL` runs statements (separated by `;`) on the test file's
+    // database last, to try a setting.
+    if let Ok(statements) = std::env::var("VT_SQL") {
+        tmpl.database().execute_batch(&statements)?;
+        println!("ran {statements}");
     }
+    let mut moved = RgbaImage::new(w, h);
+    draw_objects(&mut moved, &data.objects, &brushes(&tmpl)?, Placement { offset: (0.0, 0.0), scale: 1.0 });
+    std::fs::write(format!("{output}.moved.png"), moved.to_png()?)?;
+    tmpl.set_external(&id, data.to_bytes());
     tmpl.update_preview()?;
     tmpl.renew_file_id();
     tmpl.save(output)

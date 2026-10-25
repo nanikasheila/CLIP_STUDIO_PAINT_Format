@@ -43,7 +43,8 @@
 //!   at 0 without it, plus the direction of the line with bit 0x40; bit
 //!   0x80 turns each dab at random by up to `RotationRandom` × 180°, which
 //!   is drawn as a wider stroke (60% of the way to the widest dab of that
-//!   range). A stroke is as wide as the ellipse across the line; the
+//!   range). `BrushStyle.StyleFlag` bit 0x40 turns the tip a further
+//!   quarter (the angle then names the major axis). A stroke is as wide as the ellipse across the line; the
 //!   anti-aliasing loss grows with how long the ellipse is across the line
 //!   against along it (× 0.4 to × 1.75).
 //!
@@ -224,6 +225,7 @@ fn brush(row: &Row, curves: &HashMap<i64, Curve>) -> Brush {
             rotation: row.opt_real("RotationBase").unwrap_or(0.0),
             rotation_flags: row.opt_int("RotationEffector").unwrap_or(0),
             rotation_random: row.opt_real("RotationRandom").unwrap_or(0.0),
+            turned: row.opt_int("StyleFlag").unwrap_or(0) & 0x40 != 0,
         },
         anti_alias: row.opt_int("AntiAlias").unwrap_or(1),
     }
@@ -241,6 +243,9 @@ pub struct Tip {
     pub rotation_flags: i64,
     /// `RotationRandom`, 0..1.
     pub rotation_random: f64,
+    /// `StyleFlag` bit 0x40: the tip is turned a quarter, so the angle
+    /// names its major axis.
+    pub turned: bool,
 }
 
 impl Default for Tip {
@@ -251,6 +256,7 @@ impl Default for Tip {
             rotation: 0.0,
             rotation_flags: 0,
             rotation_random: 0.0,
+            turned: false,
         }
     }
 }
@@ -274,6 +280,9 @@ impl Tip {
         let mut angle = if self.rotation_flags & Self::FIXED != 0 { self.rotation.to_radians() } else { 0.0 };
         if self.rotation_flags & Self::DIRECTION != 0 {
             angle += u.1.atan2(u.0);
+        }
+        if self.turned {
+            angle += std::f64::consts::FRAC_PI_2;
         }
         angle
     }
@@ -706,6 +715,10 @@ mod tests {
         assert!((width(&follows, 20.0, thickness, 0.0) - 37.9).abs() < 0.5);
         assert!((width(&follows, 20.0, thickness, 90.0) - 19.2).abs() < 0.5);
         assert!((width(&follows, 20.0, follows.thickness_at(1.0, 0.0), 90.0) - 38.9).abs() < 0.5);
+        // StyleFlag 0x40 turns the tip a quarter: the 0° line is now the thin one.
+        let turned = Tip { turned: true, ..follows };
+        assert!((width(&turned, 20.0, thickness, 90.0) - 37.9).abs() < 0.5);
+        assert!((width(&turned, 20.0, thickness, 0.0) - 19.2).abs() < 0.5);
     }
 
     #[test]
