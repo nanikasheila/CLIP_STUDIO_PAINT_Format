@@ -188,7 +188,7 @@ Python の標準ライブラリだけで動く読み取り実装か、Rust 実�
 | R7 ベクター | V1 | 済 | [V1](validation/V1-corpus.md): 4,819 個すべて一致 |
 | R8 テキスト | V1 | 済 | [V1](validation/V1-corpus.md): 8,344 ブロックすべて一致 |
 | R9 プレビュー | V1 | 済 | [V1](validation/V1-corpus.md): CanvasPreview は全件。LayerThumbnail 27,986 個すべて復号、.cmc 42 件・437 ページのサムネイル（ページの CanvasPreview）すべて取得 |
-| R10 合成描画 | V3 V6 | 一部 | [V6](validation/V6-made-files.md): 28 モードを CSP の書き出しと照合、全体で最大差 7/255。[V6b](validation/V6b-generated-layers.md): 色調補正・グラデーション・べた塗りを生成した 83 組で照合し、71 組が差 5/255 以内（知覚的の混色は近似）。プレビューとの比較（V3）は全画素レイヤーのファイルで 63〜66 dB、コーパス全体の集計は未 |
+| R10 合成描画 | V3 V6 | 済 | [V3](validation/V3-render.md): 719 件でプレビューと比較し、ベクター・テキスト・3D・色調補正のない 279 件の 92.1%（257 件）が 30 dB 以上（全体 46.2%、エラー 0）。合成モードの対応表は [03 章](spec/03-canvas-and-layers.md)。[V6](validation/V6-made-files.md): 28 モードを CSP の書き出しと照合、全体で最大差 7/255。[V6b](validation/V6b-generated-layers.md): 色調補正・グラデーション・べた塗りを生成した 83 組で照合し、71 組が差 5/255 以内 |
 | R11 書き戻し | V1 | 済 | [V1](validation/V1-corpus.md): 全件バイト一致 |
 | R12 編集 | V4 V6 | 済 | [V6](validation/V6-made-files.md) 2・5 章: 画素の差し替え・名前・不透明度・合成モード・表示・クリッピング・プレビュー・ファイル ID の更新、ラスターレイヤーとフォルダーの追加・削除を CSP で開いて確認。書き出しとの差は 0〜2/255 |
 | R13 新規作成 | V4 V6 | 済 | [V6](validation/V6-made-files.md) 5.1: 大きさ・解像度・用紙の色（なしを含む）を変えた 3 件が自己検査を通り、CSP で開けて書き出しと全画素一致。CSP で保存し直したファイルとの構造差分を記録 |
