@@ -1,6 +1,9 @@
 //! Compare our render of .clip files with PNG exports of the same files
 //! from CSP (full size). Prints, per file, the largest and mean channel
 //! difference, the 99th percentile, the PSNR and what the renderer drew.
+//! Colours are compared over white, so the colour under a fully
+//! transparent pixel does not count; the alpha is compared as a fourth
+//! channel.
 //!
 //! Usage: render_compare FILE.clip EXPORT.png [FILE.clip EXPORT.png …]
 
@@ -27,7 +30,10 @@ fn main() -> Result<()> {
             .pixels
             .chunks_exact(4)
             .zip(export.pixels.chunks_exact(4))
-            .flat_map(|(a, b)| (0..3).map(move |c| a[c].abs_diff(b[c])))
+            .flat_map(|(a, b)| {
+                let (x, y) = (over_white(a), over_white(b));
+                (0..4).map(move |c| x[c].abs_diff(y[c]))
+            })
             .collect();
         let mean = diffs.iter().map(|&d| d as f64).sum::<f64>() / diffs.len() as f64;
         diffs.sort_unstable();
@@ -43,4 +49,11 @@ fn main() -> Result<()> {
         );
     }
     Ok(())
+}
+
+/// A pixel's colour drawn over white, with its alpha.
+fn over_white(p: &[u8]) -> [u8; 4] {
+    let a = p[3] as u32;
+    let mix = |v: u8| ((v as u32 * a + 255 * (255 - a) + 127) / 255) as u8;
+    [mix(p[0]), mix(p[1]), mix(p[2]), p[3]]
 }

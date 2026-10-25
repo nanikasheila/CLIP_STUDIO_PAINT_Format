@@ -223,9 +223,15 @@ impl Layer {
         (self.offset.0 + self.render_offset.0, self.offset.1 + self.render_offset.1)
     }
 
-    /// Canvas position of the mask offscreen's top-left pixel.
+    /// Canvas position of the mask offscreen's top-left pixel. The mask
+    /// offsets are relative to the layer's offset (a moved layer keeps its
+    /// mask in place: offset (7018, 1) with mask offset (−7018, −1) puts a
+    /// canvas-sized mask at (0, 0)).
     pub fn mask_origin(&self) -> (i64, i64) {
-        (self.mask_offset.0 + self.mask_render_offset.0, self.mask_offset.1 + self.mask_render_offset.1)
+        (
+            self.offset.0 + self.mask_offset.0 + self.mask_render_offset.0,
+            self.offset.1 + self.mask_offset.1 + self.mask_render_offset.1,
+        )
     }
 
     pub fn has_mask(&self) -> bool {

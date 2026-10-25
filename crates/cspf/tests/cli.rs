@@ -122,3 +122,30 @@ fn bad_arguments_fail_cleanly() {
     assert_eq!(cspf(&["inspect"]).status.code(), Some(1));
     assert_eq!(cspf(&["new", "x.clip", "--size", "big"]).status.code(), Some(1));
 }
+
+#[test]
+fn folders_and_attributes() {
+    let dir = tempfile::tempdir().unwrap();
+    let png = red_square(dir.path());
+    let clip = path(dir.path(), "new.clip");
+    ok(&["new", &clip, "--size", "64x48"]);
+    let with_folder = path(dir.path(), "folder.clip");
+    let added: serde_json::Value =
+        serde_json::from_str(&ok(&["add-folder", &clip, &with_folder, "--name", "F"])).unwrap();
+    let folder = added["folder"].as_i64().unwrap().to_string();
+    let inside = path(dir.path(), "inside.clip");
+    let added: serde_json::Value =
+        serde_json::from_str(&ok(&["add-layer", &with_folder, &png, &inside, "--parent", &folder])).unwrap();
+    let layer = added["layer"].as_i64().unwrap().to_string();
+    let changed = path(dir.path(), "changed.clip");
+    ok(&["set", &inside, &layer, &changed, "--opacity", "50", "--blend", "2", "--visible", "no", "--name", "L"]);
+    let changed2 = path(dir.path(), "changed2.clip");
+    ok(&["set", &changed, &folder, &changed2, "--clip", "yes"]);
+
+    let report: serde_json::Value = serde_json::from_str(&ok(&["check", &changed2])).unwrap();
+    assert_eq!(report["ok"], true, "{report}");
+    let layers = ok(&["layers", &changed2]);
+    assert!(layers.contains("F [folder] clip"), "{layers}");
+    assert!(layers.contains("    L [raster] hidden  opacity=128 blend=2"), "{layers}");
+    assert!(!cspf(&["set", &changed2, &layer, &changed, "--blend", "999"]).status.success());
+}

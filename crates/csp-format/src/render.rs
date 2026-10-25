@@ -281,6 +281,16 @@ impl Buffer {
     /// Composite `source` (premultiplied) onto self with a mode; `coverage`
     /// scales the source alpha per pixel (opacity × mask × clipping base).
     fn composite(&mut self, source: &Buffer, mode: BlendMode, coverage: impl Fn(usize) -> f32) {
+        self.composite_with(source, mode, coverage, false);
+    }
+
+    /// Like [`Buffer::composite`], but keep self's alpha: the source shows
+    /// only where self has pixels (clipping onto a base layer).
+    fn composite_atop(&mut self, source: &Buffer, mode: BlendMode, coverage: impl Fn(usize) -> f32) {
+        self.composite_with(source, mode, coverage, true);
+    }
+
+    fn composite_with(&mut self, source: &Buffer, mode: BlendMode, coverage: impl Fn(usize) -> f32, atop: bool) {
         for i in 0..self.data.len() {
             let s = source.data[i];
             let k = coverage(i);
@@ -292,20 +302,22 @@ impl Buffer {
             let ba = b[3];
             let sc = [s[0] / s[3], s[1] / s[3], s[2] / s[3]];
             let bc = if ba > 0.0 { [b[0] / ba, b[1] / ba, b[2] / ba] } else { [0.0; 3] };
-            let oa = sa + ba * (1.0 - sa);
+            let oa = if atop { ba } else { sa + ba * (1.0 - sa) };
+            // Source where the backdrop is empty (not when clipping).
+            let alone = if atop { 0.0 } else { sa * (1.0 - ba) };
             let mut out = [0.0; 4];
             if mode.is_glow() {
                 // Glow modes blend the backdrop with the source colour times
                 // its alpha and are not then mixed by alpha (measured in CSP).
                 let mixed = mode.blend(bc, sc.map(|v| v * sa));
                 for c in 0..3 {
-                    out[c] = sa * (1.0 - ba) * sc[c] + ba * mixed[c];
+                    out[c] = alone * sc[c] + ba * mixed[c];
                 }
             } else {
                 let mixed = mode.blend(bc, sc);
                 for c in 0..3 {
                     // W3C compositing: source over, with the blended colour where both exist.
-                    out[c] = sa * (1.0 - ba) * sc[c] + sa * ba * mixed[c] + (1.0 - sa) * b[c];
+                    out[c] = alone * sc[c] + sa * ba * mixed[c] + (1.0 - sa) * b[c];
                 }
             }
             out[3] = oa;
@@ -418,26 +430,43 @@ fn resample(image: &RgbaImage, width: u32, height: u32) -> RgbaImage {
 
 impl Renderer<'_> {
     /// Draw the children of `node` (bottom first) onto `target`.
+    ///
+    /// A layer and the clipping layers above it form a group, as in CSP:
+    /// the clipping layers are drawn onto the base layer alone (keeping its
+    /// alpha), and the group is then drawn with the base layer's mode,
+    /// opacity and mask (measured in CSP, `docs/validation/V6-made-files.md`).
+    /// A pass-through folder or a correction layer as the base has no image
+    /// of its own; its clipping layers are drawn onto the backdrop, masked
+    /// by the base's alpha.
     fn children(&mut self, node: &LayerNode, target: &mut Buffer) -> Result<()> {
-        // Alpha of the current clipping base (the nearest non-clipping layer below).
-        let mut base: Option<Vec<f32>> = None;
+        let mut group: Option<Group> = None;
         for child in &node.children {
             let layer = &child.layer;
+            if !layer.clipping
+                && let Some(done) = group.take()
+            {
+                done.flush(target);
+            }
             if !layer.visible {
                 self.report.hidden += 1;
                 if !layer.clipping {
-                    base = Some(vec![0.0; self.width * self.height]);
+                    group = Some(Group::Empty);
                 }
                 continue;
             }
-            let Some(content) = self.content(child, target)? else {
+            let backdrop = match (&group, layer.clipping) {
+                (Some(Group::Isolated { buffer, .. }), true) => buffer,
+                _ => &*target,
+            };
+            let Some(content) = self.content(child, backdrop)? else {
                 if !layer.clipping {
-                    base = Some(vec![0.0; self.width * self.height]);
+                    group = Some(Group::Empty);
                 }
                 continue;
             };
             let mut coverage = vec![layer.opacity_fraction() as f32; self.width * self.height];
             if layer.mask_enabled
+                && !content.masked
                 && let Some(mask) = self.mask(layer)?
             {
                 self.report.masked += 1;
@@ -445,31 +474,39 @@ impl Renderer<'_> {
                     *c *= m;
                 }
             }
-            if layer.clipping {
-                self.report.clipped += 1;
-                if let Some(base) = &base {
-                    for (c, b) in coverage.iter_mut().zip(base) {
-                        *c *= b;
-                    }
-                }
-            } else {
-                base = Some(content.buffer.data.iter().zip(&coverage).map(|(p, c)| p[3] * c).collect());
-            }
-            match content.mode {
-                Some(mode) => target.composite(&content.buffer, mode, |i| coverage[i]),
-                None => {
-                    // Pass-through: the folder was drawn onto a copy of the
-                    // backdrop; mix it in by opacity and mask.
-                    for (i, pixel) in target.data.iter_mut().enumerate() {
-                        let k = coverage[i];
-                        let s = content.buffer.data[i];
-                        for c in 0..4 {
-                            pixel[c] += (s[c] - pixel[c]) * k;
-                        }
-                    }
-                }
-            }
             self.report.drawn += 1;
+            if !layer.clipping {
+                group = Some(match content.mode {
+                    Some(mode) => Group::Isolated { buffer: content.buffer, mode, coverage },
+                    None => {
+                        let alpha = content.buffer.data.iter().zip(&coverage).map(|(p, c)| p[3] * c).collect();
+                        mix(target, &content.buffer, &coverage);
+                        Group::Backdrop { alpha }
+                    }
+                });
+                continue;
+            }
+            self.report.clipped += 1;
+            match &mut group {
+                Some(Group::Isolated { buffer, .. }) => match content.mode {
+                    Some(mode) => buffer.composite_atop(&content.buffer, mode, |i| coverage[i]),
+                    None => mix(buffer, &content.buffer, &coverage),
+                },
+                Some(Group::Backdrop { alpha }) => {
+                    for (c, a) in coverage.iter_mut().zip(alpha.iter()) {
+                        *c *= a;
+                    }
+                    match content.mode {
+                        Some(mode) => target.composite(&content.buffer, mode, |i| coverage[i]),
+                        None => mix(target, &content.buffer, &coverage),
+                    }
+                }
+                // No base (or a hidden or empty one): nothing shows.
+                Some(Group::Empty) | None => self.report.drawn -= 1,
+            }
+        }
+        if let Some(done) = group {
+            done.flush(target);
         }
         Ok(())
     }
@@ -489,11 +526,11 @@ impl Renderer<'_> {
             if mode == BlendMode::PassThrough {
                 let mut buffer = backdrop.clone();
                 self.children(node, &mut buffer)?;
-                return Ok(Some(Content { buffer, mode: None }));
+                return Ok(Some(Content { buffer, mode: None, masked: false }));
             }
             let mut buffer = Buffer::new(self.width, self.height);
             self.children(node, &mut buffer)?;
-            return Ok(Some(Content { buffer, mode: Some(mode) }));
+            return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
         }
         if layer.kind == LayerKind::Paper {
             // The paper's stored pixels are not its look (older files store
@@ -503,7 +540,7 @@ impl Renderer<'_> {
             let pixel = [color[0] as f32 / 255.0, color[1] as f32 / 255.0, color[2] as f32 / 255.0, 1.0];
             let mut buffer = Buffer::new(self.width, self.height);
             buffer.data.fill(pixel);
-            return Ok(Some(Content { buffer, mode: Some(mode) }));
+            return Ok(Some(Content { buffer, mode: Some(mode), masked: false }));
         }
         if layer.kind == LayerKind::Correction
             && let Some(correction) = layer.row.blob("FilterLayerInfo").and_then(|data| Correction::parse(data).ok())
@@ -524,24 +561,45 @@ impl Renderer<'_> {
                     pixel[c] = out[c] / 255.0 * a;
                 }
             }
-            return Ok(Some(Content { buffer, mode: None }));
+            return Ok(Some(Content { buffer, mode: None, masked: false }));
         }
-        if let Some(buffer) = self.pixels(layer)? {
-            return Ok(Some(Content { buffer, mode: Some(mode) }));
+        // Gradient layers are drawn from their settings, as CSP does when it
+        // opens a file; the pixels some files store are a cache.
+        if layer.kind == LayerKind::Gradient
+            && let Some(mut gradient) = layer.row.blob("GradationFillInfo").and_then(|data| Gradient::parse(data).ok())
+        {
+            // Its points are relative to the layer's offset (a moved layer),
+            // as vector points are.
+            let (dx, dy) = (layer.offset.0 as f64, layer.offset.1 as f64);
+            gradient.start = (gradient.start.0 + dx, gradient.start.1 + dy);
+            gradient.end = (gradient.end.0 + dx, gradient.end.1 + dy);
+            self.report.gradient_layers += 1;
+            self.report.gradients_approximate += usize::from(gradient.is_approximate());
+            if let Some((border, apply_opacity)) = self.effects(layer) {
+                // A border needs the full-size image (see `pixels`).
+                let image = gradient.draw(self.file.canvas.width_px, self.file.canvas.height_px, 1.0);
+                let (buffer, masked) = self.bordered(layer, image, (0, 0), &border, apply_opacity)?;
+                return Ok(Some(Content { buffer, mode: Some(mode), masked }));
+            }
+            let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
+            return Ok(Some(Content {
+                buffer: self.place(image, (0, 0), self.scale),
+                mode: Some(mode),
+                masked: false,
+            }));
+        }
+        if let Some((buffer, masked)) = self.pixels(layer)? {
+            return Ok(Some(Content { buffer, mode: Some(mode), masked }));
         }
         if layer.kind == LayerKind::Vector
             && let Some(image) = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?
         {
             self.report.vector_layers += 1;
-            return Ok(Some(Content { buffer: self.place(image, (0, 0), self.scale), mode: Some(mode) }));
-        }
-        if layer.kind == LayerKind::Gradient
-            && let Some(gradient) = layer.row.blob("GradationFillInfo").and_then(|data| Gradient::parse(data).ok())
-        {
-            self.report.gradient_layers += 1;
-            self.report.gradients_approximate += usize::from(gradient.is_approximate());
-            let image = gradient.draw(self.width as u32, self.height as u32, self.scale);
-            return Ok(Some(Content { buffer: self.place(image, (0, 0), self.scale), mode: Some(mode) }));
+            return Ok(Some(Content {
+                buffer: self.place(image, (0, 0), self.scale),
+                mode: Some(mode),
+                masked: false,
+            }));
         }
         *self.report.without_pixels.entry(layer.kind.name().to_owned()).or_default() += 1;
         Ok(None)
@@ -572,7 +630,11 @@ impl Renderer<'_> {
     fn place(&self, image: RgbaImage, origin: (i64, i64), level_scale: f64) -> Buffer {
         let factor = self.scale / level_scale;
         let halvings = exact_halvings(factor);
-        let image = if (factor - 1.0).abs() < 1e-9 {
+        // Output sizes are rounded down from the canvas size, so the scale
+        // asked for is a little under the level's (826 / 1653 for a half-size
+        // preview); within the tolerance of `exact_halvings` the level is
+        // used as it is rather than resampled by a fraction of a pixel.
+        let image = if (factor - 1.0).abs() < 0.005 {
             image
         } else if halvings > 0 {
             // CSP's mipmap levels: each halves the one above with a 2×2 box
@@ -610,7 +672,9 @@ impl Renderer<'_> {
         buffer
     }
 
-    fn pixels(&mut self, layer: &Layer) -> Result<Option<Buffer>> {
+    /// The layer's stored pixels placed in an output buffer, and whether
+    /// the mask was applied to them already.
+    fn pixels(&mut self, layer: &Layer) -> Result<Option<(Buffer, bool)>> {
         if layer.render_mipmap == 0 {
             return Ok(None);
         }
@@ -622,23 +686,67 @@ impl Renderer<'_> {
         if offscreen.data.is_none() {
             return Ok(None);
         }
+        if let Some((border, apply_opacity)) = border {
+            return Ok(Some(self.bordered(
+                layer,
+                offscreen.to_rgba()?,
+                layer.pixel_origin(),
+                &border,
+                apply_opacity,
+            )?));
+        }
         // Halve block by block when the wanted scale is a power of two
         // below the level (large canvases read for a preview).
-        let halvings = if border.is_none() { exact_halvings(self.scale / level_scale) } else { 0 };
-        let (mut image, level_scale) = if halvings > 0 {
+        let halvings = exact_halvings(self.scale / level_scale);
+        let (image, level_scale) = if halvings > 0 {
             (offscreen.to_rgba_halved(halvings)?, level_scale / 2f64.powi(halvings as i32))
         } else {
             (offscreen.to_rgba()?, level_scale)
         };
-        let mut origin = layer.pixel_origin();
-        if let Some((border, apply_opacity)) = border {
-            let scaled = Border { width: border.width * level_scale, ..border };
-            let (bordered, margin) = draw_border(&image, &scaled, apply_opacity);
-            image = bordered;
-            let shift = (margin as f64 / level_scale).round() as i64;
-            origin = (origin.0 - shift, origin.1 - shift);
+        Ok(Some((self.place(image, layer.pixel_origin(), level_scale), false)))
+    }
+
+    /// Draw a border around a full-size layer image whose top-left is at
+    /// canvas `origin`. The mask is applied first, so the border follows
+    /// the masked shape (CSP draws the border of a masked fill layer around
+    /// the mask's hole), and the result is not masked again.
+    fn bordered(
+        &self,
+        layer: &Layer,
+        mut image: RgbaImage,
+        origin: (i64, i64),
+        border: &Border,
+        apply_opacity: bool,
+    ) -> Result<(Buffer, bool)> {
+        let masked = layer.mask_enabled && self.fold_mask(layer, &mut image, origin)?;
+        let (bordered, margin) = draw_border(&image, border, apply_opacity);
+        let origin = (origin.0 - margin as i64, origin.1 - margin as i64);
+        Ok((self.place(bordered, origin, 1.0), masked))
+    }
+
+    /// Multiply the alpha of a full-size image at canvas `origin` by the
+    /// layer's mask. Returns false when the layer has no mask.
+    fn fold_mask(&self, layer: &Layer, image: &mut RgbaImage, origin: (i64, i64)) -> Result<bool> {
+        if layer.mask_mipmap == 0 {
+            return Ok(false);
         }
-        Ok(Some(self.place(image, origin, level_scale)))
+        let Some((offscreen, _)) = self.level(layer.mask_mipmap, 1.0)? else { return Ok(false) };
+        let outside = offscreen.attribute.init_color().map(|init| (init.alpha & 0xff) as u8).unwrap_or(0);
+        let mask = offscreen.to_alpha()?;
+        let (mx, my) = layer.mask_origin();
+        for y in 0..image.height {
+            for x in 0..image.width {
+                let (cx, cy) = (origin.0 + x as i64 - mx, origin.1 + y as i64 - my);
+                let m = if cx >= 0 && cy >= 0 && (cx as u32) < mask.width && (cy as u32) < mask.height {
+                    mask.pixels[cy as usize * mask.width as usize + cx as usize]
+                } else {
+                    outside
+                };
+                let i = (y * image.width + x) as usize * 4 + 3;
+                image.pixels[i] = ((image.pixels[i] as u32 * m as u32 + 127) / 255) as u8;
+            }
+        }
+        Ok(true)
     }
 
     /// The layer's switched-on effects: returns the border to draw and
@@ -687,6 +795,40 @@ fn exact_halvings(factor: f64) -> u32 {
 struct Content {
     buffer: Buffer,
     mode: Option<BlendMode>,
+    /// The layer mask is already in the buffer (a border was drawn around
+    /// the masked image).
+    masked: bool,
+}
+
+/// A base layer and the clipping layers drawn onto it so far.
+enum Group {
+    /// The base's own image, drawn with its mode and coverage at the end.
+    Isolated { buffer: Buffer, mode: BlendMode, coverage: Vec<f32> },
+    /// The base was mixed into the backdrop (pass-through or correction);
+    /// clipping layers are masked by its alpha.
+    Backdrop { alpha: Vec<f32> },
+    /// The base is hidden or has no image.
+    Empty,
+}
+
+impl Group {
+    fn flush(self, target: &mut Buffer) {
+        if let Group::Isolated { buffer, mode, coverage } = self {
+            target.composite(&buffer, mode, |i| coverage[i]);
+        }
+    }
+}
+
+/// Mix `source` (which already includes the backdrop, as a pass-through
+/// folder or a correction layer does) into `target` by `coverage`.
+fn mix(target: &mut Buffer, source: &Buffer, coverage: &[f32]) {
+    for (i, pixel) in target.data.iter_mut().enumerate() {
+        let k = coverage[i];
+        let s = source.data[i];
+        for c in 0..4 {
+            pixel[c] += (s[c] - pixel[c]) * k;
+        }
+    }
 }
 
 fn gray_to_rgba(gray: &GrayImage) -> RgbaImage {
@@ -757,5 +899,40 @@ mod tests {
         let mut b = a.clone();
         b.set_pixel(0, 0, [11, 20, 30, 255]);
         assert!(psnr(&a, &b) > 50.0);
+    }
+
+    /// A clipping layer is drawn onto its base layer alone, and the group
+    /// then with the base's mode and opacity (measured in CSP: a screen
+    /// layer clipped to a half-transparent multiply layer at 50%).
+    #[test]
+    fn clipping_layers_group_with_their_base() {
+        let canvas = crate::NewCanvas { width: 4, height: 4, paper: Some([200, 200, 200]), ..Default::default() };
+        let mut file = ClipFile::create(&canvas).unwrap();
+        let mut base = RgbaImage::new(4, 4);
+        base.fill([56, 199, 199, 140]);
+        let base_id = file.add_raster_layer("base", &base, (0, 0)).unwrap();
+        file.set_layer_blend(base_id, BlendMode::Multiply).unwrap();
+        file.set_layer_opacity(base_id, 0.5).unwrap();
+        let mut top = RgbaImage::new(4, 4);
+        top.fill([151, 202, 160, 255]);
+        let top_id = file.add_raster_layer("top", &top, (0, 0)).unwrap();
+        file.set_layer_blend(top_id, BlendMode::Screen).unwrap();
+        file.set_layer_clipping(top_id, true).unwrap();
+        let (image, report) = render(&file, RenderOptions::default()).unwrap();
+        assert_eq!(report.clipped, 1);
+        // Expected: group colour = screen(base, top) (the top is opaque), alpha
+        // = the base's; then multiplied onto the paper at 0.5 × 140/255.
+        let (b, t, paper): ([f64; 3], [f64; 3], f64) = ([56.0, 199.0, 199.0], [151.0, 202.0, 160.0], 200.0);
+        let a = 0.5 * 140.0 / 255.0;
+        let expected: Vec<u8> = (0..3)
+            .map(|c| {
+                let group = 255.0 - (255.0 - b[c]) * (255.0 - t[c]) / 255.0;
+                (paper * (1.0 - a) + paper * group / 255.0 * a).round() as u8
+            })
+            .collect();
+        let got = image.pixel(1, 1);
+        for c in 0..3 {
+            assert!(got[c].abs_diff(expected[c]) <= 1, "{got:?} vs {expected:?}");
+        }
     }
 }

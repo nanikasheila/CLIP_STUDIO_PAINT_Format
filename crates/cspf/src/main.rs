@@ -8,6 +8,8 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::Instant;
 
+use csp_format::edit::NewLayer;
+use csp_format::render::BlendMode;
 use csp_format::verify::{CheckOptions, check_clip, check_cmc};
 use csp_format::{ClipFile, Result};
 use serde_json::{Value, json};
@@ -25,8 +27,14 @@ USAGE:
   cspf roundtrip FILE OUT           save FILE unchanged to OUT and confirm the bytes are equal
   cspf new OUT.clip [--size WxH] [--dpi D] [--paper RRGGBB|none] [--image PNG]
                                     a new file: paper and one raster layer (with PNG's pixels)
-  cspf add-layer FILE PNG OUT [--name NAME] [--at X,Y]
+  cspf add-layer FILE PNG OUT [--name NAME] [--at X,Y] [--parent ID]
                                     add a raster layer on top holding PNG at canvas X,Y
+                                    (in folder ID; default: the root folder)
+  cspf add-folder FILE OUT [--name NAME] [--parent ID]
+                                    add an empty folder on top
+  cspf set FILE ID OUT [--name NAME] [--opacity 0-100] [--blend MODE] [--visible yes|no]
+                       [--clip yes|no]
+                                    change a layer's attributes (MODE: a LayerComposite number)
   cspf remove-layer FILE ID OUT     remove a layer (a folder with its contents)
   cspf extract FILE OUT_DIR         stored layer pixels and masks as PNG
   cspf preview FILE OUT.png         the preview CSP saved in the file
@@ -53,6 +61,8 @@ fn main() -> ExitCode {
         "roundtrip" => two(rest).and_then(|(file, out)| roundtrip(&file, &out)),
         "new" => new_file(rest),
         "add-layer" => add_layer(rest),
+        "add-folder" => add_folder(rest),
+        "set" => set_attributes(rest),
         "remove-layer" => remove_layer(rest),
         "extract" => two(rest).and_then(|(file, out)| extract(&file, &out)),
         "preview" => two(rest).and_then(|(file, out)| preview(&file, &out)),
@@ -257,25 +267,77 @@ fn new_file(args: &[String]) -> Result<bool> {
 }
 
 fn add_layer(args: &[String]) -> Result<bool> {
-    let (found, positional) = options(args, &["--name", "--at"]);
+    let (found, positional) = options(args, &["--name", "--at", "--parent"]);
     let [file, png, out] = positional.as_slice() else { return Err(bad("expected FILE PNG OUT")) };
+    let mut clip = ClipFile::open(file)?;
     let mut name = "レイヤー".to_owned();
     let mut at = (0, 0);
+    let mut parent = clip.canvas.root_folder;
     for (option, value) in found {
         match option {
             "--name" => name = value.to_owned(),
+            "--parent" => parent = value.parse().map_err(|_| bad("--parent is a folder id (see inspect)"))?,
             _ => {
                 let (x, y) = value.split_once(',').ok_or_else(|| bad("--at is X,Y"))?;
                 at = (x.parse().map_err(|_| bad("--at is X,Y"))?, y.parse().map_err(|_| bad("--at is X,Y"))?);
             }
         }
     }
+    let id = clip.add_layer(parent, NewLayer::Raster, &name)?;
+    clip.set_layer_pixels(id, &read_png(png)?, at)?;
+    finish(clip, out, json!({"file": out, "layer": id}))
+}
+
+fn add_folder(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--name", "--parent"]);
+    let [file, out] = positional.as_slice() else { return Err(bad("expected FILE OUT")) };
     let mut clip = ClipFile::open(file)?;
-    let id = clip.add_raster_layer(&name, &read_png(png)?, at)?;
+    let mut name = "フォルダー".to_owned();
+    let mut parent = clip.canvas.root_folder;
+    for (option, value) in found {
+        match option {
+            "--name" => name = value.to_owned(),
+            _ => parent = value.parse().map_err(|_| bad("--parent is a folder id (see inspect)"))?,
+        }
+    }
+    let id = clip.add_layer(parent, NewLayer::Folder, &name)?;
+    finish(clip, out, json!({"file": out, "folder": id}))
+}
+
+fn set_attributes(args: &[String]) -> Result<bool> {
+    let (found, positional) = options(args, &["--name", "--opacity", "--blend", "--visible", "--clip"]);
+    let [file, id, out] = positional.as_slice() else { return Err(bad("expected FILE ID OUT")) };
+    let id: i64 = id.parse().map_err(|_| bad("ID is a layer id (see inspect)"))?;
+    let yes = |value: &str| match value {
+        "yes" | "on" | "true" | "1" => Ok(true),
+        "no" | "off" | "false" | "0" => Ok(false),
+        _ => Err(bad("expected yes or no")),
+    };
+    let mut clip = ClipFile::open(file)?;
+    for (option, value) in found {
+        match option {
+            "--name" => clip.set_layer_name(id, value)?,
+            "--opacity" => {
+                let percent: f64 = value.parse().map_err(|_| bad("--opacity is 0-100"))?;
+                clip.set_layer_opacity(id, percent / 100.0)?;
+            }
+            "--blend" => {
+                let mode = value.parse().ok().and_then(BlendMode::from_code);
+                clip.set_layer_blend(id, mode.ok_or_else(|| bad("--blend is a LayerComposite number"))?)?;
+            }
+            "--visible" => clip.set_layer_visible(id, yes(value)?)?,
+            _ => clip.set_layer_clipping(id, yes(value)?)?,
+        }
+    }
+    finish(clip, out, json!({"file": out, "layer": id}))
+}
+
+/// Refresh the preview, give the file a new id and save it.
+fn finish(mut clip: ClipFile, out: &str, report: Value) -> Result<bool> {
     clip.update_preview()?;
     clip.renew_file_id();
     clip.save(out)?;
-    print_json(&json!({"file": out, "layer": id}));
+    print_json(&report);
     Ok(true)
 }
 
@@ -284,11 +346,7 @@ fn remove_layer(args: &[String]) -> Result<bool> {
     let id: i64 = id.parse().map_err(|_| bad("ID is a layer id (see inspect)"))?;
     let mut clip = ClipFile::open(file)?;
     clip.remove_layer(id)?;
-    clip.update_preview()?;
-    clip.renew_file_id();
-    clip.save(out)?;
-    print_json(&json!({"file": out, "removed": id}));
-    Ok(true)
+    finish(clip, out, json!({"file": out, "removed": id}))
 }
 
 fn extract(path: &Path, out: &Path) -> Result<bool> {
