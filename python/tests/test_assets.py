@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from csp_format import CspFormatError  # noqa: E402
-from csp_format.assets import c2f, colorset, material, serial, subtool, tar  # noqa: E402
+from csp_format.assets import c2f, colorset, material, serial, shortcut, subtool, tar  # noqa: E402
 
 
 def action_set() -> serial.Document:
@@ -29,6 +29,21 @@ def action_set() -> serial.Document:
 
 def points(*pairs) -> bytes:
     return struct.pack(">III", 12, len(pairs), 16) + b"".join(struct.pack(">dd", *p) for p in pairs)
+
+
+def to_bytes(c: sqlite3.Connection) -> bytes:
+    if hasattr(c, "serialize"):
+        return c.serialize()
+    import tempfile
+    import os
+    handle, name = tempfile.mkstemp()
+    os.close(handle)
+    disk = sqlite3.connect(name)
+    c.backup(disk)
+    disk.close()
+    data = Path(name).read_bytes()
+    os.unlink(name)
+    return data
 
 
 def tool_db() -> bytes:
@@ -62,18 +77,7 @@ def tool_db() -> bytes:
     c.execute("INSERT INTO Variant(VariantID, BrushSize, BrushSizeEffector, BrushPatternImageArray, VariantShowParam)"
               " VALUES (1, 5.0, ?, ?, ?)", (effector, materials, show))
     c.execute("INSERT INTO Variant(VariantID, BrushSize) VALUES (2, 30.0)")
-    if hasattr(c, "serialize"):
-        return c.serialize()
-    import tempfile
-    import os
-    handle, name = tempfile.mkstemp()
-    os.close(handle)
-    disk = sqlite3.connect(name)
-    c.backup(disk)
-    disk.close()
-    data = Path(name).read_bytes()
-    os.unlink(name)
-    return data
+    return to_bytes(c)
 
 
 class SerialTests(unittest.TestCase):
@@ -129,6 +133,26 @@ class SubToolTests(unittest.TestCase):
     def test_not_a_sub_tool_file(self):
         with self.assertRaises(CspFormatError):
             subtool.SubToolDb(b"SLCC")
+
+
+class ShortcutTests(unittest.TestCase):
+    def test_commands_keys_and_tools(self):
+        c = sqlite3.connect(":memory:")
+        c.executescript(
+            "CREATE TABLE workspaceshortcutmenu(_PW_ID INTEGER PRIMARY KEY, menucommandtype TEXT, menucommand TEXT,"
+            " shortcut TEXT, modifier INTEGER);"
+            "CREATE TABLE workspaceshortcuttool(_PW_ID INTEGER PRIMARY KEY, uuid BLOB, shortcut TEXT);"
+            "INSERT INTO workspaceshortcutmenu(menucommandtype, menucommand, shortcut, modifier) VALUES"
+            " ('advancedcommand', 'filesaveas', 'S', 6), ('basiccommand', 'undo', 'Z', 4),"
+            " ('basiccommand', 'undo', 'Z', 0), ('advancedcommand', 'filesaveaspng', 'NULL', 0);")
+        c.execute("INSERT INTO workspaceshortcuttool(uuid, shortcut) VALUES (?, 'P')", (b"\x02" * 16,))
+        keys = shortcut.parse(to_bytes(c))
+        self.assertEqual(keys.keys("filesaveas"), ["Ctrl+Shift+S"])
+        self.assertEqual(keys.keys("undo"), ["Ctrl+Z", "Z"])
+        self.assertEqual(keys.unassigned, ["filesaveaspng"])
+        self.assertEqual(keys.tools, [("02" * 16, "P")])
+        with self.assertRaises(CspFormatError):
+            shortcut.parse(tool_db())
 
 
 class MaterialTests(unittest.TestCase):

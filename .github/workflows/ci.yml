@@ -22,7 +22,7 @@ jobs:
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --all
       - name: Python tools compile
-        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py tools/corpus/value_census.py tools/corpus/schema_doc.py tools/validation/python_reader_check.py tools/validation/name_splitter_check.py tools/validation/assets_python_check.py
+        run: python -m py_compile tools/corpus/census.py tools/corpus/schema_catalog.py tools/corpus/layer_census.py tools/corpus/value_census.py tools/corpus/schema_doc.py tools/validation/python_reader_check.py tools/validation/name_splitter_check.py tools/validation/assets_python_check.py tools/assets/subtool_census.py tools/assets/subtool_columns.py tools/assets/sqlite_census.py
       - name: Python reader tests
         run: python -m unittest discover -s python/tests -v
       - name: Python reader matches the Rust crate (V7, fixture)

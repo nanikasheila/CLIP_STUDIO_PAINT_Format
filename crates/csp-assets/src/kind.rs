@@ -129,7 +129,7 @@ pub const FORMATS: &[Format] = &[
         purpose: "ワークスペースの一覧と現在のワークスペース",
         support: Catalogued,
     },
-    Format { pattern: ".khc", family: Sqlite, purpose: "ショートカットキー設定", support: Catalogued },
+    Format { pattern: ".khc", family: Sqlite, purpose: "ショートカットキー設定", support: Typed },
     Format {
         pattern: ".tomd", family: Sqlite, purpose: "修飾キー設定（ツールごと）", support: Catalogued
     },

@@ -9,6 +9,6 @@
 Mirrors ``crates/csp-assets`` (reading; colour sets, serialised documents
 and tars are also written). Encrypted material data is never decrypted.
 """
-from . import c2f, colorset, material, serial, subtool, tar
+from . import c2f, colorset, material, serial, shortcut, subtool, tar
 
-__all__ = ["c2f", "colorset", "material", "serial", "subtool", "tar"]
+__all__ = ["c2f", "colorset", "material", "serial", "shortcut", "subtool", "tar"]

@@ -99,11 +99,34 @@ u32 ヘッダーの大きさ (16 か 24)  u32 色の点の大きさ (28)  u32 �
 - CSP のインストール先 `Material/InstallPathToCatalogId.dat`: 旧形式の素材パスからインストール済みの素材パスへの対応表
   （`u64 個数`、`(u32 長さ, 文字列) × 2` の組、ビッグエンディアン）。
 
-## 7. 未解明の一覧
+## 7. 設定のデータベース（確認済み: 読み取り、W1）
+
+サブツール以外の SQLite 形式（45 種）の表・列・型・行数・値の範囲は [`sqlite-tables.tsv`](sqlite-tables.tsv)
+（`tools/assets/sqlite_census.py` で生成。数値は最小・最大、文字列と BLOB はバイト数の範囲だけを載せ、ファイルの中身は載せない）。
+CSP は列を必要になったときに足すので、同じ形式でもファイルによって列が違う（`files` が少ない列）。
+
+### 7.1 ショートカットキー（`.khc`、`.spws`）（推測: 既定のキーと照合）
+
+`Shortcut/default.khc` の `shortcutmenu`、ワークスペース（`.spws`）では `workspaceshortcutmenu`。1 行が 1 つのコマンドとキーの組で、
+キーが複数あるコマンドは複数行になる。
+
+| 列 | 中身 |
+|---|---|
+| `menucommandtype` | `basiccommand`（取り消し・コピーなど）か `advancedcommand`（メニューのコマンド） |
+| `menucommand` | コマンドの ID（`filesaveas` など。一部は UUID） |
+| `shortcut` | キーの名前（`S`、`F2`、`DELETE`、`NUM+` …）。キーなしは文字列の `NULL` |
+| `modifier` | ビット: 1 Alt、2 Shift、4 Ctrl |
+
+修飾キーのビットは、CSP の既定のキー（環境設定 Ctrl+K、ショートカットキー設定 Ctrl+Shift+Alt+K、やり直し Ctrl+Shift+Z、
+上のレイヤーを選択 Alt+]、選択範囲外を消去 Shift+Delete）と合う。ワークスペースの `workspaceshortcuttool` は、
+ツールのノードの UUID（ツール DB の `Node.NodeUuid`）とキーの組。`cspf asset shortcuts FILE --tools EditImageTool.todb` で名前付きで読める。
+
+## 8. 未解明の一覧
 
 - 影響元設定の入力ビット 0x100、ヘッダーの語 [10]（100 / 500）
 - `BrushInOutTarget` の値の意味の細部、`IncludeFillColor` の 16 バイトのレコード
 - CSP が `.sut` に値のない列を残す規則
 - `.cls` の Shift_JIS の名前の後ろの `u32`、色の形式の語
 - 素材の `xxx.dat` / `asxx.dat`
+- ワークスペースの配置（`workspaceplacement` の BLOB）、修飾キー設定（`.tomd` の `SettingData`）
 - サブツールの列のうち「推測（直訳）」の 296 列と「未解明」の 6 列（主にペン・ブラシ以外のツール）。CSP で確認済みは 18 列（W4）

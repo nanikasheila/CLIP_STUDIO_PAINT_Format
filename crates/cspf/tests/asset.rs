@@ -113,3 +113,16 @@ fn colour_sets_actions_gradients_and_corpus() {
     let summary = ok(&["asset", "corpus", dir.path().to_str().unwrap(), &report]);
     assert!(summary.ends_with("6 ok, 0 failed\n"), "{summary}");
 }
+
+#[test]
+fn shortcuts_with_tool_names() {
+    let dir = tempfile::tempdir().unwrap();
+    let spws = path(dir.path(), "workspace.spws");
+    std::fs::write(&spws, testing::workspace_shortcuts()).unwrap();
+    let todb = path(dir.path(), "EditImageTool.todb");
+    std::fs::write(&todb, testing::tool_db()).unwrap();
+    let text = ok(&["asset", "shortcuts", &spws, "--tools", &todb]);
+    assert_eq!(text, "applicationpreference\tCtrl+K\nredo\tCtrl+Shift+Z\ntool:ペン\tP\n");
+    let unnamed = ok(&["asset", "shortcuts", &spws]);
+    assert!(unnamed.ends_with(&format!("tool:{}\tP\n", "02".repeat(16))), "{unnamed}");
+}

@@ -16,6 +16,7 @@ pub mod gradient;
 pub mod kind;
 pub mod material;
 pub mod serial;
+pub mod shortcut;
 pub mod subtool;
 pub mod tar;
 #[doc(hidden)]
