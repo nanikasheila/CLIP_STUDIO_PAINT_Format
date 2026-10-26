@@ -141,3 +141,28 @@ fn modifier_keys_with_tool_names() {
     let text = ok(&["asset", "modifier-keys", &tomd, "--tools", &todb]);
     assert_eq!(text, "ops 0 0 0\n  Space\ttool:ペン\nops 1 10 0  (G-ペン)\n  Shift\toperation 100\n");
 }
+
+/// Fails without writing: the input's bytes stay the same.
+fn refused(args: &[&str], input: &str) {
+    let before = std::fs::read(input).unwrap();
+    let output = cspf(args);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!output.status.success(), "cspf {args:?} wrote over {input}");
+    assert!(stderr.contains("is the input"), "cspf {args:?}: {stderr}");
+    assert_eq!(std::fs::read(input).unwrap(), before, "cspf {args:?} changed {input}");
+}
+
+#[test]
+fn outputs_never_replace_inputs() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = path(dir.path(), "EditImageTool.todb");
+    std::fs::write(&db, testing::tool_db()).unwrap();
+    refused(&["asset", "sut-set", &db, "G-ペン", &db, "BrushSize=8.5"], &db);
+    refused(&["asset", "sut-extract", &db, "G-ペン", &db], &db);
+    let las = path(dir.path(), "test.las");
+    std::fs::write(&las, testing::action_set().to_bytes()).unwrap();
+    let dumped = path(dir.path(), "test.json");
+    std::fs::write(&dumped, ok(&["asset", "dump", &las])).unwrap();
+    refused(&["asset", "undump", &dumped, &dumped], &dumped);
+    refused(&["asset", "corpus", &dir.path().to_string_lossy(), &db], &db);
+}

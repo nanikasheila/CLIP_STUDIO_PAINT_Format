@@ -5,6 +5,8 @@
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+use crate::output;
+
 use csp_assets::action::{ActionSet, kind_name};
 use csp_assets::colorset::{Color, ColorSet};
 use csp_assets::gradient::GradientSet;
@@ -286,7 +288,7 @@ fn sut_extract(args: &[String]) -> Result<bool> {
         }
         found
     })?;
-    std::fs::write(out, bytes)?;
+    output::write(Path::new(out), bytes, &[Path::new(file)])?;
     let missing = missing.into_inner();
     for name in &missing {
         eprintln!("material not found (not packed): {name}");
@@ -337,7 +339,7 @@ fn sut_set(args: &[String]) -> Result<bool> {
             return Err(usage_error(&format!("expected COLUMN=VALUE, got {change:?}")));
         }
     }
-    std::fs::write(out, db.to_bytes()?)?;
+    output::write(Path::new(out), db.to_bytes()?, &[Path::new(file)])?;
     Ok(true)
 }
 
@@ -350,7 +352,7 @@ fn undump(args: &[String]) -> Result<bool> {
     let [json, out] = args else { return Err(usage_error("expected JSON OUT")) };
     let value: Value =
         serde_json::from_slice(&std::fs::read(json)?).map_err(|e| Error::format(format!("{json}: {e}")))?;
-    std::fs::write(out, Document::from_json(&value)?.to_bytes())?;
+    output::write(Path::new(out), Document::from_json(&value)?.to_bytes(), &[Path::new(json)])?;
     Ok(true)
 }
 
@@ -561,6 +563,8 @@ fn corpus(args: &[String]) -> Result<bool> {
         }
     }
     files.sort();
+    let inputs: Vec<&Path> = files.iter().map(PathBuf::as_path).collect();
+    output::check(Path::new(out), &inputs)?;
     let mut writer = std::io::BufWriter::new(std::fs::File::create(out)?);
     let (mut passed, mut failed) = (0, 0);
     let mut by_family: std::collections::BTreeMap<String, (usize, usize)> = Default::default();

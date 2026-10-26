@@ -37,11 +37,13 @@ CELSYS の公式のものではなく、CELSYS の承認も受けていない。
 
 ## 使い方
 
-| 使い方 | 入れ方 |
-|---|---|
-| Rust のライブラリ | `cargo add csp-format`（サブツールなどは `cargo add csp-assets`）。crates.io に出すまでは `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", tag = "v0.1.0" }` |
-| CLI | [GitHub のリリース](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases)から Windows / macOS / Linux 用の `cspf` を取るか、`cargo install cspf` |
-| Python（読み取りだけ） | `pip install csp-format`（PyPI に出すまでは下の [python/](python/README.md) の git 指定） |
+最初の版（0.1.0）はまだ公開していない（crates.io・PyPI・GitHub のリリースはない）。それまでは git のコミットを指すか、手元でビルドする。
+
+| 使い方 | 今の入れ方 | 0.1.0 の公開後 |
+|---|---|---|
+| Rust のライブラリ | `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", rev = "コミット" }`（`csp-assets` も同じ） | `cargo add csp-format` / `cargo add csp-assets` |
+| CLI | clone して `cargo build --release -p cspf`（または `cargo install --git https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format cspf`） | [リリース](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases)の実行ファイル（Windows / macOS / Linux）か `cargo install cspf` |
+| Python（読み取りだけ） | `pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format@コミット#subdirectory=python"` | `pip install csp-format` |
 | ほかの言語 | `cspf inspect` / `layers` / `anim` などの JSON 出力、`extract` / `render` の PNG 出力を使う |
 
 Rust のビルドには C コンパイラが要る（SQLite と zlib を組み込む。CSP と同じ圧縮結果を出すには zlib の C 実装が要るため）。
@@ -77,7 +79,8 @@ cspf corpus ROOT OUT.jsonl [--render]   # フォルダー内の全ファイル�
 
 すべてのコマンドは `cspf` を引数なしで実行すると表示される。
 
-入力ファイルは読むだけで、変更しない。
+入力ファイルは読むだけで、変更しない。出力に入力と同じファイルを指定すると（相対・絶対パス、シンボリックリンク、ハードリンクのどれでも）書かずにエラーになる。
+ライブラリの `ClipFile::save` は与えたパスに書くだけなので、入力を残すのは呼ぶ側の責任。
 
 ## ライブラリ
 

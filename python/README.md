@@ -5,16 +5,18 @@ actions, colour and gradient sets and materials (`csp_format.assets`) with
 the Python standard library only. It follows the same rules as the Rust
 crate `csp-format`, and both give the same results on 719 real files. For
 writing and rendering, use the Rust crates or the `cspf` command. Not made
-or endorsed by CELSYS. Documentation: [GitHub](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format).
+or endorsed by CELSYS. Documentation: [GitHub](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format);
+the [specification](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/spec/README.md) lists what is not yet understood.
 
 CLIP STUDIO PAINT のファイル（`.clip` / `.cmc`）と、サブツール・オートアクション・カラーセット・グラデーションセット・素材（`csp_format.assets`）を Python の標準ライブラリだけで読む実装。
-規則は Rust の `csp-format` と同じで、実ファイル 719 件で両者の結果が一致することを確かめている（[V7](../docs/validation/V7-python.md)、assets は [W5](../docs/assets/validation/W5-python.md)）。
+規則は Rust の `csp-format` と同じで、実ファイル 719 件で両者の結果が一致することを確かめている（[V7](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/validation/V7-python.md)、assets は [W5](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/assets/validation/W5-python.md)）。
 書き込みと合成描画は Rust 側（`cspf`）を使う。CELSYS の公式のものではない。
+仕様と未解明の項目は [仕様書](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/spec/README.md#未解明の項目)。
 
 ```sh
 pip install csp-format
-# PyPI に出すまでは
-pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format#subdirectory=python"
+# Before 0.1.0 is on PyPI / PyPI に出るまでは（COMMIT: a commit of the repository）
+pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format@COMMIT#subdirectory=python"
 ```
 
 ```python
@@ -53,11 +55,11 @@ with read_cmc("work.cmc") as work:
 | ベクター・テキスト | `clip.vector_payloads(layer)`, `clip.vector_objects(layer)`, `clip.text_blocks(layer)` |
 | 任意のテーブル | `clip.database`（メモリー上の複製）, `clip.row(table, id)` |
 | .cmc のページ順・ページのサムネイル | `work.pages()`, `work.page_file_paths()`, `work.page_thumbnail(node)` |
-| アニメーション（タイムライン・セル・キーフレーム・2D カメラ） | `read_animation(clip)`, `animation.frame_state(clip, index, frame)`（[08 章](../docs/spec/08-animation.md)） |
+| アニメーション（タイムライン・セル・キーフレーム・2D カメラ） | `read_animation(clip)`, `animation.frame_state(clip, index, frame)`（[08 章](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/spec/08-animation.md)） |
 | トラックのキー（"cmt " 文書の読み書き） | `csp_format.animation.parse_document`, `document_bytes`, `unpack_chunk` |
 | サブツール・オートアクション・カラーセット・グラデーションセット・ショートカット・素材 | `csp_format.assets`（`subtool`, `serial`, `colorset`, `shortcut`, `material`, `c2f`, `tar`） |
 
 画像は `Image(width, height, rgba)`（RGBA、非乗算）。Pillow へは
 `PIL.Image.frombytes("RGBA", (image.width, image.height), bytes(image.rgba))`。
 
-テスト: `python -m unittest discover -s python/tests`
+テスト: リポジトリでは `python -m unittest discover -s python/tests`、sdist を展開した場所では `python -m unittest discover -s tests`。

@@ -47,11 +47,15 @@ render, some layer effects, 3D) is listed in [the specification](docs/spec/READM
 
 ## Getting it
 
-| Use | How |
-|---|---|
-| Rust library | `cargo add csp-format` (and `cargo add csp-assets`). Until they are on crates.io: `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", tag = "v0.1.0" }` |
-| CLI | `cspf` for Windows, macOS and Linux from the [releases](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases), or `cargo install cspf` |
-| Python (reading) | `pip install csp-format` (until it is on PyPI, the git install in [python/](python/README.md)) |
+The first version (0.1.0) is not published yet: there is nothing on
+crates.io or PyPI and no GitHub release. Until then, point at a commit or
+build locally.
+
+| Use | Now | Once 0.1.0 is published |
+|---|---|---|
+| Rust library | `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", rev = "COMMIT" }` (`csp-assets` the same) | `cargo add csp-format` / `cargo add csp-assets` |
+| CLI | clone and `cargo build --release -p cspf` (or `cargo install --git https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format cspf`) | a binary from the [releases](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases) (Windows, macOS, Linux) or `cargo install cspf` |
+| Python (reading) | `pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format@COMMIT#subdirectory=python"` | `pip install csp-format` |
 | Other languages | the JSON of `cspf inspect` / `layers` / `anim` and the PNGs of `extract` / `render` |
 
 Building needs a C compiler: SQLite and zlib are compiled in (the reference
@@ -102,7 +106,11 @@ cspf frames FILE OUT_DIR     # animation frames as PNG
 cspf asset help              # sub tools, auto actions, colour / gradient sets, materials
 ```
 
-`cspf` without arguments lists every command. Input files are only read.
+`cspf` without arguments lists every command. Input files are only read:
+an output that is the same file as an input (by any path, symbolic link or
+hard link) is refused before anything is written. The library's
+`ClipFile::save` writes wherever it is told, so keeping inputs is the
+caller's job.
 
 ## Layout
 

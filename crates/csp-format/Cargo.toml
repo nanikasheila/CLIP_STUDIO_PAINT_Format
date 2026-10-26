@@ -11,7 +11,7 @@ authors.workspace = true
 readme = "README.md"
 keywords = ["clip-studio-paint", "csp", "clip", "manga", "file-format"]
 categories = ["parser-implementations", "multimedia::images", "encoding"]
-include = ["/src", "/assets", "/examples", "/README.md"]
+include = ["/src", "/assets", "/examples", "/README.md", "/LICENSE"]
 
 [dependencies]
 # CSP compresses with zlib (madler); its exact output is needed to reproduce

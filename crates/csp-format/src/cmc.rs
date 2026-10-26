@@ -370,6 +370,12 @@ impl CmcFile {
     }
 
     /// Writes [`CmcFile::to_bytes`] to a file.
+    ///
+    /// `path` is replaced if it exists, and nothing checks whether it is
+    /// the file this was read from. Saving over the source is possible (its
+    /// bytes were read into memory), but a failed or interrupted write then
+    /// loses the original; keeping inputs intact is the caller's job. The
+    /// `cspf` tool refuses an output that is one of its inputs.
     pub fn save(&self, path: impl AsRef<Path>) -> Result<()> {
         std::fs::write(path, self.to_bytes()?)?;
         Ok(())

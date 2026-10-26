@@ -28,7 +28,9 @@ Not made or endorsed by CELSYS. CLIP STUDIO PAINT is a trademark of CELSYS, Inc.
   part of a file.
 
 What is approximate or not drawn (vector line shapes, text CSP did not
-render, some effects, 3D) is listed in the specification.
+render, some effects, 3D) is listed in the
+[specification](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/spec/README.md#未解明の項目).
+Validation records: [docs/validation/](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/validation/).
 
 ## Example
 
@@ -46,13 +48,16 @@ file.save("copy.clip")?; // byte-identical while nothing was changed
 ```
 
 More in the [API documentation](https://docs.rs/csp-format) and in
-[`examples/`](examples/). The `cspf` crate is a command line tool built on
+[`examples/`](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/crates/csp-format/examples/). The `cspf` crate is a command line tool built on
 this one; `csp-assets` reads CSP's other files (sub tools, auto actions,
 colour and gradient sets, materials).
 
 Building needs a C compiler: SQLite and zlib are compiled in (zlib must be
 the reference C library to reproduce CSP's compressed bytes).
 
+`ClipFile::save` replaces the path it is given, even the file that was
+opened; keeping the input intact is the caller's job.
+
 ## License
 
-MIT
+MIT (see `LICENSE`)

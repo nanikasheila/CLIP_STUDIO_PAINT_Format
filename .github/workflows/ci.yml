@@ -63,9 +63,21 @@ jobs:
           RUSTDOCFLAGS: -D warnings
       - name: Crates package and build from the packaged sources
         run: cargo package --workspace --exclude csp-lab --locked
+      - name: Each crate carries the license
+        run: |
+          for crate in target/package/*.crate; do
+            echo "$crate"
+            tar -xzOf "$crate" --wildcards '*/LICENSE' | cmp - LICENSE
+          done
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Package READMEs link to the repository with absolute links
+        run: |
+          python tools/release/readme_links.py crates/*/README.md python/README.md
+          mkdir /tmp/archive && cp README.md README.en.md CHANGELOG.md /tmp/archive/
+          python tools/release/readme_links.py --base "https://github.com/${GITHUB_REPOSITORY}/blob/main/" \
+            --keep README.md --keep README.en.md --keep LICENSE --keep CHANGELOG.md /tmp/archive/*.md
       - name: Python package installs with every module
         run: |
           python -m pip install --upgrade build
@@ -73,3 +85,11 @@ jobs:
           python -m venv /tmp/venv
           /tmp/venv/bin/pip install dist/*.whl
           cd /tmp && /tmp/venv/bin/python -c "import csp_format, csp_format.assets; print(csp_format.__version__)"
+      - name: Wheel and sdist carry the license; the sdist's tests pass on their own
+        run: |
+          python -m zipfile -l dist/*.whl | grep -q 'dist-info/licenses/LICENSE'
+          mkdir /tmp/sdist && tar -xzf dist/*.tar.gz -C /tmp/sdist
+          cmp /tmp/sdist/*/LICENSE LICENSE
+          cd /tmp/sdist/* && python -I -m unittest discover -s tests -v
+      - name: License copies match the repository's
+        run: for copy in crates/*/LICENSE python/LICENSE; do cmp "$copy" LICENSE; done

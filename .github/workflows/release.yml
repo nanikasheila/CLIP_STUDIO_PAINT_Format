@@ -31,6 +31,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: musl tools
         if: contains(matrix.target, 'musl')
         run: sudo apt-get update && sudo apt-get install -y musl-tools
@@ -41,6 +44,9 @@ jobs:
           name=cspf-${GITHUB_REF_NAME}-${{ matrix.target }}
           mkdir "$name"
           cp README.md README.en.md LICENSE CHANGELOG.md "$name"/
+          # The archive is read away from the repository: links point at this tag.
+          python tools/release/readme_links.py --base "https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/" \
+            --keep README.md --keep README.en.md --keep LICENSE --keep CHANGELOG.md "$name"/*.md
           if [[ "${{ matrix.target }}" == *windows* ]]; then
             cp target/${{ matrix.target }}/release/cspf.exe "$name"/
             7z a "$name.zip" "$name" > /dev/null

@@ -11,7 +11,7 @@ authors.workspace = true
 readme = "README.md"
 keywords = ["clip-studio-paint", "csp", "subtool", "brush", "file-format"]
 categories = ["parser-implementations", "encoding"]
-include = ["/src", "/examples", "/README.md"]
+include = ["/src", "/examples", "/README.md", "/LICENSE"]
 
 [dependencies]
 csp-format.workspace = true

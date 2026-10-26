@@ -12,7 +12,7 @@ API 文書に出ていない項目（`#[doc(hidden)]`）の変更は互換性の
 
 - `Cargo.toml` の `[workspace.package] version` と `[workspace.dependencies]` の `version`（同じ値）
 - `python/pyproject.toml` の `version` と `python/csp_format/__init__.py` の `__version__`
-- `CHANGELOG.md`: `[Unreleased]` の内容を新しい版の節に移し、日付と末尾のリンクを書く
+- `CHANGELOG.md`: `[Unreleased]` の内容を新しい版の節に移し、日付と末尾のリンクを書く（0.1.0 は `## [0.1.0] - unreleased` の `unreleased` を公開の日付にする）
 
 ## 2. 確かめる
 
@@ -23,6 +23,7 @@ cargo test --all
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps -p csp-format -p csp-assets
 cargo package --workspace --exclude csp-lab   # 公開されるファイルだけでビルドできるか
 python -m unittest discover -s python/tests
+python tools/release/readme_links.py crates/*/README.md python/README.md   # 配布物の README に相対リンクがないか
 ```
 
 CI（`.github/workflows/ci.yml`）も同じことを Linux・Windows・macOS と最低 Rust 版（1.88）で確かめる。
@@ -65,4 +66,5 @@ python -m twine upload dist/*
 
 ## 公開後
 
-README の「使い方」の git 指定（crates.io / PyPI に出すまでの書き方）を消す。
+`README.md` / `README.en.md` の「使い方」の表を公開後の列だけにし、「まだ公開していない」の文を消す。
+`python/README.md` の git 指定も消す。
