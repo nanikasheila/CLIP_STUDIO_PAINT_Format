@@ -86,7 +86,8 @@ pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_
 | `add_frame_offscreens` | `file.add_frame_images(id)` | |
 | `brush_style_in` | `copy::brush_style_in` | |
 | `NewVectorLine` / `build_vector_data` / `NewFrame` / `FrameTemplate` / `build_frame_data` / `shape_signature` | `vector_build::*`、`VectorData::from_lines(..).to_bytes()` / `VectorData::from_frames(..).to_bytes()` | 同じ入力でバイト一致（実ファイルのコマ枠 34 個をひな形にして確認）。`FrameTemplate::of` は `VectorData` を受け取る |
-| `share_rows`（`BrushStyleManager` と `BrushStyle` だけ） | `copy::SHARED_TABLES`（ブラシの先端・テクスチャ画像、散布、影響元のグラフ、塗りの設定も） | clip-core はブラシ設定が指す表を写さない。写した先にブラシの表がない（`ClipFile::create` などの）キャンバスでは、テクスチャを使うブラシの線を CSP が描くときに落ちる。テクスチャ画像（`BrushPatternImage.Mipmap`）は新しい id で写し、`Canvas.BrushStyleReadProtect070` も写す（ないと新しい形のブラシ設定で CSP が落ちる） |
+| `share_rows`（`BrushStyleManager` と `BrushStyle` だけ） | `copy::SHARED_TABLES`（ブラシの先端・テクスチャ画像、散布、影響元のグラフ、塗りの設定も） | clip-core はブラシ設定が指す表を写さない。写した先にブラシの表がない（`ClipFile::create` などの）キャンバスでは、テクスチャを使うブラシの線を CSP が描くときに落ちる。テクスチャ画像（`BrushPatternImage.Mipmap`）は新しい id で写す。`Canvas.BrushStyleReadProtect070` も一緒に写す |
+| `DROPPED_LAYER_LINKS` の列を 0 にする | NULL にする | clip-core は 0 を入れる。`ComicFrameLineMipmap` が 0 のベクターレイヤーは、CSP が描くときに落ちる（実ファイルで確認。NULL なら開ける） |
 | `brush_style_of(payload)` | `VectorData::parse(payload)?.brush_style()` | 88 バイトのヘッダー（最も多い形）では +72 を読む。clip-core は +76（ブラシの大きさの f64 の上位）を読んでいた |
 | `NewText` / `retarget_*` / `text_color` | `Attributes::set` / `set_bbox` / `clear_render_offscreen` | 本文を変えたら `clear_render_offscreen` で CSP に描き直させる |
 | `subtool::read_sub_tools`（.sut） | なし | ブラシの設定は .clip 内の `BrushStyle` を `stroke` が読む。.sut はアプリ側に残す |

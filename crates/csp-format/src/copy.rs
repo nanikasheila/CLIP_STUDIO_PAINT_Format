@@ -38,8 +38,9 @@ const CHAIN_COLUMNS: [(&str, &str); 2] = [("MipmapInfo", "NextIndex"), ("BrushSt
 /// Tables (and Canvas columns) a vector or text layer copied from another
 /// file needs: vector lines find their brush styles through
 /// `Canvas.BrushStyleManager`, and without it CSP opens them empty.
-/// `Canvas.BrushStyleReadProtect070` tells CSP how to read the brush styles:
-/// newer styles without it crash CSP when it draws the lines.
+/// `Canvas.BrushStyleReadProtect070` (1 in newer files) comes with the brush
+/// styles: it seems to tell CSP how to read them (not needed by any file
+/// tried so far, but the styles were saved with it).
 pub const LAYER_TABLES: [&str; 9] = [
     "Layer",
     "VectorObjectList",
@@ -64,7 +65,9 @@ pub const SHARED_TABLES: [&str; 7] = [
     "FillStyle",
 ];
 /// Layer columns that would tie a copy to data that is not copied: masks,
-/// frame images, 3D, rulers and the like.
+/// frame images, 3D, rulers and the like. A copy gets NULL in them, as CSP's
+/// own layers without these have: CSP crashes drawing a vector layer whose
+/// `ComicFrameLineMipmap` is 0 rather than NULL.
 pub const DROPPED_LAYER_LINKS: [&str; 13] = [
     "LayerLayerMaskMipmap",
     "LayerLayerMaskThumbnail",
@@ -491,7 +494,7 @@ impl ClipFile {
         }
         let mut row = layer.row.clone();
         for column in DROPPED_LAYER_LINKS {
-            row.set(column, Value::Integer(0));
+            row.set(column, Value::Null);
         }
         let new_id = self.next_main_id("Layer")?;
         let (translated, copied) = {
@@ -647,6 +650,27 @@ mod tests {
         assert_eq!(target.layer_pixels_in_box(layer, (99, 49, 100, 50)).unwrap().pixel(0, 0), [0; 4]);
         let report = crate::verify::check_clip(target.to_bytes().unwrap(), Default::default());
         assert!(report.ok(), "{:?}", report.errors);
+    }
+
+    #[test]
+    fn dropped_links_become_null() {
+        let mut source = ClipFile::create(&NewCanvas::default()).unwrap();
+        let layer = source.add_raster_layer("one", &RgbaImage::new(4, 4), (0, 0)).unwrap();
+        source
+            .database()
+            .execute_batch(
+                "ALTER TABLE Layer ADD COLUMN ComicFrameLineMipmap INTEGER; UPDATE Layer SET ComicFrameLineMipmap = 0;",
+            )
+            .unwrap();
+        let source = ClipFile::from_bytes(source.to_bytes().unwrap()).unwrap();
+        let mut target = ClipFile::create(&NewCanvas::default()).unwrap();
+        target.prepare_copy_from(&source).unwrap();
+        let copy = target.copy_layer_from(&source, layer, CopyLayer::default()).unwrap();
+        let value: Value = target
+            .database()
+            .query_row("SELECT ComicFrameLineMipmap FROM Layer WHERE MainId = ?1", [copy], |row| row.get(0))
+            .unwrap();
+        assert_eq!(value, Value::Null);
     }
 
     #[test]
