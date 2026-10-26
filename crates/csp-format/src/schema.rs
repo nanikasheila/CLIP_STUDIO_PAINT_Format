@@ -20,6 +20,7 @@ use crate::error::Result;
 
 /// `ParamScheme.DataType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize)]
+#[non_exhaustive]
 pub enum DataType {
     Integer,
     Real,

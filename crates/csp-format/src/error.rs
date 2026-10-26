@@ -4,6 +4,7 @@ use std::fmt;
 
 /// Why a file could not be read or written.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// The data does not follow the layout this crate understands.
     Format(String),

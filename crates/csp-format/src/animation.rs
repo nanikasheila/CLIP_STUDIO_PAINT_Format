@@ -47,6 +47,7 @@ pub const TICKS_PER_SECOND: f64 = 60.0;
 
 /// What a track animates (`Track.TrackKind`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum TrackKind {
     /// 2000: an animation folder's cel assignment.
     Cels,
@@ -73,6 +74,7 @@ impl TrackKind {
 
 /// How a key moves to the next one (`FCurve/Interp`).
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum Interp {
     /// `Constant`: hold until the next key.
     Constant,

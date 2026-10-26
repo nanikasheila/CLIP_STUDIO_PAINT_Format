@@ -13,7 +13,7 @@ CSP の新旧の版とグレード（PRO / EX / DEBUT）で、保存されるフ
 | 実施日 | 2026-10-25 |
 | CSP | CLIP STUDIO PAINT EX 5.1.4（Windows、`CLIPStudioPaint.exe` のファイルバージョン 5.1.4.0）。ユーザーの PC で Computer use により操作 |
 | コーパス | `.clip` 719 件・`.cmc` 42 件（保存日 2017-08〜2026-10） |
-| 道具 | `tools/corpus/version_census.py`（構造の集計、標準ライブラリだけ）、`cspf version`、`examples/version_probe.rs` |
+| 道具 | `tools/corpus/version_census.py`（構造の集計、標準ライブラリだけ）、`cspf version`、`crates/csp-lab/examples/version_probe.rs` |
 
 ## 1. コーパスの集計
 

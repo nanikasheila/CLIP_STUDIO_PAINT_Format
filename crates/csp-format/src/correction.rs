@@ -31,6 +31,7 @@ use crate::error::{Error, Result};
 use crate::gradient::{Mixing, Ramp};
 
 #[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
 pub enum Correction {
     BrightnessContrast {
         brightness: i32,

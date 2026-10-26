@@ -40,6 +40,7 @@ pub const TAG_FOOTER: &[u8; 8] = b"CHNKFoot";
 
 /// Kind of a chunk, from its 8-byte tag.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ChunkKind {
     Head,
     External,

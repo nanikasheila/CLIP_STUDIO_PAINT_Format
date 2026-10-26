@@ -14,10 +14,10 @@ CSP はファイルを開くときに、設定（`Layer.FilterLayerInfo`、`Laye
 | 実施日 | 2026-10-24 |
 | CSP | CLIP STUDIO PAINT EX（Windows）。ユーザーの PC で Computer use により操作 |
 | ひな形 | CSP で作った 512×512 px のファイル。ラスターレイヤーと、補正レイヤー（明るさ・コントラスト、レベル補正、トーンカーブ、色相・彩度・明度、カラーバランス、階調の反転、ポスタリゼーション、2 値化、グラデーションマップ）、グラデーション、べた塗りを 1 枚ずつ持つ |
-| 生成 | `examples/corr_test.rs`。一番下のラスターレイヤーに背景を描き、対象のレイヤーだけを表示して設定を書き換える。4 回（round1〜round4）で 83 ファイル |
+| 生成 | `crates/csp-lab/examples/corr_test.rs`。一番下のラスターレイヤーに背景を描き、対象のレイヤーだけを表示して設定を書き換える。4 回（round1〜round4）で 83 ファイル |
 | 背景 | round1・2: 横に色相、縦に明度（透明の帯あり）。round3・4: 縦に R、横に B、G = (R + B) / 2 の格子。グラデーションの多くは背景を隠し、用紙（212 の灰色）の上に描く |
 | 書き出し | CSP で開き「画像を統合して書き出し → .png」 |
-| 比較 | `examples/render_compare.rs`。同じ大きさで描き、RGB の差の最大・平均・99 パーセンタイル・PSNR を出す |
+| 比較 | `crates/csp-lab/examples/render_compare.rs`。同じ大きさで描き、RGB の差の最大・平均・99 パーセンタイル・PSNR を出す |
 
 ## 結果のまとめ
 
@@ -124,8 +124,8 @@ CSP はファイルを開くときに、設定（`Layer.FilterLayerInfo`、`Laye
 
 ```sh
 # CSP で、上の「ひな形」のファイル TEMPLATE.clip を作る
-cargo run --release --example corr_test -- TEMPLATE.clip made           # round1
-cargo run --release --example corr_test -- TEMPLATE.clip made round4    # round2〜4 も同様
+cargo run --release -p csp-lab --example corr_test -- TEMPLATE.clip made           # round1
+cargo run --release -p csp-lab --example corr_test -- TEMPLATE.clip made round4    # round2〜4 も同様
 # 各 made/corr_X.clip を CSP で開き、「画像を統合して書き出し → .png」で made/corr_X_csp.png を書き出す
-cargo run --release --example render_compare -- made/corr_X.clip made/corr_X_csp.png
+cargo run --release -p csp-lab --example render_compare -- made/corr_X.clip made/corr_X_csp.png
 ```

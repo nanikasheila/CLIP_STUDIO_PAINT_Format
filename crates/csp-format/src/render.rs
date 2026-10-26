@@ -40,6 +40,7 @@ use crate::tone::Tone;
 
 /// Blending modes, numbered as in `LayerComposite`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum BlendMode {
     Normal,
     Darken,

@@ -8,6 +8,7 @@ use serde::Serialize;
 /// How the bytes are laid out.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub enum Family {
     /// SQLite database (most settings, sub tools, workspaces).
     Sqlite,

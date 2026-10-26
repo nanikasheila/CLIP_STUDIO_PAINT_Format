@@ -54,6 +54,7 @@ pub struct Stop {
 
 /// How colours mix between stops (`GradationData` mixing word).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Mixing {
     /// 通常: straight sRGB values.
     Normal,
@@ -83,6 +84,7 @@ pub struct Ramp {
 const DEFAULT_CURVE: [(f64, f64); 4] = [(0.0, 0.0), (0.25, 0.1), (0.75, 0.9), (1.0, 1.0)];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Shape {
     Linear,
     Circular,

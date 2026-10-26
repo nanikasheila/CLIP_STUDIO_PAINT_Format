@@ -153,6 +153,6 @@ csp-format に移すと次が読める。clip-core（と元の Python 実装）�
 
 ## 6. 確かめ方
 
-1. 置き換えの前後で同じファイルを読み、結果を比べる。Python は `tools/validation/name_splitter_check.py`、Rust は `crates/csp-format/examples/layer_digest.rs` の出力と旧実装の出力を比べる。
+1. 置き換えの前後で同じファイルを読み、結果を比べる。Python は `tools/validation/name_splitter_check.py`、Rust は `crates/csp-lab/examples/layer_digest.rs` の出力と旧実装の出力を比べる。
 2. 書き込みは `cspf check` で自己検査し、CSP で開いて確かめる（V6 の手順）。
 3. 実ファイルでの比較結果は [V7-python.md](validation/V7-python.md)。

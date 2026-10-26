@@ -410,6 +410,7 @@ fn ref_bytes(material: &MaterialRef) -> Vec<u8> {
 
 /// What layout a column uses.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum BlobKind {
     Records,
     Effector,

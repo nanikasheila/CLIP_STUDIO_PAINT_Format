@@ -19,6 +19,7 @@ const MAX_DEPTH: usize = 256;
 /// `CanvasUnit` / `CropFrameUnitKind` and friends.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum Unit {
     Pixel,
     Centimeter,
@@ -96,6 +97,7 @@ impl Canvas {
 /// optional columns are filled (no single column holds it).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum LayerKind {
     /// The root folder (`LayerType` 256), not shown in CSP.
     Root,

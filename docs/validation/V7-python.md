@@ -15,7 +15,7 @@
 
 ## 1. Python と Rust
 
-両方の実装で、ファイルごとに同じ要約を作って比べた（Rust は `crates/csp-format/examples/layer_digest.rs`）。
+両方の実装で、ファイルごとに同じ要約を作って比べた（Rust は `crates/csp-lab/examples/layer_digest.rs`）。
 
 - キャンバスの大きさ、保存されたプレビューの画素の CRC-32
 - レイヤーごとに: ID と木の深さ（並び順を含む）、種類、名前の CRC、表示、不透明度、
@@ -56,7 +56,7 @@ name_splitter が知っている種別（ラスター・フォルダー・テキ
 ## 再現の手順
 
 ```sh
-cargo build --release -p csp-format --example layer_digest
+cargo build --release -p csp-lab --example layer_digest
 python tools/validation/python_reader_check.py "$ROOT" LIST.txt out/v7_0.jsonl --digest target/release/examples/layer_digest --shard 0/2 &
 python tools/validation/python_reader_check.py "$ROOT" LIST.txt out/v7_1.jsonl --digest target/release/examples/layer_digest --shard 1/2 &
 wait

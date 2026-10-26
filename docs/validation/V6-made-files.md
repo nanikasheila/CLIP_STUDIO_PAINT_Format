@@ -16,7 +16,7 @@
 | 実施日 | 2026-10-24 |
 | CSP | CLIP STUDIO PAINT EX（Windows）。ユーザーの PC で Computer use により操作 |
 | 作ったファイル | `blend_modes.clip`: 512×512 px、600 dpi、用紙＋ラスターレイヤー 28 枚（下から「通常」、残りに合成モードを 1 つずつ）＋フォルダー 2 個（「通過」と「通常」） |
-| 書き出したファイル | `blend_test*.clip`（`examples/blend_test.rs`）、`variant_*.clip`（`examples/edit_variants.rs`） |
+| 書き出したファイル | `blend_test*.clip`（`crates/csp-lab/examples/blend_test.rs`）、`variant_*.clip`（`crates/csp-lab/examples/edit_variants.rs`） |
 
 ## 1. 合成モードの番号（`Layer.LayerComposite`）
 
@@ -111,7 +111,7 @@ CSP が保存し直したファイルと比べて分かったこと（参考）:
 ## 3. 合成モードの式（R10）
 
 `blend_test3.clip` を CSP で開き、「画像を統合して書き出し → .png」（100%、プレビューなし）で CSP 自身の合成結果を書き出した。
-これと、同じファイルをこのライブラリで描画した結果を、モードごとのセルで比べた（`examples/blend_compare.rs`）。
+これと、同じファイルをこのライブラリで描画した結果を、モードごとのセルで比べた（`crates/csp-lab/examples/blend_compare.rs`）。
 
 - 背景（一番下のレイヤー）: 横に色相、縦に明度を変えた不透明のグラデーション
 - 各モードのセル: 上半分は不透明度 255、下半分は 128 の色パターン
@@ -264,7 +264,7 @@ CSP と同じく全ブロックが空のデータを書くように直した（[
 
 ### 5.4 コーパスの診断で見つかった規則（構造だけを見て決め、次の V3 で確かめる）
 
-描画と保存されたプレビューの差が大きい作品を、レイヤーを 1 枚ずつ外して調べた（`examples/diagnose.rs`、名前や画素は出さない）。
+描画と保存されたプレビューの差が大きい作品を、レイヤーを 1 枚ずつ外して調べた（`crates/csp-lab/examples/diagnose.rs`、名前や画素は出さない）。
 
 - **移動したレイヤーのマスク**: マスクの位置（`LayerMaskOffset` ＋ `LayerMaskRenderOffset`）はレイヤーのオフセットからの相対。
   オフセット (7018, 1)・マスクのオフセット (−7018, −1) で、キャンバスと同じ大きさのマスクが (0, 0) に来る。見開きの作品で 5.9 → 53.3 dB
@@ -277,7 +277,7 @@ CSP と同じく全ブロックが空のデータを書くように直した（[
 
 ### 作り方
 
-`examples/tone_test.rs` で、4 章のひな形（`effects_tmpl.clip`、512×512、600 dpi、用紙は灰色 212）の 8 枚のレイヤーを 2 列 × 4 段のセルに並べ、
+`crates/csp-lab/examples/tone_test.rs` で、4 章のひな形（`effects_tmpl.clip`、512×512、600 dpi、用紙は灰色 212）の 8 枚のレイヤーを 2 列 × 4 段のセルに並べ、
 それぞれにパターンを描いて `EffectTone` を有効にした。CSP で開き、「画像を統合して書き出し → .png」で書き出して画素を比べた。
 
 - `tone_a.clip`: 上半分に不透明な灰色の横グラデーション、下半分に黒の透明度グラデーション。線数 10・20・30・60、角度 0、網点の形 2・4、固定濃度 51%
@@ -329,7 +329,7 @@ CSP と同じく全ブロックが空のデータを書くように直した（[
 
 ### 作り方
 
-CSP の G ペンで線を数本引いた `vec_tmpl.clip`（100 × 60 mm、350 dpi）をひな形にし、`examples/vec_test.rs` でベクターレイヤーのオブジェクトを差し替えた。
+CSP の G ペンで線を数本引いた `vec_tmpl.clip`（100 × 60 mm、350 dpi）をひな形にし、`crates/csp-lab/examples/vec_test.rs` でベクターレイヤーのオブジェクトを差し替えた。
 最初のオブジェクトを型にして、長さ・筆圧・大きさの決まった直線の格子を作り、ブラシの設定（`BrushStyle`）と筆圧の曲線（`BrushEffectorGraphData`）を書き換える。
 CSP で開いて「画像を統合して書き出し → .png」で書き出し、格子のセルごとに線の中ほど 40 px のインク（透明度の和）を測って線の幅とした。
 
@@ -340,9 +340,9 @@ CSP で開いて「画像を統合して書き出し → .png」で書き出し�
 | z | 点の値（値 1・2・10、点の間隔、点の補間） |
 | ta〜tj | 先端の厚さ 0.4、向き 0・45 度、`RotationEffector` 0・1・3・19・35・67・131・195。厚さを筆圧に従わせたもの（ti）。8 方向 × 大きさ・筆圧 4 通りの線 |
 | s・u | V 字・ジグザグ・四角（点の間 300〜500 px）、筆圧が 0.1 → 1 と変わる線。u は点の値 10 を 0.3〜4 にした V 字 |
-| tq_* | コーパスの作品のベクターレイヤーから、最も多いブラシ設定のオブジェクトを 1378 × 827 の窓ごと移したもの（`examples/vec_transplant.rs`）。ブラシの設定は、ほかの表を指さない列（大きさ・不透明度・厚さの影響、厚さ、向き、アンチエイリアスなど）だけを写す（全部写したファイルは CSP が開くときに落ちた）。作品の線を含むので、ユーザーの PC だけに置く |
+| tq_* | コーパスの作品のベクターレイヤーから、最も多いブラシ設定のオブジェクトを 1378 × 827 の窓ごと移したもの（`crates/csp-lab/examples/vec_transplant.rs`）。ブラシの設定は、ほかの表を指さない列（大きさ・不透明度・厚さの影響、厚さ、向き、アンチエイリアスなど）だけを写す（全部写したファイルは CSP が開くときに落ちた）。作品の線を含むので、ユーザーの PC だけに置く |
 | tw_*・tx_*・ty_* | tq_* と同じ移し方で、筆圧だけに従う大きさ（0x11）の 2 作品から。tx は厚さ・不透明度の曲線も移したもの（曲線ごとに `BrushEffectorGraphData` の行を足す）、ty は `BrushStyle` の列を全部写したもの（模様・紙質を使わない設定なので落ちない） |
-| src_b* | 作品ファイルの複製（ベクター以外のレイヤーを隠したもの）。src_bc はベクターレイヤーの保存画素を消したもの（`examples/vec_clear.rs`）、src_bl は大きさの曲線を直線にしたもの |
+| src_b* | 作品ファイルの複製（ベクター以外のレイヤーを隠したもの）。src_bc はベクターレイヤーの保存画素を消したもの（`crates/csp-lab/examples/vec_clear.rs`）、src_bl は大きさの曲線を直線にしたもの |
 | sf_*・f40_* | tx_b と ti・te・b の `StyleFlag` を変えたもの（0x1c000・0x1c200・0x1c400・0x1c608・0x1c640、各回 + 0x40） |
 | tq_s・tv_* | tq_c の最初のオブジェクト（ヘッダー 88）を型にした s の図形と、点の値 2 を 0・0.1・0.25・0.5・0.75・1 にした直線（大きさの影響 0x41 最小値 0.6・0.2、0x51、0x81、0x101） |
 | op_b・rn_* | 不透明度を筆圧に従わせたもの（op_b）と、大きさ・不透明度・厚さ・向きに乱数を入れたもの（rn_*。点の値 11 が 0 のまま） |
@@ -474,32 +474,32 @@ tz_a では同じデータを CSP と 1.03 で描けるので、0x41 の差は�
 
 ```sh
 # CSP で blend_modes.clip を作る（上の「作ったファイル」の通り）
-cargo run --release --example blend_test -- blend_modes.clip blend_test.clip
+cargo run --release -p csp-lab --example blend_test -- blend_modes.clip blend_test.clip
 # blend_test.clip を CSP で開き、「画像を統合して書き出し → .png」で csp.png を書き出す
-cargo run --release --example blend_compare -- blend_test.clip csp.png
+cargo run --release -p csp-lab --example blend_compare -- blend_test.clip csp.png
 
 # 5 章（パターンの PNG は何でもよい）
 cspf new attr.clip --size 512x512 --image pattern512.png
 cspf add-layer attr.clip grad200.png a1.clip --name 乗算50 --at 40,40
 cspf set a1.clip 5 a2.clip --opacity 50 --blend 2        # 以下、clip.clip も同様に作る
 # CSP で開いて書き出し → attr_csp.png
-cargo run --release --example render_compare -- attr.clip attr_csp.png
+cargo run --release -p csp-lab --example render_compare -- attr.clip attr_csp.png
 
 # 6 章（effects_tmpl.clip は 4 章のひな形）
-cargo run --release --example tone_test -- effects_tmpl.clip tone_a.clip
-cargo run --release --example tone_test -- effects_tmpl.clip tone_b.clip b
+cargo run --release -p csp-lab --example tone_test -- effects_tmpl.clip tone_a.clip
+cargo run --release -p csp-lab --example tone_test -- effects_tmpl.clip tone_b.clip b
 # CSP で開いて書き出し → tone_a_csp.png、tone_b_csp.png
 
 # 8 章（SOURCE は 4 ページ以上の作品。読むだけ）
-cargo run --release -p csp-format --example cmc_edit -- SOURCE.cmc made/cmc1
+cargo run --release -p csp-lab --example cmc_edit -- SOURCE.cmc made/cmc1
 # CSP で made/cmc1/*.cmc を開き、ページ一覧の棒の本数が 1 5 2 4 3 の順か見る
 
 # 7 章（vec_tmpl.clip は CSP の G ペンで線を引いたファイル）
-cargo run --release --example vec_test -- vec_tmpl.clip vec_a.clip a     # a〜m、z、ta〜tj
+cargo run --release -p csp-lab --example vec_test -- vec_tmpl.clip vec_a.clip a     # a〜m、z、ta〜tj
 # CSP で開いて書き出し → vec_a.png。このライブラリの描画は cspf render vec_a.clip ours.png --scale 1
-cargo run --release --example vec_transplant -- vec_tmpl.clip WORK.clip LAYER tx.clip    # tx.clip.moved.png がこのライブラリの描画
-cargo run --release --example vec_clear -- vec_ti.clip 4 f40_ti.clip "UPDATE BrushStyle SET StyleFlag = StyleFlag | 64"
-VC_SEED=1 cargo run --release --example vec_clear -- tq_s.clip 4 dr_r.clip \
+cargo run --release -p csp-lab --example vec_transplant -- vec_tmpl.clip WORK.clip LAYER tx.clip    # tx.clip.moved.png がこのライブラリの描画
+cargo run --release -p csp-lab --example vec_clear -- vec_ti.clip 4 f40_ti.clip "UPDATE BrushStyle SET StyleFlag = StyleFlag | 64"
+VC_SEED=1 cargo run --release -p csp-lab --example vec_clear -- tq_s.clip 4 dr_r.clip \
   "UPDATE BrushStyle SET ThicknessBase = 0.51, ThicknessEffector = X'00000001', RotationBase = 181.5, RotationEffector = 195, RotationRandom = 0.3"
-cargo run --release --example vec_draw -- f40_ti.clip ours.png    # 保存画素を使わずベクターデータから描く
+cargo run --release -p csp-lab --example vec_draw -- f40_ti.clip ours.png    # 保存画素を使わずベクターデータから描く
 ```

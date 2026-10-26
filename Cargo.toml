@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/csp-format", "crates/csp-assets", "crates/cspf"]
+members = ["crates/csp-format", "crates/csp-assets", "crates/cspf", "crates/csp-lab"]
 
 [workspace.package]
 version = "0.1.0"

@@ -133,6 +133,7 @@ pub const MOD_SPACE: u32 = 8;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub enum ModifierAction {
     /// Switch to the tool with this node UUID (hex) while the keys are held.
     Tool(String),

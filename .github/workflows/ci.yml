@@ -28,12 +28,12 @@ jobs:
       - name: Python reader matches the Rust crate (V7, fixture)
         shell: bash
         run: |
-          cargo build --example layer_digest -p csp-format
+          cargo build --example layer_digest -p csp-lab
           python tools/validation/python_reader_check.py python/tests/data python/tests/data/files.txt v7.jsonl --digest target/debug/examples/layer_digest
           python -c "import json, sys; r = [json.loads(l) for l in open('v7.jsonl')]; print(r); sys.exit(0 if r and all(x['ok'] for x in r) else 1)"
       - name: Python asset reader matches the Rust crate (W5, synthetic files)
         shell: bash
         run: |
-          cargo build --example asset_fixtures --example asset_digest -p csp-assets
+          cargo build --example asset_fixtures --example asset_digest -p csp-lab
           target/debug/examples/asset_fixtures w5-fixtures
           python tools/validation/assets_python_check.py w5-fixtures w5.jsonl --digest target/debug/examples/asset_digest

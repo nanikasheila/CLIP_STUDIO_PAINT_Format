@@ -43,6 +43,7 @@ use crate::error::{Error, Result};
 /// `NodeOutputOp` (what it changes). Codes from CSP's own tool database.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub enum ToolKind {
     /// A tool or group (no settings).
     Folder,

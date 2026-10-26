@@ -53,6 +53,7 @@ pub const RECORD_OVERHEAD: u32 = 112;
 /// Pixel layout of an offscreen.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum PixelKind {
     /// BGRA colour with a separate alpha plane.
     Color,
