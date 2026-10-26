@@ -39,11 +39,14 @@ First release.
 
 - Commands to inspect, check, extract, render, create and edit files, and
   `cspf asset` for the files of `csp-assets`.
+- Inputs are never replaced: a command refuses an output that is one of its
+  inputs, by any path, symbolic link or hard link.
 
 ### Python
 
 - `csp_format`: a reader with the standard library only, matching the Rust
   crate; `csp_format.assets` for the files of `csp-assets`.
+- The sdist carries the tests and their synthetic files.
 
 [Unreleased]: https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases/tag/v0.1.0

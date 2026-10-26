@@ -11,12 +11,13 @@ authors.workspace = true
 readme = "README.md"
 keywords = ["clip-studio-paint", "csp", "clip", "manga", "cli"]
 categories = ["command-line-utilities", "multimedia::images"]
-include = ["/src", "/tests", "/README.md"]
+include = ["/src", "/tests", "/README.md", "/LICENSE"]
 
 [dependencies]
 csp-format.workspace = true
 csp-assets.workspace = true
 rusqlite = { version = "0.40", features = ["bundled", "serialize"] }
+same-file = "1"
 serde = "1"
 serde_json = { version = "1", features = ["preserve_order"] }
 

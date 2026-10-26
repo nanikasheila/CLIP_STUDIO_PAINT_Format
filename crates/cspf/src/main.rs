@@ -1,8 +1,10 @@
 //! `cspf`: command line tool for CLIP STUDIO PAINT files.
 //!
-//! Input files are only read; outputs go to the paths given.
+//! Input files are only read; outputs go to the paths given, and a
+//! command refuses an output that is one of its inputs.
 
 mod asset;
+mod output;
 
 use std::collections::HashSet;
 use std::io::{BufRead, Write};
@@ -246,7 +248,7 @@ fn roundtrip(path: &Path, out: &Path) -> Result<bool> {
     let original = std::fs::read(path)?;
     let file = ClipFile::from_bytes(original.clone())?;
     let saved = file.to_bytes()?;
-    std::fs::write(out, &saved)?;
+    output::write(out, &saved, &[path])?;
     let same = saved == original;
     print_json(&json!({"file": path, "out": out, "bytes": saved.len(), "identical": same}));
     Ok(same)
@@ -279,6 +281,7 @@ fn new_file(args: &[String]) -> Result<bool> {
     let [out] = positional.as_slice() else { return Err(bad("expected OUT.clip")) };
     let mut canvas = csp_format::NewCanvas::default();
     let mut image = None;
+    let mut inputs = Vec::new();
     for (name, value) in found {
         match name {
             "--size" => {
@@ -293,9 +296,13 @@ fn new_file(args: &[String]) -> Result<bool> {
                     u32::from_str_radix(value.trim_start_matches('#'), 16).map_err(|_| bad("--paper is RRGGBB"))?;
                 canvas.paper = Some([(rgb >> 16) as u8, (rgb >> 8) as u8, rgb as u8]);
             }
-            _ => image = Some(read_png(value)?),
+            _ => {
+                inputs.push(Path::new(value));
+                image = Some(read_png(value)?);
+            }
         }
     }
+    output::check(Path::new(out), &inputs)?;
     let mut file = ClipFile::create(&canvas)?;
     if let Some(image) = image {
         let raster = file.canvas.row.int("CanvasCurrentLayer");
@@ -374,7 +381,7 @@ fn add_layer(args: &[String]) -> Result<bool> {
     }
     let id = clip.add_layer(parent, NewLayer::Raster, &name)?;
     clip.set_layer_pixels(id, &read_png(png)?, at)?;
-    finish(clip, out, json!({"file": out, "layer": id}))
+    finish(clip, out, &[file, png], json!({"file": out, "layer": id}))
 }
 
 fn add_folder(args: &[String]) -> Result<bool> {
@@ -390,7 +397,7 @@ fn add_folder(args: &[String]) -> Result<bool> {
         }
     }
     let id = clip.add_layer(parent, NewLayer::Folder, &name)?;
-    finish(clip, out, json!({"file": out, "folder": id}))
+    finish(clip, out, &[file], json!({"file": out, "folder": id}))
 }
 
 fn set_attributes(args: &[String]) -> Result<bool> {
@@ -418,11 +425,13 @@ fn set_attributes(args: &[String]) -> Result<bool> {
             _ => clip.set_layer_clipping(id, yes(value)?)?,
         }
     }
-    finish(clip, out, json!({"file": out, "layer": id}))
+    finish(clip, out, &[file], json!({"file": out, "layer": id}))
 }
 
 /// Refresh the preview, give the file a new id and save it.
-fn finish(mut clip: ClipFile, out: &str, report: Value) -> Result<bool> {
+fn finish(mut clip: ClipFile, out: &str, inputs: &[&str], report: Value) -> Result<bool> {
+    let inputs: Vec<&Path> = inputs.iter().map(Path::new).collect();
+    output::check(Path::new(out), &inputs)?;
     clip.update_preview()?;
     clip.renew_file_id();
     clip.save(out)?;
@@ -435,7 +444,7 @@ fn remove_layer(args: &[String]) -> Result<bool> {
     let id: i64 = id.parse().map_err(|_| bad("ID is a layer id (see inspect)"))?;
     let mut clip = ClipFile::open(file)?;
     clip.remove_layer(id)?;
-    finish(clip, out, json!({"file": out, "removed": id}))
+    finish(clip, out, &[file], json!({"file": out, "removed": id}))
 }
 
 fn extract(path: &Path, out: &Path) -> Result<bool> {
@@ -446,16 +455,17 @@ fn extract(path: &Path, out: &Path) -> Result<bool> {
         if let Some((image, origin)) = file.layer_pixels(layer)? {
             let name =
                 out.join(format!("layer{:04}_{}_{}x{}.png", layer.main_id, layer.kind.name(), origin.0, origin.1));
-            std::fs::write(name, image.to_png()?)?;
+            output::write(&name, image.to_png()?, &[path])?;
             count += 1;
         }
         if let Some((mask, origin)) = file.layer_mask(layer)? {
             let name = out.join(format!("layer{:04}_mask_{}x{}.png", layer.main_id, origin.0, origin.1));
-            std::fs::write(name, mask.to_png()?)?;
+            output::write(&name, mask.to_png()?, &[path])?;
             count += 1;
         }
         if let Some(thumbnail) = file.layer_thumbnail(layer)? {
-            std::fs::write(out.join(format!("layer{:04}_thumbnail.png", layer.main_id)), thumbnail.to_png()?)?;
+            let name = out.join(format!("layer{:04}_thumbnail.png", layer.main_id));
+            output::write(&name, thumbnail.to_png()?, &[path])?;
             count += 1;
         }
     }
@@ -467,7 +477,7 @@ fn preview(path: &Path, out: &Path) -> Result<bool> {
     let file = ClipFile::open(path)?;
     match file.preview()? {
         Some(image) => {
-            std::fs::write(out, image.to_png()?)?;
+            output::write(out, image.to_png()?, &[path])?;
             Ok(true)
         }
         None => {
@@ -496,7 +506,7 @@ fn render(args: &[String]) -> Result<bool> {
             None => csp_format::render::render(&clip, Default::default())?,
         },
     };
-    std::fs::write(out, image.to_png()?)?;
+    output::write(&out, image.to_png()?, &[&file])?;
     print_json(&serde_json::to_value(&report).expect("JSON"));
     Ok(true)
 }
@@ -571,7 +581,7 @@ fn frames(args: &[String]) -> Result<bool> {
             cropped.paste(&image, -(area.x.round() as i64), -(area.y.round() as i64));
             cropped
         };
-        std::fs::write(Path::new(out).join(format!("{n:04}.png")), image.to_png()?)?;
+        output::write(&Path::new(out).join(format!("{n:04}.png")), image.to_png()?, &[Path::new(file)])?;
         written += 1;
     }
     print_json(&json!({
@@ -613,7 +623,7 @@ fn anim_set(args: &[String]) -> Result<bool> {
         clip.set_cel_keys(timeline_id, folder, &keys)?;
     }
     clip.reload()?;
-    finish(clip, out, json!({"file": out, "timeline": timeline_id}))
+    finish(clip, out, &[file], json!({"file": out, "timeline": timeline_id}))
 }
 
 /// Stable short key of a path relative to the corpus root (FNV-1a).
@@ -688,6 +698,9 @@ fn corpus(args: &[String]) -> Result<bool> {
         None => walk(&root, &mut files),
     }
     files.sort();
+    let mut inputs: Vec<&Path> = files.iter().map(PathBuf::as_path).collect();
+    inputs.extend(list.as_deref().map(Path::new));
+    output::check(Path::new(out), &inputs)?;
     let mut output = std::fs::OpenOptions::new().create(true).append(true).open(out)?;
     // A run that was killed may have left half a line; start on a new one.
     if std::fs::read(out).is_ok_and(|bytes| bytes.last().is_some_and(|last| *last != b'\n')) {

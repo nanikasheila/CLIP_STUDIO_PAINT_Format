@@ -166,3 +166,55 @@ fn animation_commands_on_a_file_without_timelines() {
     let set = cspf(&["anim-set", &clip, &path(dir.path(), "out.clip"), "--fps", "12"]);
     assert!(!set.status.success());
 }
+
+/// Fails without writing: the input's bytes stay the same.
+fn refused(dir: &Path, args: &[&str], input: &str) {
+    let before = std::fs::read(dir.join(input)).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_cspf")).args(args).current_dir(dir).output().expect("run cspf");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!output.status.success(), "cspf {args:?} wrote over {input}");
+    assert!(stderr.contains("is the input"), "cspf {args:?}: {stderr}");
+    assert_eq!(std::fs::read(dir.join(input)).unwrap(), before, "cspf {args:?} changed {input}");
+}
+
+#[test]
+fn outputs_never_replace_inputs() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+    let png = red_square(root);
+    let clip = path(root, "new.clip");
+    ok(&["new", &clip, "--size", "64x48"]);
+    std::fs::create_dir(root.join("sub")).unwrap();
+    std::fs::hard_link(root.join("new.clip"), root.join("hard.clip")).unwrap();
+    // The same file by an absolute path, a relative one, a roundabout one and a hard link.
+    let mut names = vec![clip.clone(), "new.clip".to_owned(), "./sub/../new.clip".to_owned(), "hard.clip".to_owned()];
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(root.join("new.clip"), root.join("sub/link.clip")).unwrap();
+        names.push("sub/link.clip".to_owned());
+    }
+    for out in &names {
+        let out = out.as_str();
+        for args in [
+            vec!["roundtrip", "new.clip", out],
+            vec!["add-layer", "new.clip", "square.png", out],
+            vec!["add-folder", "new.clip", out],
+            vec!["set", "new.clip", "3", out, "--opacity", "50"],
+            vec!["remove-layer", "new.clip", "3", out],
+            vec!["preview", "new.clip", out],
+            vec!["render", "new.clip", out],
+        ] {
+            refused(root, &args, "new.clip");
+        }
+    }
+    refused(root, &["add-layer", "new.clip", "square.png", &png], "square.png");
+    refused(root, &["new", "square.png", "--image", "square.png"], "square.png");
+    refused(root, &["corpus", ".", "new.clip"], "new.clip");
+
+    let anim = path(root, "anim.clip");
+    std::fs::copy(concat!(env!("CARGO_MANIFEST_DIR"), "/../../python/tests/data/anim.clip"), &anim).unwrap();
+    refused(root, &["anim-set", "anim.clip", "./anim.clip", "--fps", "12"], "anim.clip");
+    // A different output still works, and the inputs are untouched.
+    ok(&["anim-set", &anim, &path(root, "anim12.clip"), "--fps", "12"]);
+    ok(&["roundtrip", &clip, &path(root, "copy.clip")]);
+}

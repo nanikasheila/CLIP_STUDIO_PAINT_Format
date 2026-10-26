@@ -1,4 +1,5 @@
 /target
+/python/build/
 __pycache__/
 *.pyc
 # Real artwork never goes into the repository.
@@ -10,3 +11,4 @@ __pycache__/
 # The empty pages CSP made for blank::blank_page (no artwork; also in name-studio).
 !crates/csp-format/assets/blank-*.clip
 !crates/csp-format/assets/blank-*.cmc
+*.egg-info/
