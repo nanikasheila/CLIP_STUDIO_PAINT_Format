@@ -77,11 +77,17 @@ pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_
 | `encode_offscreen_image` / `image_to_blocks` | `offscreen::encode` | CSP と同じ zlib で、元のブロックとバイト一致 |
 | `transform_vector_data` | `VectorObject::transform(scale, dx, dy)` | 点・外接矩形・ブラシサイズ・104 バイト点の制御点も動かす |
 | `transform_text_attributes` | `Attributes::transform` | |
-| `write_cmc(template, pages, ...)` | `CmcFile::add_page` / `reorder` / `remove_page` / `save` | ひな形からの新規作成は csp-format にまだない（§5） |
+| `write_cmc(template, pages, ...)` | `CmcFile::open(template)` → `set_project_value` → `save_with_pages(output, pages)` | ページ一覧だけを作り直し、作品の設定はひな形のまま。`PageLink` / `set_pages` で一覧を直接渡すこともできる。`work_canvas_values` は `page_canvas_values`。`Link*` の保存時刻は UTC（CSP は PC の時刻だが、読み手は使わない） |
+| （ページの追加・並べ替え・削除） | `CmcFile::add_page` / `reorder` / `remove_page` / `save` | |
 | `verify::check_clip` | `verify::check_clip(data, options)` / `cspf check` | コンテナ・DB・画素の再符号化・ベクター・テキスト・参照まで調べる |
 | `verify::verify_work` | `verify::check_cmc(data, Some(folder))` | |
-| `RowCopier`（他ファイルの行の複製）、`merge_schema` | なし | §5 |
-| `NewVectorLine` / `build_vector_data` / `NewFrame` / `FrameTemplate` | なし（`VectorObject` を組み立てて `VectorData::to_bytes`） | §5 |
+| `ClipEditor::add_layer(source, …, row_hook, payload_hook)` | `file.prepare_copy_from(&source)` → `file.copy_layer_from(&source, id, CopyLayer { row_hook, payload_hook, parent })` | 位置（`LayerOffset`）は保ち、描画のオフスクリーンはこのキャンバスの大きさで作り直す。保存された画素は同じキャンバス位置に写る。マスク・コマ枠の画像・3D などは落とす（`copy::DROPPED_LAYER_LINKS`）。`add_layer_rendered_like` に当たるものはない |
+| `RowCopier`、`merge_schema` / `merge_columns`、`share_rows` | `copy::RowCopier`、`copy::merge_schema` / `merge_columns`、`copy::share_rows` | `prepare_copy_from` が clip-core の `merge_page_schema` + `share_rows` に当たる |
+| `add_frame_offscreens` | `file.add_frame_images(id)` | |
+| `brush_style_in` | `copy::brush_style_in` | |
+| `NewVectorLine` / `build_vector_data` / `NewFrame` / `FrameTemplate` / `build_frame_data` / `shape_signature` | `vector_build::*`、`VectorData::from_lines(..).to_bytes()` / `VectorData::from_frames(..).to_bytes()` | 同じ入力でバイト一致（実ファイルのコマ枠 34 個をひな形にして確認）。`FrameTemplate::of` は `VectorData` を受け取る |
+| `share_rows`（`BrushStyleManager` と `BrushStyle` だけ） | `copy::SHARED_TABLES`（ブラシの先端・テクスチャ画像、散布、影響元のグラフ、塗りの設定も） | clip-core はブラシ設定が指す表を写さない。写した先にブラシの表がない（`ClipFile::create` などの）キャンバスでは、テクスチャを使うブラシの線を CSP が描くときに落ちる。テクスチャ画像（`BrushPatternImage.Mipmap`）は新しい id で写し、`Canvas.BrushStyleReadProtect070` も写す（ないと新しい形のブラシ設定で CSP が落ちる） |
+| `brush_style_of(payload)` | `VectorData::parse(payload)?.brush_style()` | 88 バイトのヘッダー（最も多い形）では +72 を読む。clip-core は +76（ブラシの大きさの f64 の上位）を読んでいた |
 | `NewText` / `retarget_*` / `text_color` | `Attributes::set` / `set_bbox` / `clear_render_offscreen` | 本文を変えたら `clear_render_offscreen` で CSP に描き直させる |
 | `subtool::read_sub_tools`（.sut） | なし | ブラシの設定は .clip 内の `BrushStyle` を `stroke` が読む。.sut はアプリ側に残す |
 
@@ -137,9 +143,7 @@ csp-format に移すと次が読める。clip-core（と元の Python 実装）�
 
 移行の途中で必要になったら、ここに足してから各リポジトリで使う。
 
-- Rust: 他のファイルからレイヤーを行ごと複製する機能（clip-core の `RowCopier` / `merge_schema`）
-- Rust: 線・コマ枠のベクターデータを組み立てる関数（clip-core の `build_vector_data` / `build_frame_data`）
-- Rust: ひな形からの .cmc 新規作成（clip-core の `write_cmc`）
+- Rust: 作品情報・ノンブルのレイヤーを持つ白紙ページ（clip-core の `write/blank.rs`、`write/story.rs` のうち形式の部分）
 - Python: 書き込み
 
 ## 6. 確かめ方
