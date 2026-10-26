@@ -21,7 +21,7 @@ Rust（name-studio）:
 
 ```toml
 # Cargo.toml（workspace.dependencies か crates/clip-core）
-csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", rev = "<main のコミット>" }
+csp-format = { git = "https://github.com/nanikasheila/csp-format", rev = "<main のコミット>" }
 ```
 
 両者とも `rusqlite 0.40`（`bundled`, `serialize`）と `png 0.18` を使うので、依存の重複は増えない。
@@ -30,7 +30,7 @@ csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format",
 Python（csp-name-splitter）:
 
 ```sh
-pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format#subdirectory=python"
+pip install "csp-format @ git+https://github.com/nanikasheila/csp-format#subdirectory=python"
 ```
 
 `pyproject.toml` の `dependencies` に同じ指定を書く。`csp_format` は標準ライブラリだけで動く（Python 3.10 以上）。Pillow は不要になるが、

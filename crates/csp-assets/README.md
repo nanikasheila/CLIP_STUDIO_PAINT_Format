@@ -13,7 +13,7 @@ Read and write CLIP STUDIO PAINT's files other than canvases:
 Parsing then writing an unchanged file gives the same bytes. Canvases
 (`.clip`, `.cmc`) are in [`csp-format`](https://crates.io/crates/csp-format).
 The requirements, specification and validation records are in the
-repository: [docs/assets/](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/assets/requirements.md).
+repository: [docs/assets/](https://github.com/nanikasheila/csp-format/blob/main/docs/assets/requirements.md).
 
 Not made or endorsed by CELSYS. CLIP STUDIO PAINT is a trademark of CELSYS, Inc.
 
