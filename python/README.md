@@ -1,10 +1,19 @@
 # csp_format (Python)
 
-CLIP STUDIO PAINT のファイル（`.clip` / `.cmc`）を Python の標準ライブラリだけで読む実装。
-規則は Rust の `csp-format` と同じで、実ファイル 719 件で両者の結果が一致することを確かめている（[V7](../docs/validation/V7-python.md)）。
-書き込みと合成描画は Rust 側（`cspf`）を使う。
+Read CLIP STUDIO PAINT files (`.clip`, `.cmc`) and its sub tools, auto
+actions, colour and gradient sets and materials (`csp_format.assets`) with
+the Python standard library only. It follows the same rules as the Rust
+crate `csp-format`, and both give the same results on 719 real files. For
+writing and rendering, use the Rust crates or the `cspf` command. Not made
+or endorsed by CELSYS. Documentation: [GitHub](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format).
+
+CLIP STUDIO PAINT のファイル（`.clip` / `.cmc`）と、サブツール・オートアクション・カラーセット・グラデーションセット・素材（`csp_format.assets`）を Python の標準ライブラリだけで読む実装。
+規則は Rust の `csp-format` と同じで、実ファイル 719 件で両者の結果が一致することを確かめている（[V7](../docs/validation/V7-python.md)、assets は [W5](../docs/assets/validation/W5-python.md)）。
+書き込みと合成描画は Rust 側（`cspf`）を使う。CELSYS の公式のものではない。
 
 ```sh
+pip install csp-format
+# PyPI に出すまでは
 pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format#subdirectory=python"
 ```
 
@@ -46,6 +55,7 @@ with read_cmc("work.cmc") as work:
 | .cmc のページ順・ページのサムネイル | `work.pages()`, `work.page_file_paths()`, `work.page_thumbnail(node)` |
 | アニメーション（タイムライン・セル・キーフレーム・2D カメラ） | `read_animation(clip)`, `animation.frame_state(clip, index, frame)`（[08 章](../docs/spec/08-animation.md)） |
 | トラックのキー（"cmt " 文書の読み書き） | `csp_format.animation.parse_document`, `document_bytes`, `unpack_chunk` |
+| サブツール・オートアクション・カラーセット・グラデーションセット・ショートカット・素材 | `csp_format.assets`（`subtool`, `serial`, `colorset`, `shortcut`, `material`, `c2f`, `tar`） |
 
 画像は `Image(width, height, rgba)`（RGBA、非乗算）。Pillow へは
 `PIL.Image.frombytes("RGBA", (image.width, image.height), bytes(image.rgba))`。

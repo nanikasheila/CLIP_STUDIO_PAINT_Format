@@ -5,11 +5,27 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "csp-format"
 version = "0.1.0"
-description = "Read CLIP STUDIO PAINT files (.clip, .cmc) with the Python standard library only"
+description = "Read CLIP STUDIO PAINT files (.clip, .cmc) and its other files with the Python standard library only"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
+authors = [{ name = "nanikasheila" }]
+keywords = ["clip-studio-paint", "csp", "clip", "cmc", "manga"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: File Formats",
+    "Topic :: Multimedia :: Graphics",
+]
 dependencies = []
 
-[tool.setuptools]
-packages = ["csp_format"]
+[project.urls]
+Homepage = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format"
+Documentation = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/python/README.md"
+Changelog = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["csp_format", "csp_format.*"]

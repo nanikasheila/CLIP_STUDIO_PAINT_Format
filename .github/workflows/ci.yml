@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +18,9 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - run: cargo fmt --all --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test --all
@@ -37,3 +40,36 @@ jobs:
           cargo build --example asset_fixtures --example asset_digest -p csp-lab
           target/debug/examples/asset_fixtures w5-fixtures
           python tools/validation/assets_python_check.py w5-fixtures w5.jsonl --digest target/debug/examples/asset_digest
+
+  msrv:
+    name: Minimum Rust version (1.88)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo check --workspace --all-targets --locked
+
+  package:
+    name: Documentation and packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: API documentation builds without warnings
+        run: cargo doc --no-deps -p csp-format -p csp-assets
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - name: Crates package and build from the packaged sources
+        run: cargo package --workspace --exclude csp-lab --locked
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python package installs with every module
+        run: |
+          python -m pip install --upgrade build
+          python -m build python --outdir dist
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install dist/*.whl
+          cd /tmp && /tmp/venv/bin/python -c "import csp_format, csp_format.assets; print(csp_format.__version__)"

@@ -6,6 +6,12 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+homepage.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["clip-studio-paint", "csp", "clip", "manga", "cli"]
+categories = ["command-line-utilities", "multimedia::images"]
+include = ["/src", "/tests", "/README.md"]
 
 [dependencies]
 csp-format.workspace = true

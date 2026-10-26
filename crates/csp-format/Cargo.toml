@@ -6,6 +6,12 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+homepage.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["clip-studio-paint", "csp", "clip", "manga", "file-format"]
+categories = ["parser-implementations", "multimedia::images", "encoding"]
+include = ["/src", "/assets", "/examples", "/README.md"]
 
 [dependencies]
 # CSP compresses with zlib (madler); its exact output is needed to reproduce
