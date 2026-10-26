@@ -187,6 +187,7 @@ fn outputs_never_replace_inputs() {
     std::fs::create_dir(root.join("sub")).unwrap();
     std::fs::hard_link(root.join("new.clip"), root.join("hard.clip")).unwrap();
     // The same file by an absolute path, a relative one, a roundabout one and a hard link.
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut names = vec![clip.clone(), "new.clip".to_owned(), "./sub/../new.clip".to_owned(), "hard.clip".to_owned()];
     #[cfg(unix)]
     {
