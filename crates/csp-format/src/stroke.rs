@@ -717,6 +717,62 @@ pub fn draw_layer(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale
     Ok(Some(image))
 }
 
+/// The 256-pixel-aligned canvas box `(x0, y0, x1, y1)` that holds the
+/// objects and their lines, clamped to the canvas. None when it is empty.
+fn canvas_box<'a>(
+    file: &ClipFile,
+    layer: &Layer,
+    objects: impl IntoIterator<Item = &'a VectorObject>,
+) -> Option<(i64, i64, i64, i64)> {
+    let mut union: Option<[f64; 4]> = None;
+    for object in objects {
+        let b = object.bbox();
+        let margin = object.brush_size().unwrap_or(0.0).abs() * 2.0 + 4.0;
+        let b = [b[0] as f64 - margin, b[1] as f64 - margin, b[2] as f64 + margin, b[3] as f64 + margin];
+        union = Some(match union {
+            Some(u) => [u[0].min(b[0]), u[1].min(b[1]), u[2].max(b[2]), u[3].max(b[3])],
+            None => b,
+        });
+    }
+    let u = union?;
+    let (width, height) = (file.canvas.width_px as i64, file.canvas.height_px as i64);
+    let (ox, oy) = (layer.offset.0 as f64, layer.offset.1 as f64);
+    let x0 = ((u[0] + ox).floor() as i64).clamp(0, width) / 256 * 256;
+    let y0 = ((u[1] + oy).floor() as i64).clamp(0, height) / 256 * 256;
+    let x1 = ((u[2] + ox).ceil() as i64).clamp(0, width);
+    let y1 = ((u[3] + oy).ceil() as i64).clamp(0, height);
+    (x1 > x0 && y1 > y0).then_some((x0, y0, x1, y1))
+}
+
+/// Draw a vector layer at canvas size, only inside the box that holds its
+/// objects (see [`canvas_box`]), as CSP does before it halves the view
+/// down (V3 section 6). Returns the image and its canvas origin; None when
+/// the layer has no objects on the canvas.
+pub fn draw_layer_at_canvas_size(file: &ClipFile, layer: &Layer) -> Result<Option<(RgbaImage, (i64, i64))>> {
+    let vectors = layer_vectors(file, layer)?;
+    let Some((x0, y0, x1, y1)) = canvas_box(file, layer, vectors.iter().flat_map(|data| &data.objects)) else {
+        return Ok(None);
+    };
+    let brushes = brushes(file)?;
+    let mut image = RgbaImage::new((x1 - x0) as u32, (y1 - y0) as u32);
+    let at = Placement { offset: (layer.offset.0 as f64 - x0 as f64, layer.offset.1 as f64 - y0 as f64), scale: 1.0 };
+    for data in &vectors {
+        draw_objects(&mut image, &data.objects, &brushes, at);
+    }
+    Ok(Some((image, (x0, y0))))
+}
+
+/// [`draw_balloons`] at canvas size, only inside the box that holds the
+/// balloons. Returns the image and its canvas origin.
+pub fn draw_balloons_at_canvas_size(file: &ClipFile, layer: &Layer) -> Result<Option<(RgbaImage, (i64, i64))>> {
+    let vectors = layer_vectors(file, layer)?;
+    let Some((x0, y0, x1, y1)) = canvas_box(file, layer, vectors.iter().flat_map(|data| &data.objects)) else {
+        return Ok(None);
+    };
+    let at = Placement { offset: (layer.offset.0 as f64 - x0 as f64, layer.offset.1 as f64 - y0 as f64), scale: 1.0 };
+    Ok(balloons(file, layer, ((x1 - x0) as u32, (y1 - y0) as u32), at)?.map(|image| (image, (x0, y0))))
+}
+
 /// Draw the balloons of a text layer (its `VectorObjectList` objects) at
 /// `scale` into an image of `width × height`, as CSP merges the balloons
 /// of one layer: every object is a closed shape, filled with its sub colour inside
@@ -724,6 +780,10 @@ pub fn draw_layer(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale
 /// outside the other objects' fills, so overlapping balloons and their
 /// tails make one outline (V3 section 5). None when there are no balloons.
 pub fn draw_balloons(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale: f64) -> Result<Option<RgbaImage>> {
+    balloons(file, layer, (width, height), Placement { offset: (layer.offset.0 as f64, layer.offset.1 as f64), scale })
+}
+
+fn balloons(file: &ClipFile, layer: &Layer, size: (u32, u32), at: Placement) -> Result<Option<RgbaImage>> {
     let mut objects: Vec<VectorObject> =
         layer_vectors(file, layer)?.into_iter().flat_map(|data| data.objects).collect();
     if objects.is_empty() {
@@ -744,8 +804,6 @@ pub fn draw_balloons(file: &ClipFile, layer: &Layer, width: u32, height: u32, sc
     }
     let brushes = brushes(file)?;
     let fallback = Brush::default();
-    let at = Placement { offset: (layer.offset.0 as f64, layer.offset.1 as f64), scale };
-    let size = (width, height);
     let brush_of = |object: &VectorObject| {
         object.brush_styles().iter().find_map(|id| brushes.get(&(*id as i64))).unwrap_or(&fallback)
     };
@@ -764,7 +822,7 @@ pub fn draw_balloons(file: &ClipFile, layer: &Layer, width: u32, height: u32, sc
             fill_coverage(&path, size)
         })
         .collect();
-    let mut image = RgbaImage::new(width, height);
+    let mut image = RgbaImage::new(size.0, size.1);
     for (object, fill) in objects.iter().zip(&fills) {
         if let Some(fill) = fill {
             fill.paint(&mut image, colors(object).1);
