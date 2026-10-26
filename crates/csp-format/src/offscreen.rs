@@ -652,6 +652,65 @@ impl Offscreen {
         Ok(image)
     }
 
+    /// Boxes `(x0, y0, x1, y1)` in offscreen pixels of the blocks that store
+    /// data. Nothing is decompressed; edge blocks end at the offscreen's size.
+    pub fn stored_boxes(&self) -> Vec<(u32, u32, u32, u32)> {
+        let p = self.parameter;
+        let Some(data) = &self.data else { return Vec::new() };
+        data.blocks
+            .iter()
+            .enumerate()
+            .filter(|(_, block)| block.zlib.is_some())
+            .map(|(index, _)| {
+                let (left, top) = p.block_origin(index);
+                (left, top, (left + BLOCK_SIZE).min(p.width), (top + BLOCK_SIZE).min(p.height))
+            })
+            .collect()
+    }
+
+    /// [`Offscreen::to_rgba`] of the box `(x0, y0, x1, y1)` in offscreen
+    /// pixels, which may reach outside the offscreen (that part is
+    /// transparent). Only the blocks the box overlaps are decompressed, so
+    /// part of a large sheet can be read without decoding all of it.
+    pub fn to_rgba_region(&self, region: (i64, i64, i64, i64)) -> Result<RgbaImage> {
+        let p = self.parameter;
+        if p.kind() == PixelKind::Unknown {
+            bail!("Unknown pixel layout (channel order {:#x})", p.channel_order);
+        }
+        let (x0, y0, x1, y1) = region;
+        let mut image = RgbaImage::new((x1 - x0).max(0) as u32, (y1 - y0).max(0) as u32);
+        // The part of the box inside the offscreen.
+        let inside = (x0.max(0), y0.max(0), x1.min(p.width as i64), y1.min(p.height as i64));
+        if inside.0 >= inside.2 || inside.1 >= inside.3 {
+            return Ok(image);
+        }
+        // The init colour covers the offscreen only.
+        if let Some(init) = self.attribute.init_color()
+            && init.do_initialize
+        {
+            let mut fill = RgbaImage::new((inside.2 - inside.0) as u32, (inside.3 - inside.1) as u32);
+            fill.fill([255, 255, 255, (init.alpha & 0xff) as u8]);
+            image.paste(&fill, inside.0 - x0, inside.1 - y0);
+        }
+        let Some(data) = &self.data else { return Ok(image) };
+        let expected = p.block_bytes();
+        let size = BLOCK_SIZE as i64;
+        let columns = (inside.0 / size)..(inside.2 - 1) / size + 1;
+        for row in (inside.1 / size)..(inside.3 - 1) / size + 1 {
+            for column in columns.clone() {
+                let index = (row * p.blocks_x as i64 + column) as usize;
+                let Some(raw) = data.blocks.get(index).map(Block::inflate).transpose()?.flatten() else { continue };
+                if raw.len() < expected {
+                    bail!("Block {index} has {} bytes, the layout needs {expected}", raw.len());
+                }
+                let (left, top) = p.block_origin(index);
+                let tile = block_to_rgba(&p, BLOCK_SIZE.min(p.width - left), BLOCK_SIZE.min(p.height - top), &raw);
+                image.paste(&tile, left as i64 - x0, top as i64 - y0);
+            }
+        }
+        Ok(image)
+    }
+
     /// [`Offscreen::to_rgba`] halved `halvings` times with
     /// [`RgbaImage::halve`], one block at a time, so a large offscreen read
     /// at a small scale never exists at full size. Blocks are 256 pixels and
@@ -868,6 +927,56 @@ mod tests {
         assert_eq!(decoded.pixel(0, 0), [200, 100, 50, 255]);
         assert_eq!(decoded.pixel(1, 1)[3], 0);
         assert_eq!(offscreen.reencode_check().unwrap(), (2, 2, 2));
+    }
+
+    #[test]
+    fn regions_decode_only_what_they_cover() {
+        // 600×300: blocks of 256 px, the last column and row cut short.
+        let mut image = RgbaImage::new(600, 300);
+        for (x, y) in [(0, 0), (255, 255), (256, 0), (599, 299), (300, 280)] {
+            image.set_pixel(x, y, [x as u8, y as u8, 7, 200]);
+        }
+        let parameter = Parameter::new(PixelKind::Color, 600, 300);
+        let data = encode(&parameter, Some(&image), None).unwrap();
+        let mut attribute = Attribute::new(&parameter, None);
+        attribute.set_block_sizes(&data.record_sizes());
+        let offscreen = Offscreen::parse(&attribute.to_bytes(), Some(&data.to_bytes())).unwrap();
+        // Blocks 0, 1, 4 and 5 store pixels; 2 (512..600, 0..256) and 3 do not.
+        assert_eq!(
+            offscreen.stored_boxes(),
+            [(0, 0, 256, 256), (256, 0, 512, 256), (256, 256, 512, 300), (512, 256, 600, 300)]
+        );
+        let whole = offscreen.to_rgba().unwrap();
+        for region in
+            [(0, 0, 600, 300), (250, 250, 310, 290), (-10, -20, 5, 5), (590, 290, 700, 400), (700, 0, 710, 10)]
+        {
+            let part = offscreen.to_rgba_region(region).unwrap();
+            assert_eq!((part.width as i64, part.height as i64), (region.2 - region.0, region.3 - region.1));
+            for y in 0..part.height as i64 {
+                for x in 0..part.width as i64 {
+                    let (cx, cy) = (x + region.0, y + region.1);
+                    let expected = if (0..600).contains(&cx) && (0..300).contains(&cy) {
+                        whole.pixel(cx as u32, cy as u32)
+                    } else {
+                        [0; 4]
+                    };
+                    assert_eq!(part.pixel(x as u32, y as u32), expected, "{region:?} at {cx},{cy}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn regions_keep_the_init_colour_inside_only() {
+        let parameter = Parameter::new(PixelKind::Color, 100, 100);
+        let init = InitColor { do_initialize: true, alpha: 0xffff_ffff, image_values: vec![0xffff_ffff; 4] };
+        let attribute = Attribute::new(&parameter, Some(&init));
+        let offscreen = Offscreen::parse(&attribute.to_bytes(), None).unwrap();
+        let part = offscreen.to_rgba_region((90, 90, 110, 110)).unwrap();
+        assert_eq!(part.pixel(0, 0), [255, 255, 255, 255]);
+        assert_eq!(part.pixel(9, 9), [255, 255, 255, 255]);
+        assert_eq!(part.pixel(10, 10), [0; 4]);
+        assert!(offscreen.stored_boxes().is_empty());
     }
 
     #[test]
