@@ -36,7 +36,9 @@ use crate::binary::{Reader, Writer, adler32};
 use crate::error::{Error, Result, bail};
 use crate::image::{GrayImage, RgbaImage};
 
+/// Width and height of a block in pixels.
 pub const BLOCK_SIZE: u32 = 256;
+/// Pixels per block.
 pub const BLOCK_PIXELS: usize = (BLOCK_SIZE * BLOCK_SIZE) as usize;
 const ATTRIBUTE_HEADER: u32 = 16;
 const BEGIN_NAME: &str = "BlockDataBeginChunk";
@@ -53,6 +55,7 @@ pub const RECORD_OVERHEAD: u32 = 112;
 /// Pixel layout of an offscreen.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum PixelKind {
     /// BGRA colour with a separate alpha plane.
     Color,
@@ -62,28 +65,36 @@ pub enum PixelKind {
     Monochrome,
     /// One 8-bit plane (layer masks, selections, "alpha only" data).
     Alpha,
+    /// A layout this crate does not know.
     Unknown,
 }
 
 /// One named section of the attribute: its `u32` values.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct Section {
+    /// Section name (`Parameter`, `InitColor`, `BlockSize`).
     pub name: String,
+    /// The values, as stored.
     pub values: Vec<u32>,
 }
 
 /// `Offscreen.Attribute`, kept value for value so it can be written back.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct Attribute {
+    /// The sections, in stored order.
     pub sections: Vec<Section>,
 }
 
 /// The fields of the `Parameter` section, named after `VOffscreen`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 pub struct Parameter {
+    /// Width in pixels.
     pub width: u32,
+    /// Height in pixels.
     pub height: u32,
+    /// Blocks per row.
     pub blocks_x: u32,
+    /// Block rows.
     pub blocks_y: u32,
     /// `BlockDataChannelOrder`: 0x21 colour (BGRA), 0x11 gray, 0x01 alpha only.
     pub channel_order: u32,
@@ -105,9 +116,13 @@ pub struct Parameter {
     pub alpha_row_bytes: u32,
     /// `BlockDataOffsetImageBlock`: pixels per block (65 536).
     pub block_pixels: u32,
+    /// Block width in pixels (256).
     pub block_width: u32,
+    /// Block height in pixels (256).
     pub block_height: u32,
+    /// log2 of the block width (8).
     pub block_shift_x: u32,
+    /// log2 of the block height (8).
     pub block_shift_y: u32,
 }
 
@@ -143,6 +158,7 @@ impl Parameter {
         }
     }
 
+    /// The pixel layout these values describe.
     pub fn kind(&self) -> PixelKind {
         match (self.channel_order, self.image_channels, self.alpha_row_bytes) {
             (0x21, 4, _) => PixelKind::Color,
@@ -153,6 +169,7 @@ impl Parameter {
         }
     }
 
+    /// Number of blocks in the grid.
     pub fn block_count(&self) -> usize {
         self.blocks_x as usize * self.blocks_y as usize
     }
@@ -194,13 +211,16 @@ impl Parameter {
 /// `InitColor`: how blocks that are not stored start out.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct InitColor {
+    /// Not stored blocks are filled (`DoInitialize`).
     pub do_initialize: bool,
     /// Alpha of a not stored pixel (0xFFFFFFFF = opaque, as on paper).
     pub alpha: u32,
+    /// Colour values of a not stored pixel.
     pub image_values: Vec<u32>,
 }
 
 impl Attribute {
+    /// Parses an `Offscreen.Attribute` blob.
     pub fn parse(data: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(data);
         let header = reader.be_u32()?;
@@ -228,6 +248,7 @@ impl Attribute {
         Ok(Attribute { sections })
     }
 
+    /// The blob; an unchanged attribute gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut bodies = Vec::new();
         for section in &self.sections {
@@ -249,6 +270,7 @@ impl Attribute {
         writer.into_inner()
     }
 
+    /// The section of this name.
     pub fn section(&self, name: &str) -> Option<&Section> {
         self.sections.iter().find(|section| section.name == name)
     }
@@ -257,6 +279,7 @@ impl Attribute {
         self.sections.iter_mut().find(|section| section.name == name)
     }
 
+    /// The `Parameter` section, typed and checked.
     pub fn parameter(&self) -> Result<Parameter> {
         let values = &self
             .section("Parameter")
@@ -295,6 +318,7 @@ impl Attribute {
         self.section("Parameter").map(|section| section.values.get(18..).unwrap_or(&[])).unwrap_or(&[])
     }
 
+    /// The `InitColor` section, if any.
     pub fn init_color(&self) -> Option<InitColor> {
         // u32 20 (fixed part), DoInitialize, AlphaValue, ImageValueCount, u32 4, values.
         let values = &self.section("InitColor")?.values;
@@ -313,6 +337,7 @@ impl Attribute {
         values.get(3..3 + count)
     }
 
+    /// Replaces (or adds) the `BlockSize` section.
     pub fn set_block_sizes(&mut self, sizes: &[u32]) {
         let values = vec![TABLE_HEADER, sizes.len() as u32, TABLE_ENTRY].into_iter().chain(sizes.iter().copied());
         match self.section_mut("BlockSize") {
@@ -366,16 +391,20 @@ impl Attribute {
 /// One block record of the payload.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Block {
+    /// Index in the grid (row by row).
     pub index: u32,
     /// Decompressed size the record declares.
     pub raw_size: u32,
+    /// Block width in pixels.
     pub width: u32,
+    /// Block height in pixels.
     pub height: u32,
     /// zlib stream; None when the block is not stored (all transparent).
     pub zlib: Option<Vec<u8>>,
 }
 
 impl Block {
+    /// Length of the block's record in the payload.
     pub fn record_size(&self) -> u32 {
         match &self.zlib {
             Some(zlib) => RECORD_OVERHEAD + zlib.len() as u32,
@@ -395,6 +424,7 @@ impl Block {
         }
     }
 
+    /// The decompressed block; None when it is not stored.
     pub fn inflate(&self) -> Result<Option<Vec<u8>>> {
         let Some(zlib) = &self.zlib else { return Ok(None) };
         let mut raw = Vec::with_capacity(self.raw_size as usize);
@@ -412,20 +442,27 @@ impl Block {
 /// A tail table (`BlockStatus`, `BlockCheckSum`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Table {
+    /// Table name.
     pub name: String,
+    /// First value after the name (12).
     pub header: u32,
+    /// Bytes per entry (4).
     pub entry_size: u32,
+    /// One value per block.
     pub values: Vec<u32>,
 }
 
 /// The external payload of an offscreen.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockData {
+    /// One record per block of the grid.
     pub blocks: Vec<Block>,
+    /// The tables after the blocks.
     pub tables: Vec<Table>,
 }
 
 impl BlockData {
+    /// Parses an `Offscreen.BlockData` external payload.
     pub fn parse(payload: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(payload);
         let length = reader.be_u64()?;
@@ -482,6 +519,7 @@ impl BlockData {
         Ok(BlockData { blocks, tables })
     }
 
+    /// The payload; unchanged data gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Writer::new();
         writer.be_u64(0);
@@ -511,6 +549,7 @@ impl BlockData {
         data
     }
 
+    /// The table of this name.
     pub fn table(&self, name: &str) -> Option<&Table> {
         self.tables.iter().find(|table| table.name == name)
     }
@@ -558,12 +597,14 @@ impl BlockData {
         })
     }
 
+    /// Record length of every block, for the `BlockSize` section.
     pub fn record_sizes(&self) -> Vec<u32> {
         self.blocks.iter().map(Block::record_size).collect()
     }
 }
 
-/// zlib with CSP's settings (see [`crate::zlib`]).
+/// zlib with CSP's settings: the bundled C zlib at level 1, window bits 15,
+/// memory level 9 (gives CSP's bytes exactly).
 pub fn compress(raw: &[u8]) -> Vec<u8> {
     crate::zlib::compress(raw).expect("compressing in memory")
 }
@@ -571,12 +612,16 @@ pub fn compress(raw: &[u8]) -> Vec<u8> {
 /// A decoded offscreen.
 #[derive(Debug, Clone)]
 pub struct Offscreen {
+    /// The attribute.
     pub attribute: Attribute,
+    /// Its `Parameter` section.
     pub parameter: Parameter,
+    /// The block data, when the payload is stored.
     pub data: Option<BlockData>,
 }
 
 impl Offscreen {
+    /// Parses an attribute and, if given, its block data payload, and checks they agree.
     pub fn parse(attribute: &[u8], payload: Option<&[u8]>) -> Result<Self> {
         let attribute = Attribute::parse(attribute)?;
         let parameter = attribute.parameter()?;
@@ -589,6 +634,7 @@ impl Offscreen {
         Ok(Offscreen { attribute, parameter, data })
     }
 
+    /// The pixel layout.
     pub fn kind(&self) -> PixelKind {
         self.parameter.kind()
     }

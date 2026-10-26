@@ -110,12 +110,14 @@ fn fill_header(header: &mut [u8], count: usize, bbox: [i32; 4], brush_style: u32
 pub struct NewVectorLine {
     /// `(x, y, width factor)`; the factor (pen pressure) is 0..1.
     pub points: Vec<(f64, f64, f64)>,
+    /// Join the last point to the first.
     pub closed: bool,
     /// Full line width in pixels.
     pub width_px: f64,
 }
 
 impl NewVectorLine {
+    /// The points without the width factors.
     pub fn xy(&self) -> Vec<(f64, f64)> {
         self.points.iter().map(|&(x, y, _)| (x, y)).collect()
     }
@@ -125,7 +127,9 @@ impl NewVectorLine {
 /// border's full width.
 #[derive(Debug, Clone, PartialEq)]
 pub struct NewFrame {
+    /// Outline of the panel, in layer pixels.
     pub points: Vec<(f64, f64)>,
+    /// Full width of the border in pixels.
     pub width_px: f64,
 }
 

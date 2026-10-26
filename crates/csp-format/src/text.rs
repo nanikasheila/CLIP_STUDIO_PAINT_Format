@@ -35,25 +35,32 @@ pub mod ids {
 /// One attribute record.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Record {
+    /// Record id (see [`ids`]).
     pub id: u32,
+    /// Record bytes, as stored.
     pub data: Vec<u8>,
 }
 
 /// A parsed attribute list.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Attributes {
+    /// The records, in stored order.
     pub records: Vec<Record>,
 }
 
 /// Font name pair of record 57.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct Font {
+    /// First field of the record, not decoded (kept on writing).
     pub lead: u16,
+    /// Font name as CSP shows it.
     pub name: String,
+    /// PostScript name of the font.
     pub postscript_name: String,
 }
 
 impl Attributes {
+    /// Parses a `TextLayerAttributes` blob.
     pub fn parse(blob: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(blob);
         let mut records = Vec::new();
@@ -68,6 +75,7 @@ impl Attributes {
         Ok(Attributes { records })
     }
 
+    /// The blob, records in the same order (unchanged records give the same bytes).
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut writer = Writer::new();
         for record in &self.records {
@@ -76,10 +84,12 @@ impl Attributes {
         writer.into_inner()
     }
 
+    /// The bytes of the first record with this id.
     pub fn get(&self, id: u32) -> Option<&[u8]> {
         self.records.iter().find(|record| record.id == id).map(|record| record.data.as_slice())
     }
 
+    /// Replaces the first record with this id, or appends one.
     pub fn set(&mut self, id: u32, data: Vec<u8>) {
         match self.records.iter_mut().find(|record| record.id == id) {
             Some(record) => record.data = data,
@@ -101,18 +111,22 @@ impl Attributes {
         self.i32s(ids::FONT_SIZE)?.first().map(|value| *value as f64 / 100.0)
     }
 
+    /// Text block bounding box in layer pixels (record 42: x0, y0, x1, y1).
     pub fn bbox(&self) -> Option<[i32; 4]> {
         self.i32s(ids::BBOX)?.try_into().ok()
     }
 
+    /// Sets record 42.
     pub fn set_bbox(&mut self, bbox: [i32; 4]) {
         self.set_i32s(ids::BBOX, &bbox);
     }
 
+    /// Text block width and height in pixels (record 63).
     pub fn block_size(&self) -> Option<[i32; 2]> {
         self.i32s(ids::BLOCK_SIZE)?.try_into().ok()
     }
 
+    /// Four corners in 1/100 px relative to the anchor (record 64).
     pub fn quad(&self) -> Option<[i32; 8]> {
         self.i32s(ids::QUAD)?.try_into().ok()
     }
@@ -122,6 +136,7 @@ impl Attributes {
         self.i32s(ids::BALLOON)?.first().map(|value| *value as u32).filter(|value| *value > 0)
     }
 
+    /// Id of the offscreen CSP rendered the text into (record 50; 0 = render again).
     pub fn render_offscreen(&self) -> Option<u32> {
         self.i32s(ids::RENDER_OFFSCREEN)?.first().map(|value| *value as u32)
     }
@@ -133,6 +148,7 @@ impl Attributes {
         }
     }
 
+    /// The font (record 57).
     pub fn font(&self) -> Option<Font> {
         let data = self.get(ids::FONT)?;
         let mut reader = Reader::new(data);
@@ -177,6 +193,7 @@ pub fn split_array(blob: &[u8]) -> Result<Vec<&[u8]>> {
     Ok(parts)
 }
 
+/// Joins parts into a `…Array` column (the inverse of [`split_array`]).
 pub fn join_array<T: AsRef<[u8]>>(parts: &[T]) -> Vec<u8> {
     let mut writer = Writer::new();
     for part in parts {
@@ -188,7 +205,9 @@ pub fn join_array<T: AsRef<[u8]>>(parts: &[T]) -> Vec<u8> {
 /// One text block of a text layer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextBlock {
+    /// The text (UTF-8, `\n` between lines).
     pub text: String,
+    /// Its attribute records.
     pub attributes: Attributes,
 }
 

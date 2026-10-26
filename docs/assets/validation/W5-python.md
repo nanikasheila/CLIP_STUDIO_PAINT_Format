@@ -1,7 +1,7 @@
 # W5 Python と Rust の照合（2026-10-25）
 
 標準ライブラリだけの Python 版（`python/csp_format/assets`）と Rust 版（`crates/csp-assets`）が、同じファイルから
-同じものを読むかを `tools/validation/assets_python_check.py` で照合しました。比べるのは次のとおり（`examples/asset_digest.rs` と同じ形）。
+同じものを読むかを `tools/validation/assets_python_check.py` で照合しました。比べるのは次のとおり（`crates/csp-lab/examples/asset_digest.rs` と同じ形）。
 
 - サブツール DB: ツリー（深さ・上位の名前・名前・種類・設定 ID・初期設定 ID）と、全設定行の全列（バイナリ列は解読した形）
 - 型付き直列化: `cspf asset dump` の JSON の全体
@@ -24,7 +24,7 @@
 ## 再現の手順
 
 ```sh
-cargo build --release --example asset_digest -p csp-assets
+cargo build --release --example asset_digest -p csp-lab
 python tools/validation/assets_python_check.py <フォルダー> w5.jsonl --digest target/release/examples/asset_digest
 ```
 

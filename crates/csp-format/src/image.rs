@@ -5,8 +5,11 @@ use crate::error::{Error, Result};
 /// RGBA, 8 bits per channel, straight (not premultiplied) alpha.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RgbaImage {
+    /// Width in pixels.
     pub width: u32,
+    /// Height in pixels.
     pub height: u32,
+    /// `width * height * 4` bytes, rows top to bottom, R G B A.
     pub pixels: Vec<u8>,
 }
 
@@ -16,22 +19,26 @@ impl RgbaImage {
         RgbaImage { width, height, pixels: vec![0; width as usize * height as usize * 4] }
     }
 
+    /// Sets every pixel to `pixel` (RGBA).
     pub fn fill(&mut self, pixel: [u8; 4]) {
         for chunk in self.pixels.as_chunks_mut::<4>().0.iter_mut() {
             chunk.copy_from_slice(&pixel);
         }
     }
 
+    /// The RGBA pixel at (x, y). Panics outside the image.
     pub fn pixel(&self, x: u32, y: u32) -> [u8; 4] {
         let at = (y as usize * self.width as usize + x as usize) * 4;
         self.pixels[at..at + 4].try_into().expect("4 bytes")
     }
 
+    /// Sets the RGBA pixel at (x, y). Panics outside the image.
     pub fn set_pixel(&mut self, x: u32, y: u32, pixel: [u8; 4]) {
         let at = (y as usize * self.width as usize + x as usize) * 4;
         self.pixels[at..at + 4].copy_from_slice(&pixel);
     }
 
+    /// The bytes of row `y`.
     pub fn row_mut(&mut self, y: u32) -> &mut [u8] {
         let stride = self.width as usize * 4;
         &mut self.pixels[y as usize * stride..(y as usize + 1) * stride]
@@ -180,10 +187,12 @@ impl RgbaImage {
         }
     }
 
+    /// Encodes as an 8-bit RGBA PNG.
     pub fn to_png(&self) -> Result<Vec<u8>> {
         encode_png(self.width, self.height, png::ColorType::Rgba, &self.pixels)
     }
 
+    /// Decodes a PNG (any colour type; converted to RGBA).
     pub fn from_png(data: &[u8]) -> Result<Self> {
         decode_png(data)
     }
@@ -192,16 +201,21 @@ impl RgbaImage {
 /// One 8-bit channel (masks).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GrayImage {
+    /// Width in pixels.
     pub width: u32,
+    /// Height in pixels.
     pub height: u32,
+    /// `width * height` bytes, rows top to bottom.
     pub pixels: Vec<u8>,
 }
 
 impl GrayImage {
+    /// A black (all 0) image.
     pub fn new(width: u32, height: u32) -> Self {
         GrayImage { width, height, pixels: vec![0; width as usize * height as usize] }
     }
 
+    /// Encodes as an 8-bit grayscale PNG.
     pub fn to_png(&self) -> Result<Vec<u8>> {
         encode_png(self.width, self.height, png::ColorType::Grayscale, &self.pixels)
     }

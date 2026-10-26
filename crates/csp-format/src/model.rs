@@ -13,22 +13,31 @@ use rusqlite::Connection;
 use crate::database::{Row, select, select_all, table_exists};
 use crate::error::{Result, bail};
 
+/// `LayerOpacity` of a fully opaque layer (100 %).
 pub const OPACITY_FULL: i64 = 256;
 const MAX_DEPTH: usize = 256;
 
 /// `CanvasUnit` / `CropFrameUnitKind` and friends.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum Unit {
+    /// `CanvasUnit` 0.
     Pixel,
+    /// `CanvasUnit` 1.
     Centimeter,
+    /// `CanvasUnit` 2.
     Millimeter,
+    /// `CanvasUnit` 3.
     Inch,
+    /// `CanvasUnit` 5.
     Point,
+    /// A code this crate does not know; sizes are taken as pixels.
     Unknown(i64),
 }
 
 impl Unit {
+    /// The unit of a stored unit code.
     pub fn from_code(code: i64) -> Self {
         match code {
             0 => Unit::Pixel,
@@ -55,22 +64,33 @@ impl Unit {
 /// Settings of the canvas (one row of `Canvas`).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Canvas {
+    /// `MainId` of the row.
     pub main_id: i64,
+    /// Unit of `width` and `height` (`CanvasUnit`).
     pub unit: Unit,
+    /// Width in `unit` (`CanvasWidth`).
     pub width: f64,
+    /// Height in `unit` (`CanvasHeight`).
     pub height: f64,
+    /// Resolution in dots per inch (`CanvasResolution`).
     pub resolution: f64,
     /// Size in pixels as CSP computes it from `width`/`height`.
     pub width_px: u32,
+    /// Height in pixels, as `width_px`.
     pub height_px: u32,
+    /// `MainId` of the root folder layer (`CanvasRootFolder`).
     pub root_folder: i64,
+    /// Bytes per colour channel (`CanvasChannelBytes`, 1 in CSP files).
     pub channel_bytes: i64,
+    /// The canvas is a two-page spread (`CanvasDoublePage`).
     pub double_page: bool,
+    /// The whole row, for the columns not typed here.
     #[serde(skip)]
     pub row: Row,
 }
 
 impl Canvas {
+    /// Types the columns of a `Canvas` row.
     pub fn from_row(row: Row) -> Self {
         let unit = Unit::from_code(row.int("CanvasUnit"));
         let width = row.real("CanvasWidth");
@@ -96,6 +116,7 @@ impl Canvas {
 /// optional columns are filled (no single column holds it).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum LayerKind {
     /// The root folder (`LayerType` 256), not shown in CSP.
     Root,
@@ -103,12 +124,15 @@ pub enum LayerKind {
     Paper,
     /// Comic story info / nombre text (`LayerType` 800).
     StoryInfo,
+    /// A folder (`LayerFolder` bit 0).
     Folder,
     /// コマ枠フォルダー: a folder with `ComicFrameLineMipmap`.
     FrameFolder,
     /// Pixel layer (`LayerType` bit 0).
     Raster,
+    /// Vector layer: has a `VectorObjectList` row (or the vector index columns when nothing is drawn).
     Vector,
+    /// Text layer (`TextLayerString`).
     Text,
     /// Gradient or fill layer (`GradationFillInfo`).
     Gradient,
@@ -123,10 +147,12 @@ pub enum LayerKind {
 }
 
 impl LayerKind {
+    /// Root, folder or frame folder: a layer that holds other layers.
     pub fn is_folder(self) -> bool {
         matches!(self, LayerKind::Root | LayerKind::Folder | LayerKind::FrameFolder)
     }
 
+    /// A short snake_case name (`"raster"`, `"frame_folder"`, …), the same as the serde name.
     pub fn name(self) -> &'static str {
         match self {
             LayerKind::Root => "root",
@@ -146,19 +172,29 @@ impl LayerKind {
     }
 }
 
+/// `LayerType` bit of a pixel layer.
 pub const LAYER_TYPE_RASTER: i64 = 1;
+/// `LayerType` bit of a layer with a mask.
 pub const LAYER_TYPE_MASKED: i64 = 2;
+/// `LayerType` of the root folder.
 pub const LAYER_TYPE_ROOT: i64 = 256;
+/// `LayerType` of a story info (作品情報) layer.
 pub const LAYER_TYPE_STORY_INFO: i64 = 800;
+/// `LayerType` of the paper (用紙) layer.
 pub const LAYER_TYPE_PAPER: i64 = 1584;
+/// `LayerType` bit of a tone-correction layer.
 pub const LAYER_TYPE_CORRECTION: i64 = 4096;
 
 /// One row of `Layer`, with the commonly used columns typed.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Layer {
+    /// `MainId` of the row; other rows refer to the layer by it.
     pub main_id: i64,
+    /// Name shown in the layer palette (`LayerName`).
     pub name: String,
+    /// What the layer is (derived, see [`LayerKind`]).
     pub kind: LayerKind,
+    /// `LayerType` as stored.
     pub layer_type: i64,
     /// `LayerVisibility` bit 0.
     pub visible: bool,
@@ -170,22 +206,35 @@ pub struct Layer {
     pub blend: i64,
     /// Clipped to the layer below (`LayerClip`).
     pub clipping: bool,
+    /// `LayerLock` is set.
     pub locked: bool,
+    /// `LayerFolder` as stored (bit 0 folder, bit 4 open in the palette).
     pub folder_flags: i64,
+    /// Layer position on the canvas (`LayerOffsetX/Y`); pixel, vector and text positions are relative to it.
     pub offset: (i64, i64),
+    /// Offset of the render offscreen from `offset` (`LayerRenderOffscrOffsetX/Y`).
     pub render_offset: (i64, i64),
+    /// Offset of the mask from `offset` (`LayerMaskOffsetX/Y`).
     pub mask_offset: (i64, i64),
+    /// Offset of the mask offscreen from the mask offset (`LayerMaskOffscrOffsetX/Y`).
     pub mask_render_offset: (i64, i64),
+    /// `MainId` of the `Mipmap` row of the layer's pixels (`LayerRenderMipmap`, 0 = none).
     pub render_mipmap: i64,
+    /// `MainId` of the `Mipmap` row of the mask (`LayerLayerMaskMipmap`, 0 = none).
     pub mask_mipmap: i64,
+    /// `MainId` of the bottom child (`LayerFirstChildIndex`, 0 = none).
     pub first_child: i64,
+    /// `MainId` of the sibling above (`LayerNextIndex`, 0 = none).
     pub next: i64,
+    /// `LayerUuid`, when set.
     pub uuid: Option<String>,
+    /// The whole row, for the columns not typed here.
     #[serde(skip)]
     pub row: Row,
 }
 
 impl Layer {
+    /// Types the columns of a `Layer` row. `vector_layers` are the `LayerId`s of `VectorObjectList`, used to tell vector layers.
     pub fn from_row(row: Row, vector_layers: &HashSet<i64>) -> Self {
         let main_id = row.int("MainId");
         let layer_type = row.int("LayerType");
@@ -234,10 +283,12 @@ impl Layer {
         )
     }
 
+    /// The layer has a mask.
     pub fn has_mask(&self) -> bool {
         self.mask_mipmap != 0
     }
 
+    /// Opacity as 0.0–1.0.
     pub fn opacity_fraction(&self) -> f64 {
         self.opacity.clamp(0, OPACITY_FULL) as f64 / OPACITY_FULL as f64
     }
@@ -324,7 +375,9 @@ mod tests {
 /// A layer and its children (bottom to top).
 #[derive(Debug, Clone)]
 pub struct LayerNode {
+    /// The layer.
     pub layer: Layer,
+    /// Its children, bottom to top.
     pub children: Vec<LayerNode>,
 }
 
@@ -349,13 +402,16 @@ impl LayerNode {
 /// All layers and the tree they form.
 #[derive(Debug, Clone)]
 pub struct LayerTree {
+    /// Every row of `Layer`, in table order.
     pub layers: Vec<Layer>,
+    /// The root folder and everything reachable from it.
     pub root: LayerNode,
     /// Layers not reachable from the root (CSP files have none).
     pub unreachable: Vec<i64>,
 }
 
 impl LayerTree {
+    /// Reads `Layer` and links the tree from the root folder `root_id` (`Canvas.CanvasRootFolder`). Fails on a cycle, a missing link or a tree deeper than 256.
     pub fn read(connection: &Connection, root_id: i64) -> Result<Self> {
         let vector_layers: HashSet<i64> = if table_exists(connection, "VectorObjectList")? {
             select(connection, "SELECT LayerId FROM VectorObjectList", [])?
@@ -377,6 +433,7 @@ impl LayerTree {
         Ok(LayerTree { layers: layers.clone(), root, unreachable })
     }
 
+    /// The layer with this `MainId`.
     pub fn get(&self, main_id: i64) -> Option<&Layer> {
         self.layers.iter().find(|layer| layer.main_id == main_id)
     }
@@ -410,14 +467,19 @@ fn build(by_id: &HashMap<i64, &Layer>, id: i64, seen: &mut HashSet<i64>, depth: 
 /// One row of `Project` (in a .clip: name and links to the canvas).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Project {
+    /// `ProjectInternalVersion`.
     pub internal_version: Option<String>,
+    /// `ProjectName`.
     pub name: Option<String>,
+    /// `MainId` of the canvas (`ProjectCanvas`).
     pub canvas: i64,
+    /// The whole row, for the columns not typed here.
     #[serde(skip)]
     pub row: Row,
 }
 
 impl Project {
+    /// Types the columns of a `Project` row.
     pub fn from_row(row: Row) -> Self {
         Project {
             internal_version: row.text("ProjectInternalVersion"),

@@ -1,6 +1,6 @@
 """V7: compare the Python reader (python/csp_format) with the Rust crate on many files.
 
-For each .clip, runs ``layer_digest`` (crates/csp-format/examples) and
+For each .clip, runs ``layer_digest`` (crates/csp-lab/examples) and
 computes the same digest with the Python reader, then writes one JSON line:
 ``{"key", "ok", "seconds", "differences": [...]}``. Only structure and
 CRC-32s are compared or written: no names, text, paths or pixels.

@@ -33,13 +33,18 @@ use crate::error::{Error, Result};
 /// A small XML element tree.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct Element {
+    /// Tag name.
     pub name: String,
+    /// Attributes (name, value), in document order.
     pub attributes: Vec<(String, String)>,
+    /// Text content (empty when it is only whitespace between children).
     pub text: String,
+    /// Child elements, in document order.
     pub children: Vec<Element>,
 }
 
 impl Element {
+    /// Parses a document and returns its root element.
     pub fn parse(xml: &[u8]) -> Result<Element> {
         let mut reader = Reader::from_reader(xml);
         let mut stack: Vec<Element> = vec![Element::default()];
@@ -95,18 +100,22 @@ impl Element {
         document.children.pop().ok_or_else(|| Error::format("XML: no root element"))
     }
 
+    /// The value of an attribute.
     pub fn attribute(&self, name: &str) -> Option<&str> {
         self.attributes.iter().find(|(k, _)| k == name).map(|(_, v)| v.as_str())
     }
 
+    /// The first child with this tag name.
     pub fn child(&self, name: &str) -> Option<&Element> {
         self.children.iter().find(|c| c.name == name)
     }
 
+    /// The children with this tag name.
     pub fn children_named<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &'a Element> + 'a {
         self.children.iter().filter(move |c| c.name == name)
     }
 
+    /// The text of the first child with this tag name.
     pub fn child_text(&self, name: &str) -> Option<&str> {
         self.child(name).map(|c| c.text.as_str())
     }
@@ -132,44 +141,64 @@ fn element_of(start: &quick_xml::events::BytesStart) -> Result<Element> {
 /// A file listed in `catalog.xml`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct CatalogFile {
+    /// `id` attribute, referred to by `<fileref idref=…>`.
     pub id: String,
+    /// `<path>`, relative to the material folder.
     pub path: String,
+    /// `mime` attribute.
     pub mime: String,
+    /// `encrypt="true"`: the file is in the [`crate::c2f`] envelope.
     pub encrypted: bool,
 }
 
 /// One material of a catalogue.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct CatalogItem {
+    /// `uuid` attribute.
     pub uuid: String,
     /// `image`, `brush`, `pose`, `anglepreset`, `facepreset…`, …
     pub kind: String,
+    /// `ver` attribute of `<type>`.
     pub kind_version: String,
+    /// `<name>`.
     pub name: String,
+    /// `<created_date>`, as stored.
     pub created: String,
+    /// `<modified_date>`, as stored.
     pub modified: String,
     /// Names of the groups it is in.
     pub groups: Vec<String>,
+    /// File id of the thumbnail.
     pub thumbnail: Option<String>,
+    /// File id of the data.
     pub data: Option<String>,
+    /// File id of the icedata.
     pub icedata: Option<String>,
 }
 
+/// A parsed `catalog.xml`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Catalog {
+    /// `<version>` of the archive.
     pub version: String,
+    /// `uuid` attribute of `<catalog>`.
     pub uuid: String,
     /// `material` (one item) or `catalog` (a downloaded set).
     pub kind: String,
+    /// `<name>`.
     pub name: String,
     /// The program and version that made it (`paint 1.9.3`).
     pub tool: String,
+    /// `<content_id>` (materials from CLIP STUDIO ASSETS).
     pub content_id: Option<String>,
+    /// Every item, through all groups.
     pub items: Vec<CatalogItem>,
+    /// The files the items refer to.
     pub files: Vec<CatalogFile>,
 }
 
 impl Catalog {
+    /// Parses `catalog.xml`.
     pub fn parse(xml: &[u8]) -> Result<Catalog> {
         let archive = Element::parse(xml)?;
         if archive.name != "archive" {
@@ -210,6 +239,7 @@ impl Catalog {
         })
     }
 
+    /// The file with this id.
     pub fn file(&self, id: &str) -> Option<&CatalogFile> {
         self.files.iter().find(|f| f.id == id)
     }
@@ -244,23 +274,30 @@ fn collect_items(groups: &Element, path: &mut Vec<String>, out: &mut Vec<Catalog
 /// `info.xml` / `layerData.xml`: per item uuid, keyed lists of values.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct InfoList {
+    /// `<version>`.
     pub version: String,
+    /// The `<info>` elements.
     pub infos: Vec<Info>,
 }
 
+/// One `<info>`: the values of one item.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Info {
+    /// `uuid` attribute: the item.
     pub uuid: String,
+    /// (`key`, values) of each `<datalist>`.
     pub data: Vec<(String, Vec<String>)>,
 }
 
 impl Info {
+    /// The values of a key.
     pub fn get(&self, key: &str) -> Option<&[String]> {
         self.data.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_slice())
     }
 }
 
 impl InfoList {
+    /// Parses `info.xml` or `layerData.xml`.
     pub fn parse(xml: &[u8]) -> Result<InfoList> {
         let root = Element::parse(xml)?;
         if root.name != "infolist" {
@@ -288,17 +325,21 @@ impl InfoList {
 /// A material folder read from disk (or from a `.sut`'s tar).
 #[derive(Debug, Clone, Serialize)]
 pub struct MaterialFolder {
+    /// `catalog.xml` (empty when the folder has only the encrypted catalogue).
     pub catalog: Catalog,
     /// `icedata/*.xml` and `info.xml` of the folder and of nested item folders.
     pub info: Vec<InfoList>,
     /// For each listed data file: the envelope summary (or the error).
     pub data_files: Vec<(String, std::result::Result<crate::c2f::Summary, String>)>,
+    /// Paths of the thumbnails.
     pub thumbnails: Vec<String>,
 }
 
 /// Files of a folder, by relative path with `/`.
 pub trait FileSource {
+    /// The bytes of a file.
     fn read(&self, path: &str) -> Option<Vec<u8>>;
+    /// Paths of all files.
     fn list(&self) -> Vec<String>;
     /// Modification time (seconds since 1970), when known.
     fn mtime(&self, _path: &str) -> Option<u64> {
@@ -306,6 +347,7 @@ pub trait FileSource {
     }
 }
 
+/// Files of a folder on disk.
 pub struct DirSource(pub PathBuf);
 
 impl FileSource for DirSource {
@@ -337,6 +379,7 @@ impl FileSource for DirSource {
     }
 }
 
+/// Files of a tar (a `.sut`'s `MaterialFile.FileData`).
 pub struct TarSource(pub Vec<crate::tar::Entry>);
 
 impl FileSource for TarSource {
@@ -350,6 +393,7 @@ impl FileSource for TarSource {
 }
 
 impl MaterialFolder {
+    /// Reads a material folder on disk.
     pub fn open(dir: impl AsRef<Path>) -> Result<MaterialFolder> {
         MaterialFolder::read(&DirSource(dir.as_ref().to_path_buf()))
     }
@@ -481,10 +525,12 @@ pub fn scan(root: impl AsRef<Path>) -> Vec<PathBuf> {
 /// per entry two strings (u32 length, bytes).
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct InstallMap {
+    /// (old material path, installed material path) pairs.
     pub entries: Vec<(String, String)>,
 }
 
 impl InstallMap {
+    /// Parses `InstallPathToCatalogId.dat`.
     pub fn parse(data: &[u8]) -> Result<InstallMap> {
         let cut = || Error::format("InstallPathToCatalogId: cut short");
         let count = u64::from_be_bytes(data.get(..8).ok_or_else(cut)?.try_into().unwrap()) as usize;
@@ -507,6 +553,7 @@ impl InstallMap {
         Ok(InstallMap { entries })
     }
 
+    /// The file bytes; an unchanged map gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = (self.entries.len() as u64).to_be_bytes().to_vec();
         for text in self.entries.iter().flat_map(|(a, b)| [a, b]) {
@@ -516,6 +563,7 @@ impl InstallMap {
         out
     }
 
+    /// The installed path that replaces an old one.
     pub fn get(&self, old: &str) -> Option<&str> {
         self.entries.iter().find(|(a, _)| a == old).map(|(_, b)| b.as_str())
     }

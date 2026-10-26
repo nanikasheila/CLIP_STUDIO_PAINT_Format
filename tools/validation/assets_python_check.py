@@ -7,7 +7,7 @@ documents, colour sets, material catalogues, envelopes, caches), then writes
 one JSON line ``{"key", "ok", "differences"}``. Paths are reduced to a hash
 so the output carries no names.
 
-    cargo build --release --example asset_digest -p csp-assets
+    cargo build --release --example asset_digest -p csp-lab
     python tools/validation/assets_python_check.py ROOT OUT.jsonl --digest target/release/examples/asset_digest
 """
 from __future__ import annotations

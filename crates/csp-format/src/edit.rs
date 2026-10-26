@@ -119,6 +119,7 @@ impl ClipFile {
         self.reload()
     }
 
+    /// Renames a layer (`LayerName`).
     pub fn set_layer_name(&mut self, layer_id: i64, name: &str) -> Result<()> {
         self.set_layer_value(layer_id, "LayerName", Value::Text(name.to_owned()))
     }
@@ -129,16 +130,19 @@ impl ClipFile {
         self.set_layer_value(layer_id, "LayerOpacity", Value::Integer(stored))
     }
 
+    /// Sets the blend mode (`LayerComposite`).
     pub fn set_layer_blend(&mut self, layer_id: i64, mode: BlendMode) -> Result<()> {
         self.set_layer_value(layer_id, "LayerComposite", Value::Integer(mode.code()))
     }
 
+    /// Shows or hides a layer (`LayerVisibility` bit 0; the other bits are kept).
     pub fn set_layer_visible(&mut self, layer_id: i64, visible: bool) -> Result<()> {
         let layer = self.layers.get(layer_id).ok_or_else(|| Error::format(format!("No layer {layer_id}")))?;
         let value = (layer.row.int("LayerVisibility") & !1) | visible as i64;
         self.set_layer_value(layer_id, "LayerVisibility", Value::Integer(value))
     }
 
+    /// Clips the layer to the layer below, or not (`LayerClip`).
     pub fn set_layer_clipping(&mut self, layer_id: i64, clipping: bool) -> Result<()> {
         self.set_layer_value(layer_id, "LayerClip", Value::Integer(clipping as i64))
     }
@@ -159,7 +163,9 @@ impl ClipFile {
 /// The kinds of layer [`ClipFile`] can add.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NewLayer {
+    /// A raster (pixel) layer.
     Raster,
+    /// A folder.
     Folder,
     /// The paper (用紙) in an RGB colour.
     Paper([u8; 3]),

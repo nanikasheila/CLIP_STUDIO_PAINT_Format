@@ -20,18 +20,24 @@ use crate::schema::Schema;
 /// One level of a mipmap chain.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct MipmapLevel {
+    /// `MainId` of the `MipmapInfo` row.
     pub info_id: i64,
     /// `ThisScale` in percent (100, 50, 25, …).
     pub scale: f64,
+    /// `MainId` of the `Offscreen` row holding the pixels of this level.
     pub offscreen: i64,
 }
 
 /// A `Mipmap` row and its `MipmapInfo` levels (`BaseMipmapInfo` → `NextIndex`).
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Mipmap {
+    /// `MainId` of the `Mipmap` row.
     pub main_id: i64,
+    /// The layer the mipmap belongs to (`LayerId`).
     pub layer_id: i64,
+    /// Number of levels CSP stored (`MipmapCount`).
     pub count: i64,
+    /// The levels, largest first.
     pub levels: Vec<MipmapLevel>,
 }
 
@@ -43,6 +49,22 @@ enum External {
 }
 
 /// An opened .clip file.
+///
+/// ```no_run
+/// use csp_format::ClipFile;
+///
+/// let mut file = ClipFile::open("page0001.clip")?;
+/// println!("{} x {} px", file.canvas.width_px, file.canvas.height_px);
+/// for (layer, depth) in file.layers.flatten() {
+///     println!("{}{} ({})", "  ".repeat(depth), layer.name, layer.kind.name());
+/// }
+/// // Arbitrary columns are in the embedded SQLite database.
+/// let rows = csp_format::database::select_all(file.database(), "Layer")?;
+/// assert_eq!(rows.len(), file.layers.layers.len());
+/// file.reload()?;
+/// file.save("copy.clip")?; // byte-identical while nothing was changed
+/// # Ok::<(), csp_format::Error>(())
+/// ```
 pub struct ClipFile {
     container: Container,
     database: Connection,
@@ -51,20 +73,26 @@ pub struct ClipFile {
     externals_changed: bool,
     /// Replaces the container's file id on save (see [`ClipFile::set_file_id`]).
     file_id: Option<[u8; FILE_ID_LENGTH]>,
+    /// The `Project` row.
     pub project: Project,
+    /// The canvas settings.
     pub canvas: Canvas,
+    /// The layer tree, read at open (call [`ClipFile::reload`] after changing `Layer` rows).
     pub layers: LayerTree,
 }
 
 impl ClipFile {
+    /// Reads and parses a file. The file is not kept open or changed.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         Self::from_container(Container::read(path)?)
     }
 
+    /// Parses the bytes of a .clip.
     pub fn from_bytes(data: Vec<u8>) -> Result<Self> {
         Self::from_container(Container::parse(data)?)
     }
 
+    /// Opens the database of a parsed container and reads the typed views.
     pub fn from_container(container: Container) -> Result<Self> {
         let database = database::open_bytes(container.sqlite()?)?;
         let changes_at_open = database.total_changes();
@@ -101,6 +129,7 @@ impl ClipFile {
         })
     }
 
+    /// The parsed container (chunks of the file as opened).
     pub fn container(&self) -> &Container {
         &self.container
     }
@@ -110,6 +139,7 @@ impl ClipFile {
         &self.database
     }
 
+    /// The parameter scheme registry (`ParamScheme` / `ElemScheme`).
     pub fn schema(&self) -> Result<Schema> {
         Schema::read(&self.database)
     }
@@ -143,6 +173,7 @@ impl ClipFile {
         })
     }
 
+    /// Ids of the external chunks, in file order.
     pub fn external_ids(&self) -> impl Iterator<Item = &str> {
         self.externals.iter().map(|(id, _)| id.as_str())
     }
@@ -156,6 +187,7 @@ impl ClipFile {
         }
     }
 
+    /// Removes an external chunk. Returns whether it was there.
     pub fn remove_external(&mut self, id: &str) -> bool {
         let before = self.externals.len();
         self.externals.retain(|(key, _)| key != id);
@@ -164,11 +196,13 @@ impl ClipFile {
         removed
     }
 
+    /// One row by `MainId`.
     pub fn row(&self, table: &str, main_id: i64) -> Result<Option<Row>> {
         let sql = format!("SELECT * FROM {} WHERE MainId = ?1", database::quote(table));
         Ok(select(&self.database, &sql, [main_id])?.into_iter().next())
     }
 
+    /// A mipmap and its levels.
     pub fn mipmap(&self, main_id: i64) -> Result<Option<Mipmap>> {
         let Some(row) = self.row("Mipmap", main_id)? else { return Ok(None) };
         let mut levels = Vec::new();
@@ -352,6 +386,7 @@ impl ClipFile {
         writer.assemble(&database::serialize(&copy)?)
     }
 
+    /// Writes [`ClipFile::to_bytes`] to a file.
     pub fn save(&self, path: impl AsRef<Path>) -> Result<()> {
         let bytes = self.to_bytes()?;
         std::fs::write(path, bytes)?;

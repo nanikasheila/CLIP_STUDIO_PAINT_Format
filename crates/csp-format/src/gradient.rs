@@ -24,7 +24,7 @@
 //!   u32 R, G, B  u32 1
 //! ```
 //!
-//! Between two stops the mix follows a curve (see [`crate::curve`]): the
+//! Between two stops the mix follows a curve (`curve.rs`): the
 //! stop's own control points when it has flag 0x10, otherwise CSP's
 //! default S curve through (0, 0), (0.25, 0.1), (0.75, 0.9), (1, 1).
 //! Colours mix in straight (not premultiplied) sRGB for the normal mode,
@@ -41,10 +41,12 @@ use crate::curve::Spline;
 use crate::error::{Error, Result};
 use crate::image::RgbaImage;
 
+/// One colour stop.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Stop {
     /// Straight RGBA, 0..1.
     pub color: [f64; 4],
+    /// 1 main colour, 2 sub colour, 0x10 curved to the next stop (`curve` holds the curve).
     pub flags: u32,
     /// 0..1 along the gradient.
     pub position: f64,
@@ -54,6 +56,7 @@ pub struct Stop {
 
 /// How colours mix between stops (`GradationData` mixing word).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Mixing {
     /// 通常: straight sRGB values.
     Normal,
@@ -72,7 +75,9 @@ pub enum Mixing {
 /// The stops of a gradient (also the colours of a gradient map).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Ramp {
+    /// The stops, by position.
     pub stops: Vec<Stop>,
+    /// How colours mix between stops.
     pub mixing: Mixing,
     /// Luminance correction (0 none … 3 high); only used by 知覚的.
     pub correction: i32,
@@ -82,21 +87,30 @@ pub struct Ramp {
 /// CSP's curve between stops that store none.
 const DEFAULT_CURVE: [(f64, f64); 4] = [(0.0, 0.0), (0.25, 0.1), (0.75, 0.9), (1.0, 1.0)];
 
+/// Gradient shape.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Shape {
+    /// 直線.
     Linear,
+    /// 円 (an ellipse).
     Circular,
 }
 
+/// A gradient or fill layer (`Layer.GradationFillInfo`).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Gradient {
+    /// The colours.
     pub ramp: Ramp,
     /// A fill layer (べた塗り): the first stop's colour everywhere.
     pub fill: bool,
+    /// Linear or circular.
     pub shape: Shape,
     /// Ellipse width and height (pixels) and rotation (degrees).
     pub ellipse: [f64; 3],
+    /// Start point in layer pixels.
     pub start: (f64, f64),
+    /// End point in layer pixels.
     pub end: (f64, f64),
 }
 
@@ -289,6 +303,7 @@ fn from_oklab(c: [f64; 3]) -> [f64; 3] {
 }
 
 impl Gradient {
+    /// Parses `GradationFillInfo`.
     pub fn parse(data: &[u8]) -> Result<Self> {
         let sections = sections(data);
         let find = |name: &str| {

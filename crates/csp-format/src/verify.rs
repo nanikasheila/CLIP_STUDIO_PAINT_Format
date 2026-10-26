@@ -28,101 +28,148 @@ impl Default for CheckOptions {
     }
 }
 
+/// Checks of the CSFCHUNK container.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ContainerReport {
+    /// Structural problems found while parsing (see [`crate::container::Container::findings`]).
     pub findings: Vec<String>,
     /// Rebuilding from the parsed chunks gives the same bytes (R1).
     pub reassembles: bool,
     /// The writer, fed the original chunks, gives the same bytes (R11).
     pub writer_reproduces: bool,
+    /// Number of external chunks.
     pub external_chunks: usize,
+    /// `ExternalChunk.Offset` points at each stored chunk.
     pub external_offsets_match: bool,
     /// Every `ExternalChunk.ExternalID` is stored as TEXT. CSP looks chunks
     /// up by text, so a BLOB id makes the layer load as broken.
     pub external_ids_text: bool,
 }
 
+/// Checks of the embedded database.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct DatabaseReport {
+    /// Number of tables.
     pub tables: usize,
+    /// Rows over all tables.
     pub rows: usize,
+    /// Tables that could not be read.
     pub unreadable_tables: Vec<String>,
+    /// Rows of `ParamScheme`.
     pub param_scheme_rows: usize,
     /// Columns in tables that `ParamScheme` does not list.
     pub unregistered_columns: Vec<String>,
 }
 
+/// The layer tree.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct LayerReport {
+    /// Number of `Layer` rows.
     pub layers: usize,
+    /// Layers per [`crate::LayerKind`] name.
     pub kinds: BTreeMap<String, usize>,
+    /// Layers not reachable from the root folder.
     pub unreachable: usize,
+    /// Why the tree could not be built, if it could not.
     pub tree_error: Option<String>,
+    /// Layers per `LayerComposite` value.
     pub blend_modes: BTreeMap<i64, usize>,
 }
 
+/// Raster pixels (`Offscreen` rows and their block data).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct PixelReport {
+    /// `Offscreen` rows.
     pub offscreens: usize,
+    /// Offscreens whose block data chunk is stored.
     pub stored: usize,
+    /// Offscreens per pixel kind (`color`, `gray`, `monochrome`, `alpha`, `unknown`).
     pub kinds: BTreeMap<String, usize>,
+    /// `Attribute` blobs that could not be parsed.
     pub attribute_errors: usize,
+    /// `Attribute` blobs not written back byte for byte.
     pub attribute_round_trip_failures: usize,
+    /// Block data that could not be parsed or has the wrong number of blocks.
     pub payload_errors: usize,
+    /// Block data not written back byte for byte.
     pub payload_round_trip_failures: usize,
+    /// Block data whose block sizes differ from the attribute's size table.
     pub block_size_table_mismatches: usize,
+    /// Blocks in the grids of all offscreens.
     pub blocks: usize,
+    /// Blocks with stored (compressed) pixels.
     pub stored_blocks: usize,
+    /// Blocks whose stored checksum is wrong.
     pub checksum_mismatches: usize,
+    /// Blocks that could not be inflated or have the wrong size.
     pub decode_errors: usize,
+    /// Blocks compressed again to the same bytes, with CSP's zlib settings.
     pub reencoded_identical: usize,
     /// Blocks equal to zlib's default settings instead (material brush tips).
     pub reencoded_identical_default: usize,
     /// Blocks equal to neither.
     pub reencoded_different: usize,
+    /// The first problem found, for diagnosis.
     pub first_error: Option<String>,
 }
 
+/// External chunk references (`ExternalChunk` ids named by table columns).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ReferenceReport {
+    /// Ids referred to by any column.
     pub references: usize,
     /// Referenced ids without a chunk (normal: CSP builds them on opening).
     pub not_stored: usize,
     /// Chunks no column refers to.
     pub unreferenced_chunks: usize,
+    /// Per `Table.Column`: (references, of which stored).
     pub by_column: BTreeMap<String, (usize, usize)>,
 }
 
 /// Vector data round trips (R7).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct VectorReport {
+    /// `VectorObjectList` payloads.
     pub payloads: usize,
+    /// Vector objects.
     pub objects: usize,
+    /// Points over all objects.
     pub points: usize,
     /// Objects per header size.
     pub header_sizes: BTreeMap<usize, usize>,
+    /// Objects per point size.
     pub point_sizes: BTreeMap<usize, usize>,
+    /// Payloads that could not be parsed.
     pub parse_errors: usize,
+    /// Payloads not written back byte for byte.
     pub round_trip_failures: usize,
+    /// The first problem found, for diagnosis.
     pub first_error: Option<String>,
 }
 
 /// Text layer round trips (R8).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct TextReport {
+    /// Text layers.
     pub layers: usize,
+    /// Text blocks.
     pub blocks: usize,
+    /// Attribute records over all blocks.
     pub records: usize,
     /// Records per id.
     pub record_ids: BTreeMap<u32, usize>,
+    /// Attribute lists that could not be parsed.
     pub parse_errors: usize,
+    /// Texts or attribute lists not written back byte for byte.
     pub round_trip_failures: usize,
+    /// The first problem found, for diagnosis.
     pub first_error: Option<String>,
 }
 
 /// Layer effect settings (`LayerEffectInfo`) round trips.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct EffectReport {
+    /// `LayerEffectInfo` blobs.
     pub blobs: usize,
     /// Layers with `LayerEffectAttached`.
     pub attached: usize,
@@ -130,24 +177,40 @@ pub struct EffectReport {
     pub enabled: BTreeMap<String, usize>,
     /// Section names and how often they occur.
     pub sections: BTreeMap<String, usize>,
+    /// Blobs that could not be parsed.
     pub parse_errors: usize,
+    /// Blobs not written back byte for byte.
     pub round_trip_failures: usize,
+    /// The first problem found, for diagnosis.
     pub first_error: Option<String>,
 }
 
+/// Result of [`check_clip`]: every check of a .clip.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct ClipReport {
+    /// The container.
     pub container: ContainerReport,
+    /// The database.
     pub database: DatabaseReport,
+    /// The layer tree.
     pub layers: LayerReport,
+    /// Raster pixels.
     pub pixels: PixelReport,
+    /// External chunk references.
     pub references: ReferenceReport,
+    /// Vector data.
     pub vectors: VectorReport,
+    /// Text layers.
     pub texts: TextReport,
+    /// Layer effects.
     pub effects: EffectReport,
+    /// Size of the stored preview (`CanvasPreview`), if any.
     pub preview: Option<(u32, u32)>,
+    /// Why the preview could not be decoded, if it could not.
     pub preview_error: Option<String>,
+    /// Saving without changes gives the input bytes.
     pub unchanged_save_identical: bool,
+    /// Checks that could not run, with why.
     pub errors: Vec<String>,
 }
 
@@ -558,19 +621,25 @@ fn check_texts(file: &ClipFile, report: &mut TextReport) -> Result<()> {
 /// Self-check of a .cmc (R14).
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct CmcReport {
+    /// `CanvasNode` rows.
     pub nodes: usize,
+    /// Pages in the page list.
     pub pages: usize,
+    /// Pages that are spreads.
     pub spreads: usize,
     /// Structural problems, and page files missing next to the .cmc.
     pub findings: Vec<String>,
+    /// Saving without changes gives the input bytes.
     pub unchanged_save_identical: bool,
     /// Rewriting the page list in its own order and reading it back gives
     /// the same pages without findings (the edit path, V4).
     pub edit_round_trip: bool,
+    /// Checks that could not run, with why.
     pub errors: Vec<String>,
 }
 
 impl CmcReport {
+    /// Whether every check passed.
     pub fn ok(&self) -> bool {
         self.errors.is_empty() && self.findings.is_empty() && self.unchanged_save_identical && self.edit_round_trip
     }

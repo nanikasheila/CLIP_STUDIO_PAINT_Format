@@ -20,15 +20,22 @@ use crate::error::Result;
 
 /// `ParamScheme.DataType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize)]
+#[non_exhaustive]
 pub enum DataType {
+    /// 1.
     Integer,
+    /// 2.
     Real,
+    /// 3.
     Text,
+    /// 4.
     Blob,
+    /// Any other code.
     Unknown(i64),
 }
 
 impl DataType {
+    /// The type of a stored `DataType` code.
     pub fn from_code(code: i64) -> Self {
         match code {
             1 => DataType::Integer,
@@ -39,6 +46,7 @@ impl DataType {
         }
     }
 
+    /// The stored code.
     pub fn code(&self) -> i64 {
         match self {
             DataType::Integer => 1,
@@ -81,14 +89,23 @@ pub fn element_kind_name(code: i64) -> &'static str {
 /// One `ParamScheme` row.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct Param {
+    /// `TableName`.
     pub table: String,
+    /// `LabelName`: the column.
     pub column: String,
+    /// `DataType`.
     pub data_type: DataType,
+    /// `Flag`, as stored.
     pub flag: i64,
+    /// `OwnerType`: the element kind whose `MainId` the column holds (see [`element_kind_name`]).
     pub owner_type: i64,
+    /// `LockType`, as stored (see `docs/spec/09-versions.md`).
     pub lock_type: i64,
+    /// `LockSpecified`, as stored.
     pub lock_specified: i64,
+    /// `AlternativeLockType`, in newer files.
     pub alternative_lock_type: Option<i64>,
+    /// `AlternativeLockSpecified`, in newer files.
     pub alternative_lock_specified: Option<i64>,
     /// Table an id column links to (`MainId` there); None for plain values.
     pub link_table: Option<String>,
@@ -97,20 +114,27 @@ pub struct Param {
 /// One `ElemScheme` row.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
 pub struct Elem {
+    /// `TableName`.
     pub table: String,
+    /// `ElemType` (see [`element_kind_name`]).
     pub elem_type: i64,
+    /// `MaxIndex`: the highest `MainId` given out in the table.
     pub max_index: i64,
 }
 
 /// The registry of one database.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct Schema {
+    /// `ParamScheme` rows.
     pub params: Vec<Param>,
+    /// `ElemScheme` rows.
     pub elems: Vec<Elem>,
+    /// `ExternalTableAndColumnName`: (table, column) pairs that hold external chunk ids.
     pub external_columns: Vec<(String, String)>,
 }
 
 impl Schema {
+    /// Reads the three registry tables.
     pub fn read(connection: &Connection) -> Result<Self> {
         let params = select_all(connection, "ParamScheme")?
             .iter()
@@ -142,18 +166,22 @@ impl Schema {
         Ok(Schema { params, elems, external_columns })
     }
 
+    /// The row of a column.
     pub fn param(&self, table: &str, column: &str) -> Option<&Param> {
         self.params.iter().find(|param| param.table == table && param.column == column)
     }
 
+    /// The rows of a table.
     pub fn table_params(&self, table: &str) -> impl Iterator<Item = &Param> {
         self.params.iter().filter(move |param| param.table == table)
     }
 
+    /// The row of a table.
     pub fn elem(&self, table: &str) -> Option<&Elem> {
         self.elems.iter().find(|elem| elem.table == table)
     }
 
+    /// Whether the column holds external chunk ids.
     pub fn is_external(&self, table: &str, column: &str) -> bool {
         self.external_columns.iter().any(|(t, c)| t == table && c == column)
     }

@@ -23,20 +23,25 @@ const FIXED_SECTIONS: [(&str, usize); 2] = [("EffectEdge", 24), ("EffectTone", 7
 /// A parsed `LayerEffectInfo` blob; sections in file order.
 #[derive(Debug, Clone, PartialEq)]
 pub struct LayerEffects {
+    /// Format version (2).
     pub version: u32,
+    /// (name, bytes) of each section, in stored order; the bytes follow the name.
     pub sections: Vec<(String, Vec<u8>)>,
 }
 
 /// The border effect (フチ).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Border {
+    /// The border is on.
     pub enabled: bool,
     /// Width in canvas pixels.
     pub width: f64,
+    /// Colour as 8-bit RGB.
     pub color: [u8; 3],
 }
 
 impl LayerEffects {
+    /// Parses a `LayerEffectInfo` blob.
     pub fn parse(data: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(data);
         let total = reader.be_u32()? as usize;
@@ -70,6 +75,7 @@ impl LayerEffects {
         Ok(LayerEffects { version, sections })
     }
 
+    /// The blob; unchanged sections give the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut body = Writer::new();
         body.be_u32(self.version);
@@ -86,10 +92,12 @@ impl LayerEffects {
         out.data
     }
 
+    /// The bytes of a section.
     pub fn section(&self, name: &str) -> Option<&[u8]> {
         self.sections.iter().find(|(n, _)| n == name).map(|(_, payload)| payload.as_slice())
     }
 
+    /// The bytes of a section, mutably.
     pub fn section_mut(&mut self, name: &str) -> Option<&mut Vec<u8>> {
         self.sections.iter_mut().find(|(n, _)| n == name).map(|(_, payload)| payload)
     }
@@ -107,6 +115,7 @@ impl LayerEffects {
         Some(Border { enabled, width, color })
     }
 
+    /// Writes the border settings into `EffectEdge` (keeping its other bytes). Fails when the blob has no such section.
     pub fn set_border(&mut self, border: Border) -> Result<()> {
         let payload = self.section_mut("EffectEdge").ok_or_else(|| Error::format("No EffectEdge section"))?;
         let mut writer = Writer::new();

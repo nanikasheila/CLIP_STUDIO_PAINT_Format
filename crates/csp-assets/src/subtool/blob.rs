@@ -32,11 +32,14 @@ fn word(data: &[u8], at: usize) -> Result<u32> {
 /// anything else as `{"recordSize", "hex"}`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Records {
+    /// Bytes per record.
     pub record_size: u32,
+    /// Each record's bytes.
     pub records: Vec<Vec<u8>>,
 }
 
 impl Records {
+    /// Parses the header and records; fails when the sizes do not add up.
     pub fn parse(data: &[u8]) -> Result<Records> {
         let (header, count, size) = (word(data, 0)?, word(data, 4)? as usize, word(data, 8)?);
         if header != 12 || size == 0 {
@@ -50,6 +53,7 @@ impl Records {
         Ok(Records { record_size: size, records })
     }
 
+    /// The blob; unchanged records give the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::with_capacity(12 + self.records.len() * self.record_size as usize);
         out.extend_from_slice(&12u32.to_be_bytes());
@@ -77,6 +81,7 @@ impl Records {
             .collect()
     }
 
+    /// 16-byte records of two `f64` (graph points).
     pub fn from_points(points: &[[f64; 2]]) -> Records {
         Records {
             record_size: 16,
@@ -84,6 +89,7 @@ impl Records {
         }
     }
 
+    /// Records of `size` bytes from rows of `u32` words.
     pub fn from_words(size: u32, rows: &[Vec<u32>]) -> Records {
         Records {
             record_size: size,
@@ -117,6 +123,7 @@ pub fn show_items(data: &[u8]) -> Result<Vec<u32>> {
     Ok(Records::parse(data)?.words().into_iter().filter_map(|w| w.first().copied()).collect())
 }
 
+/// The `VariantShowParam` blob of these item ids.
 pub fn show_items_bytes(items: &[u32]) -> Vec<u8> {
     Records::from_words(4, &items.iter().map(|&i| vec![i]).collect::<Vec<_>>()).to_bytes()
 }
@@ -126,11 +133,13 @@ pub fn show_items_bytes(items: &[u32]) -> Vec<u8> {
 pub struct InOutTarget {
     /// The [`Effector`] item id of the setting (e.g. 1001 brush size).
     pub item: u32,
+    /// The setting changes with 入り抜き.
     pub enabled: bool,
     /// The value word (0..100): 入り抜きで変化する最小値 (%), see the spec.
     pub value: u32,
 }
 
+/// Decodes `BrushInOutTarget`.
 pub fn in_out_targets(data: &[u8]) -> Result<Vec<InOutTarget>> {
     let records = Records::parse(data)?;
     if records.record_size != 12 {
@@ -139,6 +148,7 @@ pub fn in_out_targets(data: &[u8]) -> Result<Vec<InOutTarget>> {
     Ok(records.words().into_iter().map(|w| InOutTarget { item: w[0], enabled: w[1] != 0, value: w[2] }).collect())
 }
 
+/// The `BrushInOutTarget` blob of these entries.
 pub fn in_out_targets_bytes(targets: &[InOutTarget]) -> Vec<u8> {
     let rows: Vec<Vec<u32>> = targets.iter().map(|t| vec![t.item, t.enabled as u32, t.value]).collect();
     Records::from_words(12, &rows).to_bytes()
@@ -146,8 +156,11 @@ pub fn in_out_targets_bytes(targets: &[InOutTarget]) -> Vec<u8> {
 
 /// Inputs of an effector (bits of header words 1 and 2).
 pub const INPUT_PRESSURE: u32 = 0x10;
+/// Pen tilt (header bit).
 pub const INPUT_TILT: u32 = 0x20;
+/// Pen speed (header bit).
 pub const INPUT_VELOCITY: u32 = 0x40;
+/// Randomness (header bit).
 pub const INPUT_RANDOM: u32 = 0x80;
 /// Offered on brush size, density and the like since CSP 1.x (meaning
 /// not known yet; see the spec).
@@ -165,21 +178,29 @@ pub const INPUT_0X100: u32 = 0x100;
 /// header in that order.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Effector {
+    /// Header size in bytes (word 0).
     pub header_size: u32,
+    /// Inputs this setting offers (word 1, `INPUT_*` bits).
     pub offered: u32,
+    /// Inputs in use (word 2, `INPUT_*` bits).
     pub inputs: u32,
     /// Minimum (%) with pressure, tilt, velocity and random.
     pub minimum: [i32; 4],
+    /// Header word 7 (0 in every file seen).
     pub word7: u32,
     /// Header word 10 (44- and 48-byte headers): the maximum (%) with tilt
     /// (W4).
     pub word10: Option<u32>,
+    /// The pressure graph (筆圧), if stored.
     pub pressure_graph: Option<Records>,
+    /// The tilt graph, if stored.
     pub tilt_graph: Option<Records>,
+    /// The velocity graph, if stored.
     pub velocity_graph: Option<Records>,
 }
 
 impl Effector {
+    /// Parses an `…Effector` blob.
     pub fn parse(data: &[u8]) -> Result<Effector> {
         let header_size = word(data, 0)?;
         if !matches!(header_size, 40 | 44 | 48) {
@@ -215,6 +236,7 @@ impl Effector {
         })
     }
 
+    /// The blob; an unchanged effector gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let graphs =
             [&self.pressure_graph, &self.tilt_graph, &self.velocity_graph].map(|g| g.as_ref().map(Records::to_bytes));
@@ -244,6 +266,7 @@ impl Effector {
         out
     }
 
+    /// Whether an input (`INPUT_*`) is in use.
     pub fn uses(&self, input: u32) -> bool {
         self.inputs & input != 0
     }
@@ -279,10 +302,15 @@ impl Effector {
 /// empty for user materials) and `u32 0`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct MaterialRef {
+    /// Where CSP found the material (`.:Paint005:<uuid>:data:material.layer`).
     pub path: String,
+    /// 3 installed, 2 in the user's material folder.
     pub kind: Option<u32>,
+    /// Material name.
     pub name: Option<String>,
+    /// The `u32` after the name (1).
     pub flag: Option<u32>,
+    /// Install path (`.:Install:Paint005:…`), in newer files.
     pub install_path: Option<String>,
     /// Bytes after the known fields.
     #[serde(skip)]
@@ -318,10 +346,12 @@ fn utf16_bytes(text: &str) -> Vec<u8> {
 /// `*PatternImageArray` and `*TextureImage`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct MaterialList {
+    /// The materials, in stored order.
     pub materials: Vec<MaterialRef>,
 }
 
 impl MaterialList {
+    /// Parses a material list.
     pub fn parse(data: &[u8]) -> Result<MaterialList> {
         let (header, count) = (word(data, 0)?, word(data, 4)? as usize);
         if header != 8 {
@@ -342,6 +372,7 @@ impl MaterialList {
         Ok(MaterialList { materials })
     }
 
+    /// The blob; an unchanged list gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
         out.extend_from_slice(&8u32.to_be_bytes());
@@ -410,14 +441,21 @@ fn ref_bytes(material: &MaterialRef) -> Vec<u8> {
 
 /// What layout a column uses.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum BlobKind {
+    /// [`Records`].
     Records,
+    /// [`Effector`].
     Effector,
+    /// [`MaterialList`].
     MaterialList,
+    /// A gradation (`crate::gradient`).
     Gradation,
+    /// Not known.
     Unknown,
 }
 
+/// The layout of a `Variant` column, from its name.
 pub fn kind_of_column(column: &str) -> BlobKind {
     if column.ends_with("Effector") {
         BlobKind::Effector

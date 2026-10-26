@@ -8,6 +8,7 @@ use serde::Serialize;
 /// How the bytes are laid out.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[non_exhaustive]
 pub enum Family {
     /// SQLite database (most settings, sub tools, workspaces).
     Sqlite,
@@ -19,18 +20,23 @@ pub enum Family {
     C2f,
     /// `.clip` canvas (CSFCHUNK), see the `csp-format` crate.
     Clip,
+    /// PNG image.
     Png,
+    /// XML text.
     Xml,
+    /// ustar archive.
     Tar,
     /// Material catalogue cache (`catalog*.cac`).
     CatalogCache,
     /// UTF-8 text (cloud sync stamps, the launcher's menu pages).
     Text,
+    /// No bytes.
     Empty,
     /// No signature: known only by name (see [`FORMATS`]) or not known.
     Unknown,
 }
 
+/// The family of a file from its first bytes.
 pub fn family(data: &[u8]) -> Family {
     if data.is_empty() {
         Family::Empty
@@ -66,6 +72,7 @@ pub fn family(data: &[u8]) -> Family {
 pub struct Format {
     /// File extension (lower case, with the dot) or exact file name.
     pub pattern: &'static str,
+    /// How its bytes are laid out.
     pub family: Family,
     /// What CSP calls it / uses it for.
     pub purpose: &'static str,
@@ -73,6 +80,7 @@ pub struct Format {
     pub support: Support,
 }
 
+/// How much of a format this crate reads.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Support {
@@ -373,11 +381,15 @@ pub fn format_of(file_name: &str) -> Option<&'static Format> {
 /// name. `consistent` is false when the bytes do not match the name.
 #[derive(Debug, Clone, Serialize)]
 pub struct Detected {
+    /// The family from the bytes.
     pub family: Family,
+    /// The known format of this file name, if any.
     pub format: Option<&'static Format>,
+    /// The bytes match the name's format.
     pub consistent: bool,
 }
 
+/// What a file is, from its name and bytes.
 pub fn detect(file_name: &str, data: &[u8]) -> Detected {
     let family = family(data);
     let format = format_of(file_name);

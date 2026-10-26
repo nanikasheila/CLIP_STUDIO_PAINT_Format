@@ -47,6 +47,7 @@ pub const TICKS_PER_SECOND: f64 = 60.0;
 
 /// What a track animates (`Track.TrackKind`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum TrackKind {
     /// 2000: an animation folder's cel assignment.
     Cels,
@@ -56,10 +57,12 @@ pub enum TrackKind {
     Paper,
     /// 2005: a 2D camera folder.
     Camera,
+    /// Another `TrackKind` value.
     Other(i64),
 }
 
 impl TrackKind {
+    /// The kind of a stored `TrackKind` value.
     pub fn from_code(code: i64) -> Self {
         match code {
             2000 => TrackKind::Cels,
@@ -73,6 +76,7 @@ impl TrackKind {
 
 /// How a key moves to the next one (`FCurve/Interp`).
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum Interp {
     /// `Constant`: hold until the next key.
     Constant,
@@ -85,6 +89,7 @@ pub enum Interp {
 }
 
 impl Interp {
+    /// The interpolation named `name` in a mixer.
     pub fn from_name(name: &str) -> Self {
         match name {
             "Constant" => Interp::Constant,
@@ -94,6 +99,7 @@ impl Interp {
         }
     }
 
+    /// The name stored in a mixer.
     pub fn name(&self) -> &str {
         match self {
             Interp::Constant => "Constant",
@@ -109,9 +115,13 @@ impl Interp {
 pub struct Key {
     /// Motion ticks.
     pub frame: f64,
+    /// The value at the key.
     pub value: f64,
+    /// Slope on the left of the key (0 in every file seen).
     pub left_slope: f64,
+    /// Slope on the right of the key (0 in every file seen).
     pub right_slope: f64,
+    /// How the value moves to the next key.
     pub interp: Interp,
     /// Cel curves: the cel's layer name.
     pub tag: Option<String>,
@@ -120,8 +130,11 @@ pub struct Key {
 /// One animated value (`FCurve`): `Type` and, for pairs, `Axis` X or Y.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Curve {
+    /// `Type` of the curve (`Position`, `Scale`, `Rotation`, `Opacity`, …).
     pub kind: String,
+    /// `Axis` (`X` or `Y`) of a pair's curve.
     pub axis: Option<String>,
+    /// The keys, in time order.
     pub keys: Vec<Key>,
 }
 
@@ -190,8 +203,11 @@ impl Curve {
 /// A `Param` node: the value a track shows without keys, and its name.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Param {
+    /// `Name` attribute (the value kind, as the curves' `kind`).
     pub name: String,
+    /// `Tag` attribute, if any.
     pub tag: Option<String>,
+    /// The value.
     pub value: Value,
 }
 
@@ -202,11 +218,14 @@ pub struct Clip {
     pub time: (f64, f64),
     /// `MotionClip` Start..End in motion ticks.
     pub motion: (f64, f64),
+    /// `Param` nodes of `AnimInfo`: values without keys.
     pub params: Vec<Param>,
+    /// `FCurve` nodes of `AnimInfo`.
     pub curves: Vec<Curve>,
 }
 
 impl Clip {
+    /// Reads the clip of a track mixer document.
     pub fn from_document(document: &Document) -> Result<Self> {
         let clip = document.action_clip().ok_or_else(|| Error::format("Track mixer has no ActionNodeClip"))?;
         let number = |path: &[&str]| clip.find(path).and_then(|n| n.value.as_f64()).unwrap_or(0.0);
@@ -245,10 +264,12 @@ impl Clip {
         if me == ms { ts } else { ts + (m - ms) * (te - ts) / (me - ms) }
     }
 
+    /// The curve of this kind and axis.
     pub fn curve(&self, kind: &str, axis: Option<&str>) -> Option<&Curve> {
         self.curves.iter().find(|c| c.kind == kind && c.axis.as_deref() == axis)
     }
 
+    /// The `Param` of this name.
     pub fn param(&self, name: &str) -> Option<&Param> {
         self.params.iter().find(|p| p.name == name)
     }
@@ -276,11 +297,15 @@ impl Clip {
 /// UTF-16 tag, u32 type, value).
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct MapEntry {
+    /// Entry name.
     pub name: String,
+    /// Entry tag.
     pub tag: String,
+    /// The value.
     pub value: MapValue,
 }
 
+/// Value of a [`MapEntry`], by type code.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum MapValue {
     /// Type 0.
@@ -372,19 +397,25 @@ fn put_utf16(out: &mut Writer, text: &str) {
 /// A `Track` row with its mixers.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Track {
+    /// `MainId` of the row.
     pub main_id: i64,
     /// `ItemId`: the timeline's `MainId`.
     pub timeline: i64,
+    /// What the track animates (`TrackKind`).
     pub kind: TrackKind,
     /// `LayerUuidWithTrack` as 32 lower-case hex digits.
     pub layer_uuid: String,
     /// The layer it animates (by uuid), if found.
     pub layer_id: Option<i64>,
+    /// `TrackOptionFlag` as stored.
     pub option_flag: i64,
+    /// Labels on the track (`TrackLabelFirstIndex` list).
     pub labels: Vec<Label>,
     /// From `TrackActionMixer2` (or `TrackActionMixer` when that is absent).
     pub clip: Option<Clip>,
+    /// The values at the current frame (`TrackValueMap`).
     pub value_map: Vec<MapEntry>,
+    /// The decoded mixer documents: `TrackActionMixer` and `TrackActionMixer2` (external chunk id and document).
     #[serde(skip)]
     pub mixers: [Option<(String, Document)>; 2],
 }
@@ -393,32 +424,44 @@ pub struct Track {
 /// cel track (type 1) or a named track label with a length (type 3).
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Label {
+    /// `MainId` of the row.
     pub main_id: i64,
+    /// Label text.
     pub name: String,
     /// 0-based frame.
     pub frame: f64,
+    /// Type: 0 timeline label, 1 in-between mark, 3 named track label.
     pub kind: i64,
+    /// Length in frames (type 3).
     pub length: Option<f64>,
 }
 
 /// A `TimeLine` row.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct Timeline {
+    /// `MainId` of the row.
     pub main_id: i64,
+    /// Name shown in the timeline palette.
     pub name: String,
+    /// Frames per second.
     pub frame_rate: f64,
     /// 0-based first frame.
     pub start_frame: f64,
     /// 0-based frame after the last.
     pub end_frame: f64,
+    /// 0-based frame shown in CSP.
     pub current_frame: f64,
     /// タイムラインの区切り線 (`GuidelineFrameRate`).
     pub guideline: i64,
+    /// シーン number.
     pub scene: i64,
+    /// カット number.
     pub cut: i64,
     /// `TimeLineUuid` as 32 hex digits.
     pub uuid: Option<String>,
+    /// Timeline labels.
     pub labels: Vec<Label>,
+    /// Tracks, in their linked order.
     pub tracks: Vec<Track>,
 }
 
@@ -428,6 +471,7 @@ impl Timeline {
         frame * TICKS_PER_SECOND / self.frame_rate.max(1e-9)
     }
 
+    /// The track animating this layer.
     pub fn track_for_layer(&self, layer_id: i64) -> Option<&Track> {
         self.tracks.iter().find(|t| t.layer_id == Some(layer_id))
     }
@@ -436,14 +480,21 @@ impl Timeline {
 /// オニオンスキン settings (`Canvas.OnionSkin*`).
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct OnionSkin {
+    /// Onion skin is on (`OnionSkinStatus`).
     pub enabled: bool,
+    /// Previous frames shown.
     pub previous: i64,
+    /// Next frames shown.
     pub next: i64,
+    /// Fade the frames (`OnionSkinUseOpacity`).
     pub use_opacity: bool,
     /// Percent.
     pub start_opacity: i64,
+    /// Opacity step in percent (`OnionSkinStepOpaciy`, misspelled in CSP).
     pub step_opacity: i64,
+    /// Tint the frames with the colours below.
     pub use_color: bool,
+    /// `OnionSkinHalfColor`.
     pub half_color: bool,
     /// Previous frames' colour.
     pub front_color: [u8; 3],
@@ -455,9 +506,13 @@ pub struct OnionSkin {
 /// shows, in canvas pixels.
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize)]
 pub struct Frame {
+    /// Left edge.
     pub x: f64,
+    /// Top edge.
     pub y: f64,
+    /// Width.
     pub width: f64,
+    /// Height.
     pub height: f64,
 }
 
@@ -468,7 +523,9 @@ pub struct Animation {
     pub timelines: Vec<Timeline>,
     /// Index (0-based, in [`Animation::timelines`]) of the current timeline.
     pub current: usize,
+    /// オニオンスキン settings, when the canvas has them.
     pub onion_skin: Option<OnionSkin>,
+    /// The 基準フレーム.
     pub frame: Frame,
 }
 
@@ -566,6 +623,7 @@ impl Animation {
         Ok(Some(Animation { timelines, current, onion_skin: onion_skin(&file.canvas.row), frame: frame(file) }))
     }
 
+    /// The timeline at [`Animation::current`].
     pub fn current_timeline(&self) -> Option<&Timeline> {
         self.timelines.get(self.current)
     }
@@ -681,13 +739,16 @@ fn frame(file: &ClipFile) -> Frame {
 pub struct Affine(pub [f64; 6]);
 
 impl Affine {
+    /// The identity map.
     pub const IDENTITY: Affine = Affine([1.0, 0.0, 0.0, 0.0, 1.0, 0.0]);
 
+    /// Maps a point.
     pub fn apply(&self, (x, y): (f64, f64)) -> (f64, f64) {
         let [a, b, c, d, e, f] = self.0;
         (a * x + b * y + c, d * x + e * y + f)
     }
 
+    /// The inverse map; None when it is singular.
     pub fn inverse(&self) -> Option<Affine> {
         let [a, b, c, d, e, f] = self.0;
         let det = a * e - b * d;
@@ -728,8 +789,11 @@ pub struct LayerTransform {
 /// cameras' maps (frame position → canvas position of the folder's content).
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct FrameState {
+    /// Layers not drawn at this frame.
     pub hidden: HashSet<i64>,
+    /// Keyframed layers' transforms, by layer id.
     pub transforms: HashMap<i64, LayerTransform>,
+    /// 2D cameras' maps, by camera folder id.
     pub cameras: HashMap<i64, Affine>,
     /// The cel shown by each animation folder (folder id → cel layer id).
     pub cels: HashMap<i64, Option<i64>>,

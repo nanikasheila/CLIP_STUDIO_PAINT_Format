@@ -39,7 +39,9 @@ const EXTERNAL_COLUMNS: [(&str, &str); 10] = [
 /// Settings of a new canvas (pixels; the unit is set to pixels).
 #[derive(Debug, Clone, PartialEq)]
 pub struct NewCanvas {
+    /// Width in pixels.
     pub width: u32,
+    /// Height in pixels.
     pub height: u32,
     /// Dots per inch.
     pub resolution: f64,

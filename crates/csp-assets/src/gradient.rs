@@ -29,10 +29,12 @@ use serde::Serialize;
 use crate::error::{Error, Result};
 use crate::serial::{Document, Object, Value};
 
+/// One colour stop, as stored.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Stop {
     /// Straight RGBA words as stored (`0xffffffff` = 1.0).
     pub rgba: [u32; 4],
+    /// 1 main colour (描画色), 2 sub colour (背景色), 0x10 curved to the next stop.
     pub flags: u32,
     /// 0..=0x8000.
     pub position: u32,
@@ -41,6 +43,7 @@ pub struct Stop {
 }
 
 impl Stop {
+    /// The colour as straight RGBA 0..1 (main and sub colour stops keep a stored colour too).
     pub fn color(&self) -> [f64; 4] {
         self.rgba.map(|w| (w >> 16) as f64 / 65535.0)
     }
@@ -55,22 +58,29 @@ impl Stop {
         }
     }
 
+    /// The stop takes the main colour (描画色).
     pub fn uses_main_color(&self) -> bool {
         self.flags & 1 != 0
     }
 
+    /// The stop takes the sub colour (背景色).
     pub fn uses_sub_color(&self) -> bool {
         self.flags & 2 != 0
     }
 }
 
+/// A `GradationData` blob, kept byte for byte.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct GradientData {
+    /// Header size (16 or 24).
     pub header_size: u32,
+    /// Bytes per stop record (28).
     pub stop_size: u32,
+    /// Header word 3 (16).
     pub word3: u32,
     /// Mixing and luminance correction (24-byte headers).
     pub mixing: Option<[i32; 2]>,
+    /// The stops, in stored order.
     pub stops: Vec<Stop>,
     /// Bytes inside each stop record after its 28 known bytes.
     #[serde(skip)]
@@ -92,6 +102,7 @@ fn real(data: &[u8], at: usize) -> Result<f64> {
 }
 
 impl GradientData {
+    /// A 16-byte-header gradient with these stops.
     pub fn new(stops: Vec<Stop>) -> GradientData {
         let stop_extra = vec![Vec::new(); stops.len()];
         GradientData {
@@ -105,6 +116,7 @@ impl GradientData {
         }
     }
 
+    /// Parses a `GradationData` blob.
     pub fn parse(data: &[u8]) -> Result<GradientData> {
         let header_size = word(data, 0)?;
         let stop_size = word(data, 4)?;
@@ -152,6 +164,7 @@ impl GradientData {
         })
     }
 
+    /// The blob; an unchanged gradient gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
         let put = |out: &mut Vec<u8>, w: u32| out.extend_from_slice(&w.to_be_bytes());
@@ -198,28 +211,35 @@ impl GradientData {
 /// One gradient of a set.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Gradient {
+    /// `gradationName`.
     pub name: String,
+    /// `gradationData`.
     pub data: GradientData,
 }
 
 /// A named group of gradients (a tab in the gradient set list).
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct GradientGroup {
+    /// `gradationSetName`.
     pub name: String,
+    /// The gradients, in list order.
     pub gradients: Vec<Gradient>,
 }
 
 /// A `.sgs` gradient set file.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct GradientSet {
+    /// The groups, in list order.
     pub groups: Vec<GradientGroup>,
 }
 
 impl GradientSet {
+    /// Parses a `.sgs` file.
     pub fn parse(data: &[u8]) -> Result<GradientSet> {
         GradientSet::from_document(&Document::parse(data)?)
     }
 
+    /// Reads the gradient set of a parsed [`crate::serial`] document.
     pub fn from_document(document: &Document) -> Result<GradientSet> {
         let sets = document
             .root

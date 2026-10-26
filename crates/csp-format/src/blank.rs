@@ -44,6 +44,7 @@ pub const NOMBRE_EDGE: &[u8] = include_bytes!("../assets/nombre-edge.bin");
 pub struct StoryFont {
     /// As CSP shows it (`ＭＳ ゴシック`).
     pub name: String,
+    /// PostScript name of the font (`MS-Gothic`).
     pub postscript: String,
 }
 
@@ -65,6 +66,7 @@ pub struct PageSetup {
     pub bleed_mm: f64,
     /// 基本枠 size and its offset from the middle of the canvas.
     pub basic_mm: [f64; 2],
+    /// Offset of the 基本枠 from the middle of the canvas (x, y).
     #[serde(default)]
     pub basic_offset_mm: [f64; 2],
     /// 右綴じ (a manga) rather than 左綴じ.
@@ -94,9 +96,12 @@ pub struct PageSetup {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum StoryPosition {
+    /// 左下 (1).
     #[default]
     Left,
+    /// 下 (2).
     Center,
+    /// 右下 (3).
     Right,
 }
 
@@ -132,8 +137,10 @@ pub struct StoryLayout {
     /// サブタイトル, after 作品名 and 話数.
     #[serde(default)]
     pub subtitle: String,
+    /// Where the 作品名 goes.
     #[serde(default)]
     pub title_position: StoryPosition,
+    /// Where the 作者名 goes.
     #[serde(default = "center")]
     pub author_position: StoryPosition,
     /// ページ番号 in the 作品情報 (`7ページ`); none shows none.
@@ -156,11 +163,13 @@ impl Default for StoryLayout {
     }
 }
 
+/// ページ番号 in the 作品情報.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PageNumber {
     /// The first page's number.
     pub start: i64,
+    /// Where the ページ番号 goes.
     #[serde(default = "right")]
     pub position: StoryPosition,
 }
@@ -170,11 +179,17 @@ pub struct PageNumber {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NombrePlace {
+    /// Above the 基本枠, binding side (1).
     TopInner,
+    /// Above the 基本枠, in the middle (2).
     Top,
+    /// Above the 基本枠, outer side (3).
     TopOuter,
+    /// Below the 基本枠, binding side (4).
     BottomInner,
+    /// Below the 基本枠, in the middle (5).
     Bottom,
+    /// Below the 基本枠, outer side (6).
     BottomOuter,
 }
 
@@ -216,6 +231,7 @@ fn nombre_size() -> f64 {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ShownNombre {
+    /// Where the ノンブル goes.
     pub place: NombrePlace,
     /// 白 rather than 黒.
     #[serde(default)]
@@ -226,6 +242,7 @@ pub struct ShownNombre {
     /// フォーマット: the text before and after the number.
     #[serde(default)]
     pub prefix: String,
+    /// Text after the number.
     #[serde(default)]
     pub suffix: String,
     /// 基本枠との間隔: 横 (from the 基本枠's side, inwards) and 縦.
@@ -301,6 +318,7 @@ impl PageSetup {
         mm_to_px(mm, self.resolution)
     }
 
+    /// Canvas size in pixels.
     pub fn canvas_px(&self) -> (i64, i64) {
         (self.px(self.canvas_mm[0]), self.px(self.canvas_mm[1]))
     }

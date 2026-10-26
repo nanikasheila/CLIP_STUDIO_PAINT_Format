@@ -745,7 +745,7 @@ fn canvas_box<'a>(
 }
 
 /// Draw a vector layer at canvas size, only inside the box that holds its
-/// objects (see [`canvas_box`]), as CSP does before it halves the view
+/// objects (see `canvas_box`), as CSP does before it halves the view
 /// down (V3 section 6). Returns the image and its canvas origin; None when
 /// the layer has no objects on the canvas.
 pub fn draw_layer_at_canvas_size(file: &ClipFile, layer: &Layer) -> Result<Option<(RgbaImage, (i64, i64))>> {

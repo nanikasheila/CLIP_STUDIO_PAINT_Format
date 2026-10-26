@@ -30,31 +30,49 @@ use crate::curve::Spline;
 use crate::error::{Error, Result};
 use crate::gradient::{Mixing, Ramp};
 
+/// The settings of a correction layer, by type.
 #[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
 pub enum Correction {
+    /// 明るさ・コントラスト (type 1).
     BrightnessContrast {
+        /// -100..100.
         brightness: i32,
+        /// -100..100.
         contrast: i32,
     },
-    /// Per slot: input black, gamma point, input white, output black,
-    /// output white (0..1).
+    /// レベル補正 (type 2). Per slot: input black, gamma point, input
+    /// white, output black, output white (0..1).
     Levels(Vec<[f64; 5]>),
-    /// Per slot: control points (0..1).
+    /// トーンカーブ (type 3). Per slot: control points (0..1).
     ToneCurve(Vec<Vec<(f64, f64)>>),
+    /// 色相・彩度・明度 (type 4).
     HueSaturationValue {
+        /// Degrees.
         hue: i32,
+        /// -100..100.
         saturation: i32,
+        /// -100..100.
         value: i32,
     },
+    /// カラーバランス (type 5).
     ColorBalance {
+        /// 輝度を保持.
         preserve_luminosity: bool,
+        /// R, G, B shift of the shadows (-100..100).
         shadows: [i32; 3],
+        /// R, G, B shift of the midtones (-100..100).
         midtones: [i32; 3],
+        /// R, G, B shift of the highlights (-100..100).
         highlights: [i32; 3],
     },
+    /// 階調の反転 (type 6).
     Invert,
+    /// ポスタリゼーション (type 7): the number of levels.
     Posterize(i32),
+    /// 2値化 (type 8): the threshold.
     Threshold(i32),
+    /// グラデーションマップ (type 9).
     GradientMap(Ramp),
 }
 

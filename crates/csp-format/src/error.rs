@@ -4,6 +4,7 @@ use std::fmt;
 
 /// Why a file could not be read or written.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// The data does not follow the layout this crate understands.
     Format(String),
@@ -13,9 +14,11 @@ pub enum Error {
     Sqlite(rusqlite::Error),
 }
 
+/// Result with this crate's [`Error`].
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl Error {
+    /// An [`Error::Format`] with this message.
     pub fn format(message: impl Into<String>) -> Self {
         Error::Format(message.into())
     }

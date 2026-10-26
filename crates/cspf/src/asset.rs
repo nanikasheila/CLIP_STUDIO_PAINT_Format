@@ -398,6 +398,7 @@ fn modifier_keys_text(args: &[String]) -> Result<bool> {
                 ModifierAction::Tool(uuid) => format!("tool:{}", names.get(uuid).unwrap_or(uuid)),
                 ModifierAction::Operation(n) => format!("operation {n}"),
                 ModifierAction::Other { action, payload } => format!("action {action} {payload}"),
+                other => format!("{other:?}"),
             };
             println!("  {}\t{action}", entry.label());
         }

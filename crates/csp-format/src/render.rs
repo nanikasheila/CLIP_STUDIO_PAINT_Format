@@ -40,34 +40,63 @@ use crate::tone::Tone;
 
 /// Blending modes, numbered as in `LayerComposite`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+#[non_exhaustive]
 pub enum BlendMode {
+    /// 通常 (0).
     Normal,
+    /// 比較(暗) (1).
     Darken,
+    /// 乗算 (2).
     Multiply,
+    /// 焼き込みカラー (3).
     ColorBurn,
+    /// 焼き込み(リニア) (4).
     LinearBurn,
+    /// 減算 (5).
     Subtract,
+    /// カラー比較(暗) (6).
     DarkerColor,
+    /// 比較(明) (7).
     Lighten,
+    /// スクリーン (8).
     Screen,
+    /// 覆い焼きカラー (9).
     ColorDodge,
+    /// 覆い焼き(発光) (10).
     GlowDodge,
+    /// 加算 (11).
     Add,
+    /// 加算(発光) (12).
     AddGlow,
+    /// カラー比較(明) (13).
     LighterColor,
+    /// オーバーレイ (14).
     Overlay,
+    /// ソフトライト (15).
     SoftLight,
+    /// ハードライト (16).
     HardLight,
+    /// 差の絶対値 (21).
     Difference,
+    /// 除外 (22).
     Exclusion,
+    /// ビビッドライト (17).
     VividLight,
+    /// リニアライト (18).
     LinearLight,
+    /// ピンライト (19).
     PinLight,
+    /// ハードミックス (20).
     HardMix,
+    /// 色相 (23).
     Hue,
+    /// 彩度 (24).
     Saturation,
+    /// カラー (25).
     Color,
+    /// 輝度 (26).
     Brightness,
+    /// 除算 (36).
     Divide,
     /// Folders only: the children blend with what is below the folder.
     PassThrough,
@@ -360,9 +389,13 @@ impl Default for RenderOptions {
 /// What the renderer did, by layer count.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct RenderReport {
+    /// Width of the image in pixels.
     pub width: u32,
+    /// Height of the image in pixels.
     pub height: u32,
+    /// Layers drawn.
     pub drawn: usize,
+    /// Layers skipped because they or a folder above them are hidden.
     pub hidden: usize,
     /// Layers drawn without pixels of their own (no stored pixels), by kind.
     pub without_pixels: BTreeMap<String, usize>,
@@ -370,7 +403,9 @@ pub struct RenderReport {
     pub unknown_blend: BTreeMap<i64, usize>,
     /// Modes used, by `LayerComposite` value.
     pub blend_modes: BTreeMap<i64, usize>,
+    /// Layers clipped to the layer below.
     pub clipped: usize,
+    /// Layers drawn through a mask.
     pub masked: usize,
     /// Layer effects drawn, by section name (`EffectEdge`, …).
     pub effects: BTreeMap<String, usize>,
@@ -385,12 +420,14 @@ pub struct RenderReport {
     /// Gradient layers drawn from `GradationFillInfo` (see [`crate::gradient`]),
     /// and how many of them only approximately (the 知覚的 mix).
     pub gradient_layers: usize,
+    /// Gradient layers drawn only approximately (see `gradient_layers`).
     pub gradients_approximate: usize,
     /// Tones with settings whose drawing was not measured.
     pub tones_approximate: usize,
     /// Correction layers applied (see [`crate::correction`]), and how many
     /// of them only approximately.
     pub correction_layers: usize,
+    /// Correction layers applied only approximately (see `correction_layers`).
     pub corrections_approximate: usize,
 }
 

@@ -79,6 +79,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "csp-lab"
+version = "0.1.0"
+dependencies = [
+ "csp-assets",
+ "csp-format",
+ "flate2",
+ "rusqlite",
+ "serde_json",
+]
+
+[[package]]
 name = "cspf"
 version = "0.1.0"
 dependencies = [

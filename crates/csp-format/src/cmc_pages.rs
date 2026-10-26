@@ -30,8 +30,11 @@ pub struct PageLink {
     pub spread: bool,
     /// `CanvasUnit`, `CanvasWidth`, `CanvasHeight`, `CanvasResolution`.
     pub unit: i64,
+    /// `CanvasWidth`, in `unit`.
     pub width: f64,
+    /// `CanvasHeight`, in `unit`.
     pub height: f64,
+    /// `CanvasResolution`, in dpi.
     pub resolution: f64,
     /// Save time as year, month, day, hour, minute, second (CSP writes the
     /// PC's local time; [`PageLink::read`] uses UTC, having no time zone).
