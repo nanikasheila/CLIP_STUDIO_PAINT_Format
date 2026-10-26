@@ -66,5 +66,4 @@ python -m twine upload dist/*
 
 ## 公開後
 
-`README.md` / `README.en.md` の「使い方」の表を公開後の列だけにし、「まだ公開していない」の文を消す。
-`python/README.md` の git 指定も消す。
+[crates.io](https://crates.io/crates/csp-format)・[docs.rs](https://docs.rs/csp-format)・[PyPI](https://pypi.org/project/csp-format/) と GitHub のリリースに新しい版が出ているか確かめる。
