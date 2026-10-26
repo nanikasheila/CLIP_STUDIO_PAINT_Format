@@ -1,13 +1,13 @@
 column	group	label	values	certainty	type	rows	kinds	min	max	blob
 AntiAlias	アンチエイリアス	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	確認済み（W3 表示: 1 弱、2 中）	INTEGER	2048	brush,effectLines,eraser,shape,selection,balloon,vectorEdit,fill,frame,?,ruler,blend	0	3	
-BalloonFillOpacity	フキダシ	塗り 不透明度	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	100	100	
-BalloonInsertType	フキダシ	作成 方式	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	0	1	
+BalloonFillOpacity	フキダシ作成	塗りの不透明度	0–100 %	確認済み（W4）	INTEGER	61	balloon,brush	100	100	
+BalloonInsertType	フキダシ作成	追加方法	一覧の並び順 0 レイヤーを新規作成, 1 選択中のレイヤーに追加	確認済み（W4: 新規作成 0、追加 1）	INTEGER	61	balloon,brush	0	1	
 BalloonTailCurveKind	フキダシ	しっぽ 曲線 種類	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	2	
 BalloonTailType	フキダシ	しっぽ 方式	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	1	
 BalloonTailWidth	フキダシ	しっぽ 幅	名前からの直訳	推測（直訳）	REAL	16	balloon	20.0	94.10000000000001	
 BalloonTailWidthUnit	フキダシ	しっぽ 幅 単位	名前からの直訳	推測（直訳）	INTEGER	16	balloon	0	0	
-BalloonTone	フキダシ	トーン	名前からの直訳	推測（直訳）	INTEGER	180	effectLines,balloon,brush,?	0	1	
-BalloonUniteText	フキダシ	結合 テキスト	名前からの直訳	推測（直訳）	INTEGER	61	balloon,brush	1	1	
+BalloonTone	フキダシ作成 / 流線 / 集中線	トーン化	0/1（フキダシ・流線・集中線で共通の列）	確認済み（W4: フキダシ、流線）	INTEGER	180	effectLines,balloon,brush,?	0	1	
+BalloonUniteText	フキダシ作成	描画位置のテキストに結合	0/1	確認済み（W4）	INTEGER	61	balloon,brush	1	1	
 BrushAdjustFlowByInterval	ブラシ先端	間隔によるブラシ濃度調整	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
 BrushAdjustVelocity	補正	速度の調整	0/1	推測	INTEGER	1473	brush,eraser,shape,balloon,effectLines,frame,liquify,blend,fill,vectorEdit,selection,ruler	0	1	
 BrushAtLeast1Pixel	ブラシサイズ	最小値を 1 ピクセルにする	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
@@ -128,15 +128,15 @@ ComicFrameInsertType	コマ枠	作成 方式	名前からの直訳	推測（直�
 ComicFrameMakeBaseLayer	コマ枠	作成 基準 レイヤー	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	1	1	
 ComicFrameMakeFillLayer	コマ枠	作成 塗り レイヤー	名前からの直訳	推測（直訳）	INTEGER	31	frame,?	0	1	
 CompositeMode	インク	合成モード	CSP のレイヤー合成モード番号（.clip の LayerComposite と同じ表）	確認済み（W4: ハードミックス 20）	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	0	31	
-ConcentrateStreamBasePointType	集中線	線 基準 点 方式	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	2	
-ConcentrateStreamFillOpacity	集中線	線 塗り 不透明度	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	100	100	
-ConcentrateStreamIntervalAngle	集中線	線 間隔 角度	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	2.0	30.0	
-ConcentrateStreamIntervalDistance	集中線	線 間隔 距離	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	5.0	60.0	
-ConcentrateStreamIntervalDistanceUnit	集中線	線 間隔 距離 単位	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	0	
-ConcentrateStreamIntervalType	集中線	線 間隔 方式	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
-ConcentrateStreamMakeLayer	集中線	線 作成 レイヤー	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	1	2	
-ConcentrateStreamUseFill	集中線	線 使う 塗り	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
-ConcentrateStreamUseRuler	集中線	線 使う 定規	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
+ConcentrateStreamBasePointType	描画位置（集中線）	基準位置	一覧の並び順 0 内側, 1 中点, 2 外側（0 と 2 を確認）	確認済み（W4: 内側 0、外側 2）	INTEGER	85	effectLines,?	0	2	
+ConcentrateStreamFillOpacity	集中線	塗りの不透明度	0–100 %	確認済み（W4）	INTEGER	85	effectLines,?	100	100	
+ConcentrateStreamIntervalAngle	描画間隔（集中線）	線の間隔（角度）	度	確認済み（W4）	REAL	85	effectLines,?	2.0	30.0	
+ConcentrateStreamIntervalDistance	描画間隔（集中線）	線の間隔（距離）	数値（単位は ConcentrateStreamIntervalDistanceUnit）	推測	REAL	85	effectLines,?	5.0	60.0	
+ConcentrateStreamIntervalDistanceUnit	描画間隔（集中線）	線の間隔（距離）の単位	0 px, 2 mm（推測）	推測	INTEGER	85	effectLines,?	0	0	
+ConcentrateStreamIntervalType	描画間隔（集中線）	線の間隔の方式	0 角度, 1 距離	確認済み（W4: 角度 0、距離 1）	INTEGER	85	effectLines,?	0	1	
+ConcentrateStreamMakeLayer	集中線	描画先	一覧の値（推測）	推測	INTEGER	85	effectLines,?	1	2	
+ConcentrateStreamUseFill	集中線	下地を塗りつぶす	0/1	確認済み（W4）	INTEGER	85	effectLines,?	0	1	
+ConcentrateStreamUseRuler	集中線	放射線定規を中心に用いる	0/1	確認済み（W4）	INTEGER	85	effectLines,?	0	1	
 ContourFillBlendGraph	等高線塗り	等高線の混合の曲線	点の列	推測	BLOB	24	gradient			records:24
 ContourFillUseBlack	等高線塗り	黒を使う		推測	INTEGER	24	gradient	0	2	
 ContourFillUseTrans	等高線塗り	透明を使う		推測	INTEGER	24	gradient	0	2	
@@ -269,8 +269,8 @@ LightTableClickOperation	ライトテーブル	クリック 操作	名前から�
 LightTableDragOperation	ライトテーブル	ドラッグ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
 LightTableTouchOperation	ライトテーブル	タッチ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
 LineCurveKind	線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	43	shape,brush,ruler	0	1	
-LineLockAngle	グラデーション	角度の刻み	0/1	確認済み（W4: グラデーション）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	0	0	
-LineLockAngleStep	グラデーション	角度の刻みの角度	度	確認済み（W4）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	42	45	
+LineLockAngle	グラデーション / 連続曲線	角度の刻み	0/1	確認済み（W4: グラデーション、連続曲線）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	0	0	
+LineLockAngleStep	グラデーション / 連続曲線	角度の刻みの角度	度	確認済み（W4）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	42	45	
 LineWidthAddValue	線	幅 加算 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	1.0	6.5	
 LineWidthAddValueUnit	線	幅 加算 値 単位	名前からの直訳	推測（直訳）	INTEGER	24	brush,vectorEdit	0	0	
 LineWidthConstantValue	線	幅 一定 値	名前からの直訳	推測（直訳）	REAL	24	brush,vectorEdit	4.0	20.0	
@@ -309,32 +309,32 @@ Object3DSnapFlag	3D	スナップ フラグ	名前からの直訳	推測（直訳
 Object3DSnapRotationGridInterval	3D	スナップ 回転 グリッド 間隔	名前からの直訳	推測（直訳）	INTEGER	11	operation	72	72	
 Object3DUsePersAutoPos	3D	使う パース 自動 位置	名前からの直訳	推測（直訳）	INTEGER	1	operation	1	1	
 ObjectAllLayer	操作	すべての レイヤー	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
-ObjectAlwaysShowFrame	操作	常に 表示 枠	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
+ObjectAlwaysShowFrame	操作（オブジェクト）	常に枠を表示	0/1	確認済み（W4）	INTEGER	5	operation	0	0	
 ObjectComicFrameLink	操作	コマ 枠 連動	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	1	
 ObjectComicFrameSnap	操作	コマ 枠 スナップ	名前からの直訳	推測（直訳）	INTEGER	12	operation	1	1	
 ObjectOperationAtBlank	操作	操作 で 空白	名前からの直訳	推測（直訳）	INTEGER	8	operation	257	257	
-ObjectOperationAtBlank2	操作	操作 で 空白 2	名前からの直訳	推測（直訳）	INTEGER	5	operation	272	273	
+ObjectOperationAtBlank2	操作（オブジェクト）	透明箇所の操作	チェックのビットの組（初期 0x111 は 別のレイヤーへの選択切り替え・3D レイヤーの操作・2D カメラフォルダーのみ有効。0x1 と 0x100 が前の 2 つ、0x10 が 2D カメラ。平行線定規の方向指定・ドラッグで範囲指定して選択・すべてのレイヤーで有効は 0x8・0x1000・0x10000000 のどれか）	確認済み（W4: ビットの一部）	INTEGER	5	operation	272	273	
 ObjectResizableTransformOperation	操作	拡縮可能 変形 操作	名前からの直訳	推測（直訳）	INTEGER	11	operation	1	1	
-ObjectSelectFolder	操作	選択 フォルダー	名前からの直訳	推測（直訳）	INTEGER	5	operation	0	0	
-ObjectSelectType	操作	選択 方式	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
-ObjectSelectable	操作	選択できる対象	名前からの直訳	推測（直訳）	INTEGER	12	operation	2147483647	2147483647	
+ObjectSelectFolder	操作（オブジェクト）	フォルダーを選択	0/1	確認済み（W4）	INTEGER	5	operation	0	0	
+ObjectSelectType	操作（オブジェクト）	選択の追加	ボタンの並び順（3 番目で 2）	確認済み（W4: 3 番目 2）	INTEGER	12	operation	0	0	
+ObjectSelectable	操作（オブジェクト）	選択可能なオブジェクト	種類ごとのビット（ベクター 0x2、テキスト 0x10、定規 0x100 を確認）	確認済み（W4: ベクター・テキスト・定規のビット）	INTEGER	12	operation	2147483647	2147483647	
 ObjectUseSnap	補正	表示メニューに従いスナップ	0/1	確認済み（W4: テキスト）	INTEGER	4	text,operation	1	1	
 ObjectVectorChangeWidth	操作	ベクター 変更 幅	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	0	
 ObjectVectorOperation	操作	ベクター 操作	名前からの直訳	推測（直訳）	INTEGER	12	operation	0	1	
 Opacity	不透明度	不透明度	0–100 %	確認済み（W3 表示・書き出し、W4）	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	49	100	
-ParallelStreamBasePointType	流線	線 基準 点 方式	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	2	
-ParallelStreamInterval	流線	線 間隔	名前からの直訳	推測（直訳）	REAL	34	effectLines	0.3	30.0	
-ParallelStreamIntervalUnit	流線	線 間隔 単位	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	0	2	
-ParallelStreamLineAngle	流線	線 線 角度	名前からの直訳	推測（直訳）	REAL	34	effectLines	-180.0	90.0	
-ParallelStreamMakeLayer	流線	線 作成 レイヤー	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	2	
-ParallelStreamMaxLineNumber	流線	線 最大 線 数	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	200	300	
-ParallelStreamUseRuler	流線	線 使う 定規	名前からの直訳	推測（直訳）	INTEGER	34	effectLines	1	1	
+ParallelStreamBasePointType	描画位置（流線）	基準位置	一覧の並び順 0 始点, 1 中点, 2 終点（1 と 2 を確認）	確認済み（W4: 中点 1、終点 2）	INTEGER	34	effectLines	1	2	
+ParallelStreamInterval	描画間隔（流線）	線の間隔	数値（単位は ParallelStreamIntervalUnit）	確認済み（W4）	REAL	34	effectLines	0.3	30.0	
+ParallelStreamIntervalUnit	描画間隔（流線）	線の間隔の単位	0 px, 2 mm（推測）	推測	INTEGER	34	effectLines	0	2	
+ParallelStreamLineAngle	流線	角度	度	確認済み（W4）	REAL	34	effectLines	-180.0	90.0	
+ParallelStreamMakeLayer	流線	描画先	一覧の値（推測）	推測	INTEGER	34	effectLines	1	2	
+ParallelStreamMaxLineNumber	描画間隔（流線）	最大本数	本	確認済み（W4）	INTEGER	34	effectLines	200	300	
+ParallelStreamUseRuler	流線	平行線定規を角度に用いる	0/1	確認済み（W4）	INTEGER	34	effectLines	1	1	
 PerspectiveRulerChangeType	パース定規	変更 方式	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
 PerspectiveRulerOperation	パース定規	操作	名前からの直訳	推測（直訳）	INTEGER	8	ruler	0	0	
-PolylineAddAndDeletePoint	折れ線	加算 と Delete 点	名前からの直訳	推測（直訳）	INTEGER	60	shape,brush,effectLines,frame,ruler,balloon,selection	1	1	
-PolylineClose	折れ線	閉じる	名前からの直訳	推測（直訳）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	0	1	
+PolylineAddAndDeletePoint	連続曲線	作成途中の制御点の追加・削除	0/1	確認済み（W4）	INTEGER	60	shape,brush,effectLines,frame,ruler,balloon,selection	1	1	
+PolylineClose	連続曲線	線を閉じる	0/1	確認済み（W4）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	0	1	
 PolylineCurveKind	折れ線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	80	shape,brush,selection,frame,ruler,balloon	0	3	
-PolylineCurveKindWithoutCubic	折れ線	曲線 種類 なし 3 次	名前からの直訳	推測（直訳）	INTEGER	42	effectLines	1	1	
+PolylineCurveKindWithoutCubic	連続曲線	曲線	ボタンの並び順 0 1 番目, 1 2 番目, 2 3 番目（1 と 2 を確認）	確認済み（W4: 2 番目 1、3 番目 2）	INTEGER	42	effectLines	1	1	
 PolylineDesignationType	折れ線	指定 方式	名前からの直訳	推測（直訳）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	1	1	
 PolylineShowPrediction	折れ線	表示 予測	名前からの直訳	推測（直訳）	INTEGER	54	shape,brush,effectLines,frame,selection,ruler,balloon	1	1	
 RotateDoubleClick	回転	2 本指 クリック	名前からの直訳	推測（直訳）	INTEGER	12	view	1	1	
@@ -395,27 +395,27 @@ Stickness	補正	ポストスムージング	0–10	推測	INTEGER	1678	brush,er
 StreamBrushSize	効果線	Brush サイズ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	0.5	50.0	
 StreamBrushSizeDisturb	効果線	Brush サイズ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	25	100	
 StreamBrushSizeUnit	効果線	Brush サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	2	
-StreamExtendToFrame	効果線	伸ばす へ 枠	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamExtendToFrame	描画位置	コマ外まで延長	0/1（集中線で基準位置が外側のときは使えない）	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
 StreamGroupDisturb	効果線	まとまり 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	25	75	
-StreamGroupGap	効果線	まとまり 間隔	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	4	10	
-StreamGroupSize	効果線	まとまり サイズ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	3	10	
-StreamIntervalDisturb	効果線	間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	10	75	
-StreamJagLength	効果線	ギザギザ 長さ	名前からの直訳	推測（直訳）	REAL	85	effectLines,?	20.0	300.0	
-StreamJagLengthUnit	効果線	ギザギザ 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	0	
-StreamJagNumber	効果線	ギザギザ 数	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	24	36	
-StreamLineLength	効果線	線 長さ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	30.0	2000.0	
-StreamLineLengthDisturb	効果線	線 長さ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	10	50	
-StreamLineLengthUnit	効果線	線 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	0	
-StreamMakeCurve	効果線	作成 曲線	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
-StreamStartGapDisturb	効果線	開始 間隔 乱れ	名前からの直訳	推測（直訳）	REAL	119	effectLines,?	10.0	1000.0	
-StreamStartGapDisturbUnit	効果線	開始 間隔 乱れ 単位	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	2	
+StreamGroupGap	描画間隔	まとまりの隙間	数値	推測	INTEGER	119	effectLines,?	4	10	
+StreamGroupSize	描画間隔	まとまりの本数	本	確認済み（W4）	INTEGER	119	effectLines,?	3	10	
+StreamIntervalDisturb	描画間隔	線の間隔の乱れの段階	段階のバー（3 段目で 50、元の 10 は 1 段目）	確認済み（W4: 3 段目 50）	INTEGER	119	effectLines,?	10	75	
+StreamJagLength	描画位置（集中線）	ギザギザの高さ	数値（単位は StreamJagLengthUnit）	確認済み（W4）	REAL	85	effectLines,?	20.0	300.0	
+StreamJagLengthUnit	描画位置（集中線）	ギザギザの高さの単位	0 px, 2 mm（推測）	推測	INTEGER	85	effectLines,?	0	0	
+StreamJagNumber	描画位置（集中線）	ギザギザの数	個	確認済み（W4）	INTEGER	85	effectLines,?	24	36	
+StreamLineLength	描画位置	長さ	数値（単位は StreamLineLengthUnit）	確認済み（W4）	REAL	119	effectLines,?	30.0	2000.0	
+StreamLineLengthDisturb	描画位置	長さの乱れの段階	段階のバー（推測）	推測	INTEGER	119	effectLines,?	10	50	
+StreamLineLengthUnit	描画位置	長さの単位	0 px, 2 mm（推測）	推測	INTEGER	119	effectLines,?	0	0	
+StreamMakeCurve	流線 / 集中線	曲線化	0/1	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
+StreamStartGapDisturb	描画位置	基準位置のずれの幅	数値（単位は StreamStartGapDisturbUnit）	確認済み（W4）	REAL	119	effectLines,?	10.0	1000.0	
+StreamStartGapDisturbUnit	描画位置	基準位置のずれの幅の単位	0 px, 2 mm（推測）	推測	INTEGER	119	effectLines,?	0	2	
 StreamUseBrushSizeDisturb	効果線	使う Brush サイズ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
-StreamUseGroup	効果線	使う まとまり	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
-StreamUseGroupDisturb	効果線	使う まとまり 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	1	1	
-StreamUseIntervalDisturb	効果線	使う 間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
-StreamUseJag	効果線	使う ギザギザ	名前からの直訳	推測（直訳）	INTEGER	85	effectLines,?	0	1	
-StreamUseLineLengthDisturb	効果線	使う 線 長さ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
-StreamUseStartGapDisturb	効果線	使う 開始 間隔 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
+StreamUseGroup	描画間隔	まとまり	0/1	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
+StreamUseGroupDisturb	描画間隔	まとまりの乱れ	0/1	推測	INTEGER	119	effectLines,?	1	1	
+StreamUseIntervalDisturb	描画間隔	線の間隔の乱れ	0/1	推測	INTEGER	119	effectLines,?	0	1	
+StreamUseJag	描画位置（集中線）	基準位置をギザギザにする	0/1	確認済み（W4）	INTEGER	85	effectLines,?	0	1	
+StreamUseLineLengthDisturb	描画位置	長さの乱れ	0/1	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
+StreamUseStartGapDisturb	描画位置	基準位置のずれ	0/1	推測	INTEGER	119	effectLines,?	0	1	
 SymmetryRulerLineNumber	対称定規	線 数	名前からの直訳	推測（直訳）	INTEGER	8	ruler	2	11	
 SymmetryRulerLineSymmetry	対称定規	線 対称	名前からの直訳	推測（直訳）	INTEGER	8	ruler	1	1	
 SyncDualBrushSize	2-ブラシ形状	メインのブラシサイズに連動	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	

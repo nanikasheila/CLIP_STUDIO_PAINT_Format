@@ -111,12 +111,17 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 | 29 | 選択範囲「長方形選択」: 作成方法 4 番目、選択範囲と画像を連動 オン、図形 楕円、表示メニューに従いスナップ オン | `SelectCreateType` 1 → 3、`SelectMoveImage` 0 → 1、`FixedShapeKind` 0 → 1、`ShapeEnableSnap` 0 → 1 |
 | 30 | グラデーション「昼空」: 形状 楕円、端の処理 3 番目、ディザリング オフ、角度の刻み オン・15 | `GradationShapeKind` 0 → 2、`GradationRepeatType` 0 → 2、`GradationDither` 1 → 0、`LineLockAngle` 0 → 1、`LineLockAngleStep` 45 → 15 |
 | 31 | グラデーション: 反転、形状 円、端の処理 2 番目 | `GradationData` の点の並びと位置が左右反対になる（`GradationReverseSaved` は 1 のまま）、`GradationShapeKind` 2 → 1、`GradationRepeatType` 2 → 1 |
+| 32 | フキダシ「角丸フキダシ」: 塗りの不透明度 64、追加方法 レイヤーを新規作成、トーン化 オン、描画位置のテキストに結合 オフ | `BalloonFillOpacity` 100 → 64、`BalloonInsertType` 1 → 0、`BalloonTone` 0 → 1、`BalloonUniteText` 1 → 0 |
+| 33 | 流線「陰気」: 角度 -150、トーン化 オン、平行線定規を角度に用いる オフ、曲線化 オン。描画間隔: 線の間隔 17、乱れ 3 段目、まとまり オン・5、最大本数 150 | `ParallelStreamLineAngle` -180 → -150、`BalloonTone` 0 → 1（フキダシと同じ列）、`ParallelStreamUseRuler` 1 → 0、`StreamMakeCurve` 0 → 1、`ParallelStreamInterval` 12 → 17、`StreamIntervalDisturb` 10 → 50、`StreamUseGroup` 0 → 1、`StreamGroupSize` 3 → 5、`ParallelStreamMaxLineNumber` 200 → 150 |
+| 34 | 流線の描画位置: 長さ 420、乱れ オン、コマ外まで延長 オフ、基準位置 中点、基準位置のずれ 35。連続曲線: 曲線 3 番目、線を閉じる オン、角度の刻み オン・20、作成途中の制御点の追加・削除 オフ | `StreamLineLength` 500 → 420、`StreamUseLineLengthDisturb` 0 → 1、`StreamExtendToFrame` 1 → 0、`ParallelStreamBasePointType` 2 → 1、`StreamStartGapDisturb` 50 → 35、`PolylineCurveKindWithoutCubic` 1 → 2、`PolylineClose` 0 → 1、`LineLockAngle` 0 → 1、`LineLockAngleStep` 45 → 20、`PolylineAddAndDeletePoint` 1 → 0 |
+| 35 | 集中線「密な集中線」: 放射線定規を中心に用いる オフ、下地を塗りつぶす オン・塗りの不透明度 72、線の間隔 角度・3.5、基準位置 外側、ギザギザの数 40・高さ 250、基準位置をギザギザにする オフ | `ConcentrateStreamUseRuler` 1 → 0、`ConcentrateStreamUseFill` 0 → 1、`ConcentrateStreamFillOpacity` 100 → 72、`ConcentrateStreamIntervalType` 1 → 0、`ConcentrateStreamIntervalAngle` 2 → 3.5、`ConcentrateStreamBasePointType` 0 → 2、`StreamJagNumber` 36 → 40、`StreamJagLength` 300 → 250、`StreamUseJag` 1 → 0 |
+| 36 | 操作「オブジェクト」: フォルダーを選択 オン、常に枠を表示 オン、選択の追加 3 番目、透明箇所の操作（別のレイヤーへの選択切り替え オフ、3D レイヤーの操作 オフ、平行線定規の方向指定 オン、ドラッグで範囲指定して選択 オン、すべてのレイヤーで有効 オン）、選択可能なオブジェクト（ベクター・テキスト・定規 オフ） | `ObjectSelectFolder` 0 → 1、`ObjectAlwaysShowFrame` 0 → 1、`ObjectSelectType` 0 → 2、`ObjectOperationAtBlank2` 0x111 → 0x10001018、`ObjectSelectable` 0x6FFFFFFF → 0x6FFFFEED（0x2・0x10・0x100 が消える） |
 
-2〜31 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を、21〜26 回目はテキストツール「テキスト」を、27〜31 回目は図形「長方形」・選択範囲「長方形選択」・グラデーション「昼空」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた（21 回目以降は前の回の書き出しと比べる）。テキストでは、フレームで折り返すをオフにすると均等揃えとフレーム揃えが使えなくなり、縦書きではスタイルのボタンが太字と斜体だけになる。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
+2〜36 回目ではほかの列は変わらなかった。9・10 回目は 8 回目の書き出しを、11〜15 回目は 10 回目の書き出しを、16 回目は 15 回目の書き出しを読み込み直した一時ツールを使った（読み込み直しで変わったのは名前と ID だけ）。17〜20 回目は CSP の塗りつぶし「他レイヤーを参照」を、21〜26 回目はテキストツール「テキスト」を、27〜31 回目は図形「長方形」・選択範囲「長方形選択」・グラデーション「昼空」を、32〜36 回目はフキダシ「角丸フキダシ」・流線「陰気」・集中線「密な集中線」・操作「オブジェクト」を書き出して読み込み直した一時ツールで、読み込み直した直後の書き出しと比べた（21 回目以降は前の回の書き出しと比べる）。テキストでは、フレームで折り返すをオフにすると均等揃えとフレーム揃えが使えなくなり、縦書きではスタイルのボタンが太字と斜体だけになる。影響元設定の画面の入力は筆圧・傾き（最小値と最大値）・速度・ランダムの 4 つだけで、入力ビット 0x100 に当たる項目は画面にない。入力をオンにすると、空だったグラフに既定の点が入る（筆圧 (0,0)–(1,1)、傾き (0,1)・(0.5,1)・(0.8,0)・(1,0)、速度 (0,1)–(1,0)）。1 回目は元のファイル（CSP の読み込み前）と比べたので、上の形式のそろえ直し
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
-[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 179 列）。
+[`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 213 列）。
 
 ## 残り
 
-- W4 の続き（まだ確かめていないツール: フキダシ、効果線・集中線、コマ枠、定規、操作、スポイト、ゆがみなど）
+- W4 の続き（まだ確かめていないツール: フキダシのしっぽ、コマ枠、定規、3D の操作、ベクター線の編集、スポイト、ゆがみなど）
 - 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
