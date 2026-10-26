@@ -218,6 +218,36 @@ impl ClipFile {
         Ok(Some((offscreen.to_rgba()?, layer.pixel_origin())))
     }
 
+    /// The layer's pixels inside the canvas box `(x0, y0, x1, y1)`,
+    /// transparent where none are stored. Only the blocks the box overlaps
+    /// are decoded.
+    pub fn layer_pixels_in_box(&self, layer: &Layer, region: (i64, i64, i64, i64)) -> Result<RgbaImage> {
+        let (x0, y0, x1, y1) = region;
+        let base = if layer.render_mipmap == 0 { None } else { self.mipmap_base(layer.render_mipmap)? };
+        match base {
+            Some(offscreen) => {
+                let (ox, oy) = layer.pixel_origin();
+                offscreen.to_rgba_region((x0 - ox, y0 - oy, x1 - ox, y1 - oy))
+            }
+            None => Ok(RgbaImage::new((x1 - x0).max(0) as u32, (y1 - y0).max(0) as u32)),
+        }
+    }
+
+    /// Canvas boxes `(x0, y0, x1, y1)` of the 256-pixel blocks of the layer
+    /// that store data, found without decompressing anything.
+    pub fn stored_pixel_boxes(&self, layer: &Layer) -> Result<Vec<(i64, i64, i64, i64)>> {
+        if layer.render_mipmap == 0 {
+            return Ok(Vec::new());
+        }
+        let Some(offscreen) = self.mipmap_base(layer.render_mipmap)? else { return Ok(Vec::new()) };
+        let (ox, oy) = layer.pixel_origin();
+        Ok(offscreen
+            .stored_boxes()
+            .into_iter()
+            .map(|(x0, y0, x1, y1)| (x0 as i64 + ox, y0 as i64 + oy, x1 as i64 + ox, y1 as i64 + oy))
+            .collect())
+    }
+
     /// The layer mask (0 = hidden, 255 = shown) and its canvas position.
     pub fn layer_mask(&self, layer: &Layer) -> Result<Option<(GrayImage, (i64, i64))>> {
         if layer.mask_mipmap == 0 {

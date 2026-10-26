@@ -54,7 +54,7 @@ pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_
 | （なし） | `layer.mask_origin()` | マスクの位置は `LayerMaskOffset` も足す（clip-core は足していない） |
 | `render_layer_pixels(layer)` | `file.layer_pixels(layer)` | `(RgbaImage, origin)` を返す |
 | `render_layer_scaled(layer, n)` | `file.mipmap_base(id)?.to_rgba_halved(n)` | 半分にする回数で指定 |
-| `layer_pixels_in_box` / `occupied_pixel_boxes` | `Offscreen::for_each_block` で作る | Rust 側には箱単位の API がない。必要なら csp-format に足す（§5） |
+| `layer_pixels_in_box` / `occupied_pixel_boxes` | `file.layer_pixels_in_box(layer, box)` / `file.stored_pixel_boxes(layer)` | 箱が重なるブロックだけを展開する。端のブロックはオフスクリーンの大きさで切る（旧実装は 256 の倍数） |
 | （なし） | `file.layer_mask(layer)`, `file.layer_thumbnail(layer)` | |
 | `vector_payloads` / `vector_objects` | `VectorObjectList` の `VectorData` を `file.external(id)` → `VectorData::parse` | 未解読部分を含めて全バイトを保持し、`to_bytes` で書き戻せる |
 | `text_blocks` / `text_strings` | `text::read_blocks(&layer.row)` | 本文と `Attributes`（`font_size`, `bbox`, `font`, `quad` …） |
@@ -137,7 +137,6 @@ csp-format に移すと次が読める。clip-core（と元の Python 実装）�
 
 移行の途中で必要になったら、ここに足してから各リポジトリで使う。
 
-- Rust: `layer_pixels_in_box` と `stored_pixel_boxes`（Python 版にはある）
 - Rust: 他のファイルからレイヤーを行ごと複製する機能（clip-core の `RowCopier` / `merge_schema`）
 - Rust: 線・コマ枠のベクターデータを組み立てる関数（clip-core の `build_vector_data` / `build_frame_data`）
 - Rust: ひな形からの .cmc 新規作成（clip-core の `write_cmc`）
