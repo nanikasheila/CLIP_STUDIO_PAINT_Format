@@ -24,32 +24,50 @@ use std::path::Path;
 use crate::binary::{Reader, Writer};
 use crate::error::{Error, Result, bail};
 
+/// The first 8 bytes of a .clip.
 pub const FILE_MAGIC: &[u8; 8] = b"CSFCHUNK";
+/// Size of the file header.
 pub const FILE_HEADER_SIZE: usize = 24;
+/// Size of a chunk header (tag and body length).
 pub const CHUNK_HEADER_SIZE: usize = 16;
+/// Length of an external id.
 pub const EXTERNAL_ID_LENGTH: usize = 40;
+/// How every external id starts.
 pub const EXTERNAL_ID_PREFIX: &str = "extrnlid";
+/// Size of the CHNKHead body.
 pub const HEAD_BODY_SIZE: usize = 40;
+/// First value of the CHNKHead body.
 pub const HEAD_VERSION: u64 = 256;
+/// Length of the file id in CHNKHead.
 pub const FILE_ID_LENGTH: usize = 16;
 
+/// Tag of the head chunk.
 pub const TAG_HEAD: &[u8; 8] = b"CHNKHead";
+/// Tag of an external chunk.
 pub const TAG_EXTERNAL: &[u8; 8] = b"CHNKExta";
+/// Tag of the database chunk.
 pub const TAG_SQLITE: &[u8; 8] = b"CHNKSQLi";
+/// Tag of the last chunk.
 pub const TAG_FOOTER: &[u8; 8] = b"CHNKFoot";
 
 /// Kind of a chunk, from its 8-byte tag.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum ChunkKind {
+    /// `CHNKHead`.
     Head,
+    /// `CHNKExta`.
     External,
+    /// `CHNKSQLi`.
     Sqlite,
+    /// `CHNKFoot`.
     Footer,
+    /// Any other tag.
     Other([u8; 8]),
 }
 
 impl ChunkKind {
+    /// The kind of a tag.
     pub fn from_tag(tag: &[u8; 8]) -> Self {
         match tag {
             TAG_HEAD => ChunkKind::Head,
@@ -60,6 +78,7 @@ impl ChunkKind {
         }
     }
 
+    /// The 8-byte tag.
     pub fn tag(&self) -> [u8; 8] {
         match self {
             ChunkKind::Head => *TAG_HEAD,
@@ -70,6 +89,7 @@ impl ChunkKind {
         }
     }
 
+    /// The tag as text.
     pub fn name(&self) -> String {
         String::from_utf8_lossy(&self.tag()).into_owned()
     }
@@ -78,11 +98,15 @@ impl ChunkKind {
 /// One chunk: where its header and body are in the file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Chunk {
+    /// Kind, from the tag.
     pub kind: ChunkKind,
+    /// File offset of the chunk header.
     pub header_offset: usize,
+    /// File range of the body.
     pub body: Range<usize>,
     /// For CHNKExta: the external id and where its payload starts.
     pub external_id: Option<String>,
+    /// File offset where the payload starts (after the id, for CHNKExta).
     pub payload_offset: usize,
 }
 
@@ -103,9 +127,13 @@ pub struct Head {
 #[derive(Debug, Clone)]
 pub struct Container {
     data: Vec<u8>,
+    /// File size the header declares.
     pub declared_size: u64,
+    /// Offset of the first chunk the header declares (24).
     pub first_chunk: u64,
+    /// The CHNKHead contents, if the file has one.
     pub head: Option<Head>,
+    /// Every chunk, in file order.
     pub chunks: Vec<Chunk>,
     externals: HashMap<String, usize>,
     /// Bytes after the footer chunk (none in CSP files).
@@ -113,6 +141,7 @@ pub struct Container {
 }
 
 impl Container {
+    /// Reads and parses a file.
     pub fn read(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref();
         let data =
@@ -125,6 +154,7 @@ impl Container {
         data.starts_with(FILE_MAGIC)
     }
 
+    /// Parses the bytes of a .clip; fails on a truncated or malformed container.
     pub fn parse(data: Vec<u8>) -> Result<Self> {
         if data.len() < FILE_HEADER_SIZE || !Self::sniff(&data) {
             bail!("Not a CLIP STUDIO file (no CSFCHUNK header)");
@@ -194,14 +224,17 @@ impl Container {
         Ok(Container { data, declared_size, first_chunk, head, chunks, externals, trailing })
     }
 
+    /// The bytes as read.
     pub fn bytes(&self) -> &[u8] {
         &self.data
     }
 
+    /// The bytes as read, by value.
     pub fn into_bytes(self) -> Vec<u8> {
         self.data
     }
 
+    /// The body of a chunk.
     pub fn body(&self, chunk: &Chunk) -> &[u8] {
         &self.data[chunk.body.clone()]
     }
@@ -215,6 +248,7 @@ impl Container {
             .ok_or_else(|| Error::format("No CHNKSQLi chunk"))
     }
 
+    /// The database chunk.
     pub fn sqlite_chunk(&self) -> Option<&Chunk> {
         self.chunks.iter().find(|chunk| chunk.kind == ChunkKind::Sqlite)
     }
@@ -224,6 +258,7 @@ impl Container {
         self.chunks.iter().filter(|chunk| chunk.kind == ChunkKind::External)
     }
 
+    /// The external chunk with this id.
     pub fn external_chunk(&self, id: &str) -> Option<&Chunk> {
         self.externals.get(id).map(|index| &self.chunks[*index])
     }
@@ -235,6 +270,7 @@ impl Container {
         Some(&self.data[chunk.payload_offset..chunk.body.end])
     }
 
+    /// Ids of the external chunks, in file order.
     pub fn external_ids(&self) -> impl Iterator<Item = &str> {
         self.external_chunks().filter_map(|chunk| chunk.external_id.as_deref())
     }
@@ -330,15 +366,19 @@ pub fn is_external_id(id: &str) -> bool {
 /// SQLi, Foot, as CSP writes them.
 #[derive(Debug, Clone)]
 pub struct ContainerWriter<'a> {
+    /// File id written into CHNKHead.
     pub file_id: [u8; FILE_ID_LENGTH],
+    /// External chunks (id, payload), in file order.
     pub externals: Vec<(String, &'a [u8])>,
 }
 
 impl<'a> ContainerWriter<'a> {
+    /// A writer with no external chunks.
     pub fn new(file_id: [u8; FILE_ID_LENGTH]) -> Self {
         ContainerWriter { file_id, externals: Vec::new() }
     }
 
+    /// Appends an external chunk.
     pub fn push_external(&mut self, id: impl Into<String>, payload: &'a [u8]) {
         self.externals.push((id.into(), payload));
     }

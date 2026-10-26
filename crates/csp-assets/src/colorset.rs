@@ -24,9 +24,12 @@
 
 use crate::error::{Error, Result};
 
+/// One colour of a set.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Color {
+    /// 8-bit straight RGBA (alpha 0 is the transparent entry).
     pub rgba: [u8; 4],
+    /// Colour name, when it has one.
     pub name: Option<String>,
     /// The flag word as stored (0 or 1 so far).
     #[serde(skip)]
@@ -37,6 +40,7 @@ pub struct Color {
 }
 
 impl Color {
+    /// A colour, flagged as named when it has a name.
     pub fn new(rgba: [u8; 4], name: Option<&str>) -> Color {
         Color { rgba, name: name.map(str::to_owned), flag: name.is_some() as u32, extra: Vec::new() }
     }
@@ -47,8 +51,10 @@ impl Color {
     }
 }
 
+/// A `.cls` colour set.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct ColorSet {
+    /// Set name (UTF-8 copy).
     pub name: String,
     /// The Shift_JIS copy of the name, as stored (CSP writes it from the
     /// name; kept so that files round-trip even when it differs).
@@ -56,11 +62,15 @@ pub struct ColorSet {
     sjis_name: Vec<u8>,
     #[serde(skip)]
     after_sjis: u32,
+    /// Format version (0x0100).
     pub version: u16,
+    /// Format word as stored (4).
     pub format: u32,
+    /// The colours, in palette order.
     pub colors: Vec<Color>,
 }
 
+/// Whether the bytes start with the `SLCC` signature.
 pub fn looks_like(data: &[u8]) -> bool {
     data.starts_with(b"SLCC")
 }
@@ -89,10 +99,12 @@ impl<'a> Reader<'a> {
 }
 
 impl ColorSet {
+    /// A new set; the Shift_JIS name is made from `name`.
     pub fn new(name: &str, colors: Vec<Color>) -> ColorSet {
         ColorSet { name: name.into(), sjis_name: encode_sjis(name), after_sjis: 0, version: 0x0100, format: 4, colors }
     }
 
+    /// Parses a `.cls` file.
     pub fn parse(data: &[u8]) -> Result<ColorSet> {
         if !looks_like(data) {
             return Err(Error::format("not a colour set (no SLCC signature)"));
@@ -144,6 +156,7 @@ impl ColorSet {
         Ok(ColorSet { name, sjis_name, after_sjis, version, format, colors })
     }
 
+    /// The file; an unchanged set gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = b"SLCC".to_vec();
         out.extend_from_slice(&self.version.to_le_bytes());

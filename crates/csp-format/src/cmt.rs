@@ -78,32 +78,56 @@ const NODE_HEADER: u32 = 16;
 /// are refused rather than guessed.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub enum Value {
+    /// No value.
     Null,
+    /// `Byte`.
     Byte(u8),
+    /// `SByte`.
     SByte(i8),
+    /// `UInt16`.
     UInt16(u16),
+    /// `Int16`.
     Int16(i16),
+    /// `UInt32`.
     UInt32(u32),
+    /// `Int32`.
     Int32(i32),
+    /// `Single` (f32).
     Single(f32),
+    /// `Double` (f64).
     Double(f64),
+    /// `String` (UTF-8, at most 255 bytes, kept in the string table).
     String(String),
+    /// `Float2`.
     Float2([f32; 2]),
+    /// `Float3`.
     Float3([f32; 3]),
+    /// `Double2`.
     Double2([f64; 2]),
+    /// `Double3`.
     Double3([f64; 3]),
+    /// `SingleArray`.
     SingleArray(Vec<f32>),
+    /// `DoubleArray`.
     DoubleArray(Vec<f64>),
+    /// `ByteArray`.
     ByteArray(Vec<u8>),
+    /// `Int32Array`.
     Int32Array(Vec<i32>),
+    /// `StringArray`.
     StringArray(Vec<String>),
+    /// `Float2Array`.
     Float2Array(Vec<[f32; 2]>),
+    /// `Float3Array`.
     Float3Array(Vec<[f32; 3]>),
+    /// `Double2Array`.
     Double2Array(Vec<[f64; 2]>),
+    /// `Double3Array`.
     Double3Array(Vec<[f64; 3]>),
 }
 
 impl Value {
+    /// The type name stored in the document (`"null"` for no value).
     pub fn type_name(&self) -> &'static str {
         match self {
             Value::Null => "null",
@@ -167,6 +191,7 @@ impl Value {
         }
     }
 
+    /// The strings of a `StringArray`.
     pub fn as_strings(&self) -> Option<&[String]> {
         match self {
             Value::StringArray(v) => Some(v),
@@ -174,6 +199,7 @@ impl Value {
         }
     }
 
+    /// The text of a `String`.
     pub fn as_str(&self) -> Option<&str> {
         match self {
             Value::String(v) => Some(v),
@@ -194,17 +220,23 @@ impl Value {
 /// One node: a name, a value, attributes (name, value) and children.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Node {
+    /// Node name.
     pub name: String,
+    /// Node value.
     pub value: Value,
+    /// Attributes (name, value), in stored order.
     pub attributes: Vec<(String, String)>,
+    /// Child nodes, in stored order.
     pub children: Vec<Node>,
 }
 
 impl Node {
+    /// A node without attributes or children.
     pub fn new(name: impl Into<String>, value: Value) -> Self {
         Node { name: name.into(), value, attributes: Vec::new(), children: Vec::new() }
     }
 
+    /// The value of an attribute.
     pub fn attribute(&self, name: &str) -> Option<&str> {
         self.attributes.iter().find(|(key, _)| key == name).map(|(_, value)| value.as_str())
     }
@@ -214,6 +246,7 @@ impl Node {
         self.children.iter().find(|child| child.name == name)
     }
 
+    /// The first child with this name, mutably.
     pub fn child_mut(&mut self, name: &str) -> Option<&mut Node> {
         self.children.iter_mut().find(|child| child.name == name)
     }
@@ -223,6 +256,7 @@ impl Node {
         path.iter().try_fold(self, |node, name| node.child(name))
     }
 
+    /// Follow a path of child names, mutably.
     pub fn find_mut(&mut self, path: &[&str]) -> Option<&mut Node> {
         path.iter().try_fold(self, |node, name| node.child_mut(name))
     }
@@ -275,10 +309,12 @@ fn value_text(value: &Value) -> String {
 pub struct Document {
     /// `0100` or `0110`.
     pub version: String,
+    /// The root node.
     pub root: Node,
 }
 
 impl Document {
+    /// Parses a "cmt " document (checks the magic, the version and the CRC).
     pub fn parse(data: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(data);
         if reader.bytes(4)? != MAGIC {
@@ -315,6 +351,7 @@ impl Document {
         Ok(Document { version, root })
     }
 
+    /// The document bytes with a new CRC; an unchanged document gives the same bytes.
     pub fn to_bytes(&self) -> Result<Vec<u8>> {
         let types = types(&self.version);
         let mut strings: Vec<String> = types.iter().map(|t| (*t).to_owned()).collect();
@@ -338,6 +375,7 @@ impl Document {
         self.root.find(&["General", "ActionNodeClip"])
     }
 
+    /// The `ActionNodeClip` node of a track mixer, mutably.
     pub fn action_clip_mut(&mut self) -> Option<&mut Node> {
         self.root.find_mut(&["General", "ActionNodeClip"])
     }

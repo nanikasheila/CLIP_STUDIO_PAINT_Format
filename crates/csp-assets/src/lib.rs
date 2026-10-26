@@ -7,6 +7,7 @@
 //! kept as bytes and never decrypted.
 
 #![deny(unsafe_code)]
+#![warn(missing_docs)]
 
 pub mod action;
 pub mod c2f;

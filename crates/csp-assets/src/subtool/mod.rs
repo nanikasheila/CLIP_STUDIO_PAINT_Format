@@ -49,28 +49,44 @@ pub enum ToolKind {
     Folder,
     /// Freehand drawing: pens, pencils, brushes, airbrushes (output 10, 11, 14).
     Brush,
+    /// 消しゴム (output 12).
     Eraser,
     /// Blend / copy stamp (色混ぜ, output 13 and similar).
     Blend,
+    /// 選択範囲 (output 20).
     Selection,
+    /// 塗りつぶし (output 31, 50, 51).
     Fill,
+    /// グラデーション (output 52, 54).
     Gradient,
+    /// 図形 (output 30, 32, 33).
     Shape,
+    /// テキスト (output 70).
     Text,
+    /// フキダシ (output 61, 62).
     Balloon,
+    /// コマ枠 (output 60, 63).
     Frame,
     /// Flash, concentration and stream lines (効果線).
     EffectLines,
+    /// ベクター線の編集: 線修正, ベクター消去 and the like (output 53, 80–85).
     VectorEdit,
+    /// 定規 (output 90–93).
     Ruler,
+    /// View tools: 虫めがね, 手のひら, 回転 (output 1–3).
     View,
+    /// 操作 and similar (output 40, 42, 45, 100, 110).
     Operation,
+    /// スポイト (output 41).
     Eyedropper,
+    /// ゆがみ (output 120).
     Liquify,
+    /// An output code not listed here.
     Other,
 }
 
 impl ToolKind {
+    /// The kind of a node's `NodeInputOp` / `NodeOutputOp`.
     pub fn of(input: i64, output: i64) -> ToolKind {
         match (input, output) {
             (0, 0) => ToolKind::Folder,
@@ -106,17 +122,28 @@ pub enum DbKind {
     ToolDb,
 }
 
+/// One `Node` row: a tool, a group or a sub tool.
 #[derive(Debug, Clone)]
 pub struct Node {
+    /// The whole row, for the columns not typed here.
     pub row: Row,
+    /// `NodeUuid`.
     pub uuid: Vec<u8>,
+    /// `NodeName`, as shown in CSP.
     pub name: String,
+    /// `NodeInputOp`.
     pub input_op: i64,
+    /// `NodeOutputOp`.
     pub output_op: i64,
+    /// `NodeRangeOp`.
     pub range_op: i64,
+    /// `NodeVariantID`: the settings row (0 for a tool or group).
     pub variant_id: i64,
+    /// `NodeInitVariantID`: the initial settings (初期設定) row.
     pub init_variant_id: i64,
+    /// `NodeFirstChildUuid`, None when there is no child.
     pub first_child: Option<Vec<u8>>,
+    /// `NodeNextUuid`, None when there is no next sibling.
     pub next: Option<Vec<u8>>,
 }
 
@@ -137,10 +164,12 @@ impl Node {
         }
     }
 
+    /// What the node does ([`ToolKind::Folder`] when it has no settings).
     pub fn kind(&self) -> ToolKind {
         if self.variant_id == 0 { ToolKind::Folder } else { ToolKind::of(self.input_op, self.output_op) }
     }
 
+    /// The uuid as lower-case hex digits.
     pub fn uuid_hex(&self) -> String {
         crate::serial::hex(&self.uuid)
     }
@@ -154,9 +183,13 @@ pub fn is_none(uuid: &[u8]) -> bool {
 /// A material stored in a `.sut`.
 #[derive(Debug, Clone, Serialize)]
 pub struct MaterialFile {
+    /// `OriginalPath`: the path the sub tool's material list names.
     pub original_path: String,
+    /// `CatalogPath`.
     pub catalog_path: String,
+    /// `InstallFolder`, as stored.
     pub install_folder: i64,
+    /// `FileData`: a tar of the material folder.
     #[serde(skip)]
     pub file_data: Vec<u8>,
 }
@@ -178,6 +211,7 @@ impl MaterialFile {
 pub struct TreeEntry {
     /// Index into [`SubToolDb::nodes`].
     pub node: usize,
+    /// Depth in the tree (0 the root).
     pub depth: usize,
     /// Names of the nodes above (the unnamed root left out).
     pub path: Vec<String>,
@@ -186,7 +220,9 @@ pub struct TreeEntry {
 /// Problems with the tree links.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct TreeCheck {
+    /// Nodes reached from the root.
     pub reachable: usize,
+    /// Nodes in the table.
     pub nodes: usize,
     /// Links to uuids no node has.
     pub missing_links: usize,
@@ -201,17 +237,24 @@ pub struct TreeCheck {
 }
 
 impl TreeCheck {
+    /// The links form a proper tree (unreachable nodes are allowed).
     pub fn closed(&self) -> bool {
         self.missing_links == 0 && self.repeated == 0 && self.missing_variants == 0
     }
 }
 
+/// A sub tool file or tool database, read into memory.
 pub struct SubToolDb {
     connection: Connection,
+    /// Which kind of file it is.
     pub kind: DbKind,
+    /// The `Manager` row.
     pub manager: Row,
+    /// Every `Node` row, in table order.
     pub nodes: Vec<Node>,
+    /// Every `Variant` row, by `VariantID`.
     pub variants: BTreeMap<i64, Row>,
+    /// `MaterialFile` rows (`.sut` only).
     pub materials: Vec<MaterialFile>,
 }
 
@@ -225,15 +268,18 @@ impl std::fmt::Debug for SubToolDb {
     }
 }
 
+/// Whether the bytes look like a sub tool file (a SQLite file).
 pub fn looks_like(data: &[u8]) -> bool {
     data.starts_with(b"SQLite format 3\0")
 }
 
 impl SubToolDb {
+    /// Reads a file into memory and opens it; the file is not changed.
     pub fn open(path: impl AsRef<std::path::Path>) -> Result<SubToolDb> {
         SubToolDb::from_bytes(&std::fs::read(path)?)
     }
 
+    /// Opens the bytes of a sub tool file or tool database.
     pub fn from_bytes(data: &[u8]) -> Result<SubToolDb> {
         if !looks_like(data) {
             return Err(Error::format("not a sub tool file (not SQLite)"));
@@ -274,6 +320,7 @@ impl SubToolDb {
         Ok(())
     }
 
+    /// The database (in memory).
     pub fn connection(&self) -> &Connection {
         &self.connection
     }
@@ -283,10 +330,12 @@ impl SubToolDb {
         serialize(&self.connection)
     }
 
+    /// `Manager.RootUuid`, the top node.
     pub fn root_uuid(&self) -> Option<Vec<u8>> {
         self.manager.blob("RootUuid").filter(|u| !is_none(u)).map(<[u8]>::to_vec)
     }
 
+    /// The settings shared by every sub tool (`Manager.CommonVariantID`).
     pub fn common_variant(&self) -> Option<&Row> {
         self.variants.get(&self.manager.int("CommonVariantID"))
     }
@@ -343,6 +392,7 @@ impl SubToolDb {
         (out, check)
     }
 
+    /// Problems with the tree links.
     pub fn check_tree(&self) -> TreeCheck {
         self.walk().1
     }
@@ -352,6 +402,7 @@ impl SubToolDb {
         self.tree().into_iter().filter(|e| self.nodes[e.node].variant_id != 0).collect()
     }
 
+    /// The settings row with this `VariantID`.
     pub fn variant(&self, id: i64) -> Option<&Row> {
         self.variants.get(&id)
     }

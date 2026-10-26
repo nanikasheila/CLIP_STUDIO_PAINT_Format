@@ -15,26 +15,33 @@
 
 use crate::error::{Error, Result};
 
+/// The first 8 bytes of a C2F file.
 pub const SIGNATURE: &[u8; 8] = b"\x89C2F\r\n\x1a\n";
 
+/// One chunk of the envelope.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Chunk {
+    /// Chunk type (`HEAD`, `dATA`, `TAIL`).
     pub kind: [u8; 4],
+    /// Chunk data (encrypted for `dATA`).
     pub data: Vec<u8>,
     /// The stored CRC matches the type and data.
     pub crc_ok: bool,
 }
 
 impl Chunk {
+    /// The type as text.
     pub fn kind_name(&self) -> String {
         String::from_utf8_lossy(&self.kind).into_owned()
     }
 }
 
+/// Whether the bytes start with [`SIGNATURE`].
 pub fn looks_like(data: &[u8]) -> bool {
     data.starts_with(SIGNATURE)
 }
 
+/// The chunks of a C2F file.
 pub fn parse(data: &[u8]) -> Result<Vec<Chunk>> {
     if !looks_like(data) {
         return Err(Error::format("not a C2F file"));
@@ -56,6 +63,7 @@ pub fn parse(data: &[u8]) -> Result<Vec<Chunk>> {
     Ok(chunks)
 }
 
+/// A C2F file of these chunks, with fresh CRCs.
 pub fn write(chunks: &[Chunk]) -> Vec<u8> {
     let mut out = SIGNATURE.to_vec();
     for chunk in chunks {
@@ -82,13 +90,17 @@ pub fn crc32(kind: &[u8], data: &[u8]) -> u32 {
 /// What an envelope holds, for reports.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Summary {
+    /// Chunk types, in order.
     pub chunks: Vec<String>,
+    /// Bytes of all `dATA` chunks.
     pub payload_bytes: usize,
+    /// Every CRC matches.
     pub crc_ok: bool,
     /// Always true for material data: the payload is encrypted.
     pub encrypted: bool,
 }
 
+/// The envelope summary of a C2F file.
 pub fn summarize(data: &[u8]) -> Result<Summary> {
     let chunks = parse(data)?;
     Ok(Summary {

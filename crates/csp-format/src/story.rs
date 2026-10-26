@@ -15,11 +15,13 @@ use crate::text::{Attributes, Record, ids, join_array, split_array};
 
 /// `Layer.ComicStoryInfoType` of the 作品情報 and (ノンブル) layers.
 pub const STORY_INFO: i64 = 1;
+/// `Layer.ComicStoryInfoType` of the (ノンブル) layer.
 pub const NOMBRE_INFO: i64 = 2;
 /// Layer column of a spread's story info layers: 1 for the right page's.
 pub const FOR_RIGHT_PAGE: &str = "ComicStoryInfoForRightPage";
 /// `CropFrameOptionFlag` bits CSP sets for a single left / right page (a spread has 17).
 pub const LEFT_PAGE_FLAG: i64 = 2;
+/// See [`LEFT_PAGE_FLAG`].
 pub const RIGHT_PAGE_FLAG: i64 = 4;
 
 /// Record 0x2e: which part of the story info a block is.
@@ -41,9 +43,11 @@ const TEXT_ARRAYS: [&str; 2] = ["TextLayerAttributesArray", "TextLayerAddAttribu
 pub enum StoryPart {
     /// 作品名・話数・サブタイトル.
     Title,
+    /// 作者名.
     Author,
     /// ページ番号 (`7ページ`).
     PageNumber,
+    /// ノンブル (visible or hidden).
     Nombre,
 }
 
@@ -58,6 +62,7 @@ impl StoryPart {
         }
     }
 
+    /// The part a block is marked as (record 0x2e), if marked.
     pub fn of(attributes: &Attributes) -> Option<StoryPart> {
         match attributes.get(ATTR_STORY_PART).map(i32s).as_deref() {
             Some([1]) => Some(StoryPart::Title),
@@ -84,8 +89,11 @@ impl StoryPart {
 /// Which edge of a text block stays where it is when its text changes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Align {
+    /// The left / top edge.
     Start,
+    /// The centre.
     Middle,
+    /// The right / bottom edge.
     End,
 }
 
@@ -100,14 +108,17 @@ impl Align {
     }
 }
 
+/// Little-endian `i32`s of a record value.
 pub fn i32s(value: &[u8]) -> Vec<i64> {
     value.as_chunks::<4>().0.iter().map(|bytes| i32::from_le_bytes(*bytes) as i64).collect()
 }
 
+/// `values` as little-endian `i32`s.
 pub fn i32_bytes(values: &[i64]) -> Vec<u8> {
     values.iter().flat_map(|value| (*value as i32).to_le_bytes()).collect()
 }
 
+/// Rounds half to even, as CSP does for text positions.
 pub fn round_half_even(value: f64) -> i64 {
     value.round_ties_even() as i64
 }
@@ -147,6 +158,7 @@ fn canvas_text(db: &Connection, column: &str) -> Result<String> {
     })
 }
 
+/// `Canvas.CanvasResolution` (dpi).
 pub fn resolution(db: &Connection) -> Result<f64> {
     match canvas_value(db, "CanvasResolution")? {
         Some(Value::Real(number)) => Ok(number),
@@ -155,6 +167,7 @@ pub fn resolution(db: &Connection) -> Result<f64> {
     }
 }
 
+/// `Canvas.CanvasDoublePage` is set.
 pub fn is_spread(db: &Connection) -> Result<bool> {
     Ok(matches!(canvas_value(db, "CanvasDoublePage")?, Some(Value::Integer(flag)) if flag != 0))
 }
@@ -364,6 +377,7 @@ pub fn string_array(db: &Connection, layer_id: i64) -> Result<Option<Vec<String>
     Ok(Some(split_array(&blob)?.into_iter().map(|bytes| String::from_utf8_lossy(bytes).into_owned()).collect()))
 }
 
+/// Replaces a layer's `TextLayerStringArray` (the texts of its blocks after the first).
 pub fn set_string_array(db: &Connection, layer_id: i64, strings: &[String]) -> Result<()> {
     set_layer_column(db, layer_id, "TextLayerStringArray", join_array(strings))
 }
@@ -424,8 +438,11 @@ pub fn update_page_number(db: &Connection, first_right: bool) -> Result<()> {
 /// it stays centred (上部 / 下部) as the number changes.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NombreStyle {
+    /// Text before the number.
     pub prefix: String,
+    /// Text after the number.
     pub suffix: String,
+    /// The ノンブル stays centred when the number changes.
     pub centred: bool,
 }
 

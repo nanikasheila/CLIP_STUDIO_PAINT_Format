@@ -72,25 +72,34 @@ const KIND_NAMES: &[(&str, &str)] = &[
     ("toolactionmovelayer", "レイヤーを移動"),
 ];
 
+/// One command of an action.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ActionItem {
+    /// The command (`layeractionrasternew`, …; see [`kind_name`]).
     pub kind: String,
+    /// The command is switched on (チェック).
     pub enabled: bool,
+    /// ダイアログを表示 is on.
     pub show_settings: bool,
     /// The command's parameters (serialisation JSON form).
     pub parameter: Json,
 }
 
+/// One auto action.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct Action {
+    /// `actionName`.
     pub name: String,
+    /// `actionUuid`.
     pub uuid: String,
+    /// The commands, in order.
     pub items: Vec<ActionItem>,
 }
 
 /// An auto action set, with the document it came from.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ActionSet {
+    /// The parsed file.
     pub document: Document,
 }
 
@@ -99,6 +108,7 @@ fn bool_of(object: &Object, key: &str) -> bool {
 }
 
 impl ActionSet {
+    /// Parses a `.laf` or `.las` file.
     pub fn parse(data: &[u8]) -> Result<ActionSet> {
         let document = Document::parse(data)?;
         if document.root.array("actionArray").is_none() {
@@ -107,18 +117,22 @@ impl ActionSet {
         Ok(ActionSet { document })
     }
 
+    /// The file; an unchanged set gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         self.document.to_bytes()
     }
 
+    /// `actionSetName`.
     pub fn name(&self) -> &str {
         self.document.root.str("actionSetName").unwrap_or("")
     }
 
+    /// Renames the set.
     pub fn set_name(&mut self, name: &str) {
         self.document.root.set("actionSetName", Value::String(name.into()));
     }
 
+    /// The actions, in order.
     pub fn actions(&self) -> Vec<Action> {
         let Some(actions) = self.document.root.array("actionArray") else { return Vec::new() };
         actions

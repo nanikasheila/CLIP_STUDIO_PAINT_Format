@@ -46,9 +46,13 @@ use crate::image::RgbaImage;
 /// Settings of a switched-on tone effect.
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize)]
 pub struct Tone {
+    /// Lines per inch.
     pub lines: f64,
+    /// The resolution `lines` refers to (dpi).
     pub resolution: f64,
+    /// Screen angle in degrees.
     pub angle: f64,
+    /// Dot shape: 1 round, 2 square, 4 lines.
     pub shape: u32,
     /// Where the density comes from: 0 the image, 2 `density`.
     pub mode: u32,

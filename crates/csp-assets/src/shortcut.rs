@@ -32,17 +32,23 @@ use csp_format::database::{open_bytes, select_all, table_exists};
 
 use crate::error::{Error, Result};
 
+/// Modifier bit of Alt in the shortcut tables.
 pub const ALT: i64 = 1;
+/// Modifier bit of Shift in the shortcut tables.
 pub const SHIFT: i64 = 2;
+/// Modifier bit of Ctrl in the shortcut tables.
 pub const CTRL: i64 = 4;
 
+/// A command's key (`shortcutmenu` / `workspaceshortcutmenu` row).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Shortcut {
     /// `basiccommand` or `advancedcommand`.
     pub kind: String,
+    /// `menucommand`: the command's id.
     pub command: String,
     /// Key name as CSP stores it (`S`, `F2`, `DELETE`, `NUM+` …).
     pub key: String,
+    /// [`CTRL`], [`SHIFT`] and [`ALT`] bits.
     pub modifiers: i64,
 }
 
@@ -60,19 +66,23 @@ impl Shortcut {
     }
 }
 
+/// A tool's key (`workspaceshortcuttool` row).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ToolShortcut {
     /// The tool node's UUID as hex.
     pub tool: String,
+    /// Key name as CSP stores it.
     pub key: String,
 }
 
+/// The shortcuts of a `.khc` (ショートカット設定) or `.spws` (workspace).
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
 pub struct Shortcuts {
     /// Commands with a key (rows without one are left out).
     pub commands: Vec<Shortcut>,
     /// Commands listed without a key.
     pub unassigned: Vec<String>,
+    /// Tools with a key.
     pub tools: Vec<ToolShortcut>,
 }
 
@@ -81,6 +91,7 @@ fn no_key(key: &str) -> bool {
 }
 
 impl Shortcuts {
+    /// Opens the bytes of a `.khc` or `.spws`.
     pub fn from_bytes(data: &[u8]) -> Result<Shortcuts> {
         if !crate::subtool::looks_like(data) {
             return Err(Error::format("not a shortcut file (not SQLite)"));
@@ -88,6 +99,7 @@ impl Shortcuts {
         Shortcuts::read(&open_bytes(data)?)
     }
 
+    /// Reads the shortcut tables of an open database.
     pub fn read(connection: &Connection) -> Result<Shortcuts> {
         let menu = ["shortcutmenu", "workspaceshortcutmenu"]
             .into_iter()
@@ -127,10 +139,14 @@ impl Shortcuts {
 
 /// Keys of a modifier key setting entry.
 pub const MOD_SHIFT: u32 = 1;
+/// Modifier key setting bit of Ctrl.
 pub const MOD_CTRL: u32 = 2;
+/// Modifier key setting bit of Alt.
 pub const MOD_ALT: u32 = 4;
+/// Modifier key setting bit of Space.
 pub const MOD_SPACE: u32 = 8;
 
+/// What a modifier key setting does.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
@@ -140,12 +156,20 @@ pub enum ModifierAction {
     /// Action 1: an operation of the tool (e.g. 100 straight line).
     Operation(u32),
     /// Another action number and its payload.
-    Other { action: u32, payload: String },
+    Other {
+        /// The action number.
+        action: u32,
+        /// Its payload as hex.
+        payload: String,
+    },
 }
 
+/// One modifier key setting: the keys and what they do.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ModifierEntry {
+    /// [`MOD_SHIFT`], [`MOD_CTRL`], [`MOD_ALT`] and [`MOD_SPACE`] bits.
     pub keys: u32,
+    /// What the keys do.
     pub action: ModifierAction,
 }
 
@@ -166,12 +190,17 @@ impl ModifierEntry {
     }
 }
 
+/// The modifier key settings of one kind of tool (by its operation codes).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ModifierRule {
+    /// `NodeInputOp` of the tools the rule is for.
     pub input_op: i64,
+    /// `NodeOutputOp` of the tools the rule is for.
     pub output_op: i64,
+    /// `NodeRangeOp` of the tools the rule is for.
     pub range_op: i64,
+    /// The entries.
     pub entries: Vec<ModifierEntry>,
 }
 

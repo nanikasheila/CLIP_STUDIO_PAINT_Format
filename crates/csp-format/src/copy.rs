@@ -52,6 +52,7 @@ pub const LAYER_TABLES: [&str; 9] = [
     "BrushFixedSpray",
     "FillStyle",
 ];
+/// The `Canvas` columns copied with the tables of [`LAYER_TABLES`].
 pub const LAYER_CANVAS_COLUMNS: [&str; 2] = ["BrushStyleManager", "BrushStyleReadProtect070"];
 /// Rows vector objects refer to by id, copied keeping their ids: the brush
 /// styles and every table `BrushStyleManager` and `BrushStyle` link to.
@@ -95,7 +96,9 @@ pub type RowHook<'a> = dyn FnMut(&mut Row) -> Result<()> + 'a;
 /// What `ParamScheme` says about one column.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ColumnInfo {
+    /// Table the column refers to (`ParamScheme` link), if any.
     pub link_table: Option<String>,
+    /// `ParamScheme.OwnerType` of the column.
     pub owner_type: i64,
 }
 
@@ -187,6 +190,7 @@ pub struct RowCopier<'a> {
 }
 
 impl<'a> RowCopier<'a> {
+    /// A copier reading from `source`. `payload_hook` rewrites external payloads as they are copied; `canvas_id` is the target's `Canvas.MainId`.
     pub fn new(source: &'a ClipFile, payload_hook: Option<&'a PayloadHook<'a>>, canvas_id: i64) -> Result<Self> {
         Ok(RowCopier {
             source,

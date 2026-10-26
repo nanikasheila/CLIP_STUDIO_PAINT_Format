@@ -30,9 +30,13 @@ use crate::image::RgbaImage;
 /// The placement of an image material.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct Placement {
+    /// Width of the original image in pixels.
     pub width: u32,
+    /// Height of the original image in pixels.
     pub height: u32,
+    /// Scale (x, y) as stored; the corners are what is drawn.
     pub scale: (f64, f64),
+    /// Centre in layer pixels.
     pub center: (f64, f64),
     /// Where (0, 0), (w, 0), (0, h) and (w, h) of the original go.
     pub corners: [(f64, f64); 4],
@@ -41,6 +45,7 @@ pub struct Placement {
 const CORNERS_AT: usize = 120;
 
 impl Placement {
+    /// Parses `ResizableImageInfo`.
     pub fn parse(data: &[u8]) -> Result<Self> {
         if data.len() < CORNERS_AT + 64 {
             bail!("ResizableImageInfo of {} bytes, expected at least 184", data.len());

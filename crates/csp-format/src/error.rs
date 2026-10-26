@@ -14,9 +14,11 @@ pub enum Error {
     Sqlite(rusqlite::Error),
 }
 
+/// Result with this crate's [`Error`].
 pub type Result<T> = std::result::Result<T, Error>;
 
 impl Error {
+    /// An [`Error::Format`] with this message.
     pub fn format(message: impl Into<String>) -> Self {
         Error::Format(message.into())
     }

@@ -27,36 +27,55 @@ use serde_json::{Map, Value as Json, json};
 
 use crate::error::{Error, Result};
 
+/// Tag of a string.
 pub const TAG_STRING: u8 = 0x06;
+/// Tag of a byte string.
 pub const TAG_BYTES: u8 = 0x07;
+/// Tag of a bool.
 pub const TAG_BOOL: u8 = 0x11;
+/// Tag of a signed number.
 pub const TAG_INT: u8 = 0x13;
+/// Tag of an unsigned number.
 pub const TAG_UINT: u8 = 0x14;
+/// Tag of an `f64`.
 pub const TAG_REAL: u8 = 0x15;
+/// Tag of an array.
 pub const TAG_ARRAY: u8 = 0x48;
+/// Tag of an object.
 pub const TAG_OBJECT: u8 = 0x49;
 
 /// Named values in file order.
 pub type Fields = Vec<(String, Value)>;
 
+/// One value of the tree.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
+    /// A string (0x06).
     String(String),
+    /// Bytes (0x07).
     Bytes(Vec<u8>),
     /// 0x11, 0x13 or 0x14 with the stored big-endian bytes (kept so that
     /// unusual widths survive a round trip).
     Number {
+        /// 0x11, 0x13 or 0x14.
         tag: u8,
+        /// The big-endian bytes as stored.
         raw: Vec<u8>,
     },
+    /// An `f64` (0x15).
     Real(f64),
+    /// An array (0x48).
     Array {
+        /// Fields before the items.
         head: Fields,
+        /// The items.
         items: Vec<Value>,
     },
+    /// An object (0x49).
     Object(Object),
 }
 
+/// An object: a head (its type name) and its members.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Object {
     /// The first field group: `typename` (the class name, often empty).
@@ -65,8 +84,10 @@ pub struct Object {
     pub body: Fields,
 }
 
+/// A whole file.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Document {
+    /// The root object.
     pub root: Object,
     /// Bytes after the root object.
     pub trailing: Vec<u8>,
@@ -78,15 +99,18 @@ pub fn looks_like(data: &[u8]) -> bool {
 }
 
 impl Value {
+    /// A bool as CSP writes it.
     pub fn bool(value: bool) -> Value {
         Value::Number { tag: TAG_BOOL, raw: vec![value as u8] }
     }
 
+    /// A signed number in the width CSP uses.
     pub fn int(value: i64) -> Value {
         let raw = if value < 0 { (value as i32).to_be_bytes().to_vec() } else { minimal(value as u64) };
         Value::Number { tag: TAG_INT, raw }
     }
 
+    /// An unsigned number in the minimal width.
     pub fn uint(value: u64) -> Value {
         Value::Number { tag: TAG_UINT, raw: minimal(value) }
     }
@@ -103,6 +127,7 @@ impl Value {
         }
     }
 
+    /// Numbers and reals as `f64`.
     pub fn as_f64(&self) -> Option<f64> {
         match self {
             Value::Real(value) => Some(*value),
@@ -111,6 +136,7 @@ impl Value {
         }
     }
 
+    /// The text of a string.
     pub fn as_str(&self) -> Option<&str> {
         match self {
             Value::String(text) => Some(text),
@@ -118,6 +144,7 @@ impl Value {
         }
     }
 
+    /// The bytes of a byte string.
     pub fn as_bytes(&self) -> Option<&[u8]> {
         match self {
             Value::Bytes(bytes) => Some(bytes),
@@ -125,6 +152,7 @@ impl Value {
         }
     }
 
+    /// The object of an object value.
     pub fn as_object(&self) -> Option<&Object> {
         match self {
             Value::Object(object) => Some(object),
@@ -132,6 +160,7 @@ impl Value {
         }
     }
 
+    /// The items of an array.
     pub fn as_array(&self) -> Option<&[Value]> {
         match self {
             Value::Array { items, .. } => Some(items),
@@ -139,6 +168,7 @@ impl Value {
         }
     }
 
+    /// The tag the value is written with.
     pub fn tag(&self) -> u8 {
         match self {
             Value::String(_) => TAG_STRING,
@@ -152,18 +182,22 @@ impl Value {
 }
 
 impl Object {
+    /// An object with this type name and members.
     pub fn new(typename: &str, body: Fields) -> Object {
         Object { head: vec![("typename".into(), Value::String(typename.into()))], body }
     }
 
+    /// The `typename` of the head (empty when missing).
     pub fn typename(&self) -> &str {
         self.head.iter().find(|(k, _)| k == "typename").and_then(|(_, v)| v.as_str()).unwrap_or("")
     }
 
+    /// The member with this key.
     pub fn get(&self, key: &str) -> Option<&Value> {
         self.body.iter().find(|(k, _)| k == key).map(|(_, v)| v)
     }
 
+    /// The member with this key, mutably.
     pub fn get_mut(&mut self, key: &str) -> Option<&mut Value> {
         self.body.iter_mut().find(|(k, _)| k == key).map(|(_, v)| v)
     }
@@ -176,22 +210,27 @@ impl Object {
         }
     }
 
+    /// A string member.
     pub fn str(&self, key: &str) -> Option<&str> {
         self.get(key).and_then(Value::as_str)
     }
 
+    /// A number member as `i64`.
     pub fn i64(&self, key: &str) -> Option<i64> {
         self.get(key).and_then(Value::as_i64)
     }
 
+    /// A number member as `f64`.
     pub fn f64(&self, key: &str) -> Option<f64> {
         self.get(key).and_then(Value::as_f64)
     }
 
+    /// An object member.
     pub fn object(&self, key: &str) -> Option<&Object> {
         self.get(key).and_then(Value::as_object)
     }
 
+    /// The items of an array member.
     pub fn array(&self, key: &str) -> Option<&[Value]> {
         self.get(key).and_then(Value::as_array)
     }
@@ -322,12 +361,14 @@ impl<'a> Reader<'a> {
 }
 
 impl Document {
+    /// Parses a file; bytes after the root object go into `trailing`.
     pub fn parse(data: &[u8]) -> Result<Document> {
         let mut reader = Reader { data, at: 0 };
         let root = reader.object(0)?;
         Ok(Document { root, trailing: data[reader.at..].to_vec() })
     }
 
+    /// The file; an unchanged document gives the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
         write_object(&mut out, &self.root);
@@ -344,6 +385,7 @@ impl Document {
         json
     }
 
+    /// Reads the JSON of [`Document::to_json`].
     pub fn from_json(json: &Json) -> Result<Document> {
         let trailing = match json.get("@trailing") {
             Some(Json::String(text)) => unhex(text)?,

@@ -6,9 +6,12 @@
 
 use crate::error::{Error, Result};
 
+/// One regular file of an archive.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Entry {
+    /// Path inside the archive.
     pub name: String,
+    /// File contents.
     pub data: Vec<u8>,
 }
 
@@ -26,6 +29,7 @@ fn text(field: &[u8]) -> String {
     String::from_utf8_lossy(&field[..end]).into_owned()
 }
 
+/// The regular files of a ustar archive.
 pub fn read(data: &[u8]) -> Result<Vec<Entry>> {
     let mut entries = Vec::new();
     let mut at = 0;
@@ -66,7 +70,7 @@ pub fn write(entries: &[Entry]) -> Result<Vec<u8>> {
     write_at(entries, 0)
 }
 
-/// [`write`] with every entry stamped `mtime` (seconds since 1970).
+/// [`write()`] with every entry stamped `mtime` (seconds since 1970).
 pub fn write_at(entries: &[Entry], mtime: u64) -> Result<Vec<u8>> {
     let mut out = Vec::new();
     for entry in entries {

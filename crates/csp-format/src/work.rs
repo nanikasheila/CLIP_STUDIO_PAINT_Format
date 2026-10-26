@@ -45,6 +45,7 @@ pub enum Binding {
 }
 
 impl Binding {
+    /// The stored `ComicBindPosition` value.
     pub fn code(self) -> i64 {
         match self {
             Binding::Right => 1,
@@ -52,6 +53,7 @@ impl Binding {
         }
     }
 
+    /// Reads `ComicBindPosition` (anything but 1 is left binding).
     pub fn from_code(code: i64) -> Self {
         if code == 1 { Binding::Right } else { Binding::Left }
     }
@@ -67,6 +69,7 @@ pub enum StartSide {
 }
 
 impl StartSide {
+    /// The stored `ComicStartPage` value.
     pub fn code(self) -> i64 {
         match self {
             StartSide::Left => 0,
@@ -74,6 +77,7 @@ impl StartSide {
         }
     }
 
+    /// Reads `ComicStartPage` (anything but 1 starts on the left).
     pub fn from_code(code: i64) -> Self {
         if code == 1 { StartSide::Right } else { StartSide::Left }
     }
@@ -89,6 +93,7 @@ pub fn is_left_page(position: usize, start: StartSide) -> bool {
 pub struct PageSlot {
     /// Position of the (first) page, counted from 0.
     pub position: usize,
+    /// The file is a two-page spread.
     pub spread: bool,
     /// Side of the page at `position`.
     pub left: bool,
@@ -99,6 +104,7 @@ pub struct PageSlot {
 pub struct NewWork {
     /// Finished (trim) size of one page.
     pub trim_width: f64,
+    /// Height of the finished page.
     pub trim_height: f64,
     /// Bleed around the trim (裁ち落とし幅).
     pub bleed: f64,
@@ -108,9 +114,13 @@ pub struct NewWork {
     pub pages: usize,
     /// Join facing pages into spreads (対向ページを見開きにする).
     pub spreads: bool,
+    /// Binding side.
     pub binding: Binding,
+    /// Side of the first page.
     pub start: StartSide,
+    /// Title written into the story info (作品情報).
     pub title: String,
+    /// Author written into the story info.
     pub author: String,
 }
 
@@ -134,7 +144,9 @@ impl Default for NewWork {
 /// The bytes of a new work: the .cmc and its page files (names relative to
 /// the .cmc's folder).
 pub struct WorkFiles {
+    /// The .cmc file.
     pub cmc: Vec<u8>,
+    /// Page files: name relative to the .cmc's folder ("page0001.clip") and bytes.
     pub pages: Vec<(String, Vec<u8>)>,
 }
 
@@ -160,6 +172,7 @@ impl NewWork {
         (if spread { width * 2.0 } else { width }, self.trim_height + 2.0 * self.bleed)
     }
 
+    /// Builds the .cmc and the page files. Write the pages next to the .cmc.
     pub fn build(&self) -> Result<WorkFiles> {
         if self.pages == 0 {
             bail!("A work needs at least one page");

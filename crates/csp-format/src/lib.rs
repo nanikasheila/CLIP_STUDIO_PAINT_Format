@@ -4,6 +4,7 @@
 //! and is written down in `docs/spec/`. Input files are never modified.
 
 #![deny(unsafe_code)]
+#![warn(missing_docs)]
 
 pub mod animation;
 #[doc(hidden)]

@@ -35,23 +35,28 @@ pub struct Row {
 }
 
 impl Row {
+    /// A row with these columns and values (same length and order).
     pub fn new(columns: Vec<String>, values: Vec<Value>) -> Self {
         let index = columns.iter().enumerate().map(|(i, name)| (name.clone(), i)).collect();
         Row { columns: Arc::new(columns), index: Arc::new(index), values }
     }
 
+    /// Column names, in table order.
     pub fn columns(&self) -> &[String] {
         &self.columns
     }
 
+    /// Values, in column order.
     pub fn values(&self) -> &[Value] {
         &self.values
     }
 
+    /// (column, value) pairs in table order.
     pub fn iter(&self) -> impl Iterator<Item = (&str, &Value)> {
         self.columns.iter().map(String::as_str).zip(self.values.iter())
     }
 
+    /// The value of a column; None when the table has no such column.
     pub fn get(&self, column: &str) -> Option<&Value> {
         self.index.get(column).map(|i| &self.values[*i])
     }
@@ -71,6 +76,7 @@ impl Row {
         self.opt_int(column).unwrap_or(0)
     }
 
+    /// Integer value (reals are truncated); None when NULL, missing or not a number.
     pub fn opt_int(&self, column: &str) -> Option<i64> {
         match self.get(column)? {
             Value::Integer(value) => Some(*value),
@@ -79,10 +85,12 @@ impl Row {
         }
     }
 
+    /// Real value; NULL, missing and non-numeric read as 0.0.
     pub fn real(&self, column: &str) -> f64 {
         self.opt_real(column).unwrap_or(0.0)
     }
 
+    /// Real value (integers converted); None when NULL, missing or not a number.
     pub fn opt_real(&self, column: &str) -> Option<f64> {
         match self.get(column)? {
             Value::Integer(value) => Some(*value as f64),
@@ -100,6 +108,7 @@ impl Row {
         }
     }
 
+    /// Blob value (text as its UTF-8 bytes); None when NULL or missing.
     pub fn blob(&self, column: &str) -> Option<&[u8]> {
         match self.get(column)? {
             Value::Blob(value) => Some(value),
@@ -161,6 +170,7 @@ pub fn select_all(connection: &Connection, table: &str) -> Result<Vec<Row>> {
     select(connection, &format!("SELECT * FROM {} ORDER BY rowid", quote(table)), [])
 }
 
+/// Whether the database has a table with this name.
 pub fn table_exists(connection: &Connection, table: &str) -> Result<bool> {
     let count: i64 = connection.query_row(
         "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?1",
@@ -170,6 +180,7 @@ pub fn table_exists(connection: &Connection, table: &str) -> Result<bool> {
     Ok(count > 0)
 }
 
+/// Names of all tables, in creation order.
 pub fn tables(connection: &Connection) -> Result<Vec<String>> {
     let mut statement = connection.prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY rowid")?;
     let names = statement.query_map([], |row| row.get::<_, String>(0))?;
@@ -183,10 +194,12 @@ pub fn columns(connection: &Connection, table: &str) -> Result<Vec<(String, Stri
     Ok(names.collect::<std::result::Result<_, _>>()?)
 }
 
+/// Whether `table` has a column named `column`.
 pub fn has_column(connection: &Connection, table: &str, column: &str) -> Result<bool> {
     Ok(columns(connection, table)?.iter().any(|(name, _)| name == column))
 }
 
+/// Same as [`table_exists`].
 pub fn has_table(connection: &Connection, table: &str) -> Result<bool> {
     let count: i64 = connection.query_row(
         "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?1",

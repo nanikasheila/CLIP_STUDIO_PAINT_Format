@@ -24,17 +24,25 @@ use crate::error::{Result, bail};
 
 /// `CanvasNode.Type` values.
 pub const NODE_ROOT: i64 = 0;
+/// `CanvasNode.Type` of a page.
 pub const NODE_PAGE: i64 = 2;
 
 /// One `CanvasNode` row.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct CanvasNode {
+    /// `MainId` of the row.
     pub main_id: i64,
+    /// `Type`: [`NODE_ROOT`] or [`NODE_PAGE`].
     pub kind: i64,
+    /// `MainId` of the next page (`NextIndex`, 0 ends the list).
     pub next: i64,
+    /// `MainId` of the first page (`FirstChildIndex`, root node only).
     pub first_child: i64,
+    /// `MainId` of the page selected in CSP (`SelectedIndex`, root node only).
     pub selected: i64,
+    /// The page is a two-page spread (`PageFlag` bit 0).
     pub spread: bool,
+    /// `LinkPath` as stored (".:page0001.clip"); see [`CanvasNode::relative_path`].
     pub link_path: Option<String>,
 }
 
@@ -62,19 +70,27 @@ impl CanvasNode {
 /// Work settings from `Project` (the common subset; the row has more).
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
 pub struct CmcProject {
+    /// `ProjectInternalVersion`.
     pub version: Option<String>,
+    /// `MainId` of the root `CanvasNode` (`ProjectRootCanvasNode`).
     pub root_node: i64,
     /// `ComicBindPosition`: 1 right binding (右綴じ), 0 left ([`crate::work::Binding`]).
     pub bind_position: i64,
     /// `ComicStartPage`: 0 the first page is on the left, 1 on the right.
     pub start_page: i64,
+    /// The work has covers (`ComicCoverExist`).
     pub cover: bool,
     /// `DefaultPageUnit` (0 = px, 2 = mm in the samples).
     pub page_unit: i64,
+    /// Default page width in `page_unit` (`DefaultPageWidth`).
     pub page_width: f64,
+    /// Default page height in `page_unit` (`DefaultPageHeight`).
     pub page_height: f64,
+    /// Default page resolution in dpi (`DefaultPageResolution`).
     pub page_resolution: f64,
+    /// New pages are spreads (`DefaultPageDoublePage`).
     pub double_page: bool,
+    /// Highest NNNN used by a page file (`MaxCanvasFileIndex`); new files take the next one.
     pub max_canvas_file_index: i64,
 }
 
@@ -101,15 +117,19 @@ pub struct CmcFile {
     original: Vec<u8>,
     pub(crate) connection: Connection,
     pub(crate) modified: bool,
+    /// The work settings.
     pub project: CmcProject,
+    /// Every `CanvasNode` row, in table order (the page order is [`CmcFile::pages`]).
     pub nodes: Vec<CanvasNode>,
 }
 
 impl CmcFile {
+    /// Reads a .cmc. The file is not kept open or changed.
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
         Self::from_bytes(std::fs::read(path)?)
     }
 
+    /// Parses the bytes of a .cmc (a plain SQLite file).
     pub fn from_bytes(data: Vec<u8>) -> Result<Self> {
         if !data.starts_with(b"SQLite format 3\0") {
             bail!("Not a .cmc (SQLite) file");
@@ -129,6 +149,7 @@ impl CmcFile {
         Ok(())
     }
 
+    /// The database (in memory; changes are saved by [`CmcFile::save`]).
     pub fn database(&self) -> &Connection {
         &self.connection
     }
@@ -138,10 +159,12 @@ impl CmcFile {
         crate::VersionInfo::read(&self.connection, Some(&self.original))
     }
 
+    /// The node with this `MainId`.
     pub fn node(&self, main_id: i64) -> Option<&CanvasNode> {
         self.nodes.iter().find(|node| node.main_id == main_id)
     }
 
+    /// The root node (`Project.ProjectRootCanvasNode`, else the first node of type [`NODE_ROOT`]).
     pub fn root(&self) -> Result<&CanvasNode> {
         self.node(self.project.root_node)
             .or_else(|| self.nodes.iter().find(|node| node.kind == NODE_ROOT))
@@ -333,6 +356,7 @@ impl CmcFile {
         Ok(path)
     }
 
+    /// Something was changed since the file was read.
     pub fn is_modified(&self) -> bool {
         self.modified
     }
@@ -345,6 +369,7 @@ impl CmcFile {
         database::serialize(&self.connection)
     }
 
+    /// Writes [`CmcFile::to_bytes`] to a file.
     pub fn save(&self, path: impl AsRef<Path>) -> Result<()> {
         std::fs::write(path, self.to_bytes()?)?;
         Ok(())

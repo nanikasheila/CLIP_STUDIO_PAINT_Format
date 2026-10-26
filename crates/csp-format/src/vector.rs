@@ -25,22 +25,30 @@
 use crate::binary::{Reader, Writer, be_f64_at, be_u32_at};
 use crate::error::{Result, bail};
 
+/// Header flag (+20) of a closed shape.
 pub const FLAG_CLOSED: u32 = 0x1000;
 
 /// One stroke or shape. `header` and every point keep their raw bytes.
 #[derive(Debug, Clone, PartialEq)]
 pub struct VectorObject {
+    /// The header bytes (its size is the first `u32`).
     pub header: Vec<u8>,
+    /// Bytes per point (from the header).
     pub point_size: usize,
+    /// Each point's bytes.
     pub points: Vec<Vec<u8>>,
 }
 
 /// Typed view of one point.
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize)]
 pub struct Point {
+    /// X in layer pixels.
     pub x: f64,
+    /// Y in layer pixels.
     pub y: f64,
+    /// Bounding box of the point's stamp in layer pixels (x0, y0, x1, y1).
     pub bbox: [i32; 4],
+    /// Point flags (`u32` at +32).
     pub flags: u32,
     /// The f32 values after the flags (meaning partly unknown, see the spec).
     pub values: [f32; 13],
@@ -53,22 +61,27 @@ fn put(data: &mut [u8], offset: usize, bytes: &[u8]) {
 }
 
 impl VectorObject {
+    /// Header size in bytes (88, 92 or 96 in CSP files; 24 for some old objects).
     pub fn header_size(&self) -> usize {
         self.header.len()
     }
 
+    /// Header flags (`u32` at +20).
     pub fn flags(&self) -> u32 {
         be_u32_at(&self.header, 20)
     }
 
+    /// The shape is closed ([`FLAG_CLOSED`]).
     pub fn is_closed(&self) -> bool {
         self.flags() & FLAG_CLOSED != 0
     }
 
+    /// Bounding box in layer pixels (x0, y0, x1, y1).
     pub fn bbox(&self) -> [i32; 4] {
         [0, 4, 8, 12].map(|i| be_u32_at(&self.header, 24 + i) as i32)
     }
 
+    /// Sets the bounding box.
     pub fn set_bbox(&mut self, bbox: [i32; 4]) {
         for (i, value) in bbox.iter().enumerate() {
             put(&mut self.header, 24 + 4 * i, &value.to_be_bytes());
@@ -81,10 +94,12 @@ impl VectorObject {
         [0, 4, 8].map(|i| (be_u32_at(&self.header, 40 + i) >> 24) as u8)
     }
 
+    /// Sub colour as 8-bit RGB.
     pub fn sub_color(&self) -> [u8; 3] {
         [0, 4, 8].map(|i| (be_u32_at(&self.header, 52 + i) >> 24) as u8)
     }
 
+    /// Opacity 0.0–1.0 (`f64` at +64).
     pub fn opacity(&self) -> f64 {
         be_f64_at(&self.header, 64)
     }
@@ -103,6 +118,7 @@ impl VectorObject {
         self.brush_size_offset().map(|offset| be_f64_at(&self.header, offset))
     }
 
+    /// Sets the brush size, for header layouts that have one.
     pub fn set_brush_size(&mut self, size: f64) {
         if let Some(offset) = self.brush_size_offset() {
             put(&mut self.header, offset, &size.to_be_bytes());
@@ -127,6 +143,7 @@ impl VectorObject {
         self.shape_kind().is_some_and(|kind| kind & 0xff == 0x11)
     }
 
+    /// The typed view of point `index`.
     pub fn point(&self, index: usize) -> Option<Point> {
         let raw = self.points.get(index)?;
         let mut values = [0f32; 13];
@@ -142,6 +159,7 @@ impl VectorObject {
         })
     }
 
+    /// (x, y) of every point, in layer pixels.
     pub fn coordinates(&self) -> Vec<(f64, f64)> {
         self.points.iter().map(|raw| (be_f64_at(raw, 0), be_f64_at(raw, 8))).collect()
     }
@@ -185,12 +203,14 @@ impl VectorObject {
 pub struct VectorData {
     /// The first u32 (always 0 in the corpus).
     pub lead: u32,
+    /// The objects, in drawing order.
     pub objects: Vec<VectorObject>,
     /// Bytes after the declared length (none in the corpus).
     pub trailing: Vec<u8>,
 }
 
 impl VectorData {
+    /// Parses a `VectorObjectList.VectorData` external payload.
     pub fn parse(payload: &[u8]) -> Result<Self> {
         let mut reader = Reader::new(payload);
         let lead = reader.be_u32()?;
@@ -221,6 +241,7 @@ impl VectorData {
         Ok(VectorData { lead, objects, trailing: payload[end..].to_vec() })
     }
 
+    /// The payload; unchanged objects give the same bytes.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut body = Writer::new();
         for object in &self.objects {
