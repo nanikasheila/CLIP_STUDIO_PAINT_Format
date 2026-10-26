@@ -15,8 +15,6 @@ CLIP STUDIO PAINT のファイル（`.clip` / `.cmc`）と、サブツール・�
 
 ```sh
 pip install csp-format
-# Before 0.1.0 is on PyPI / PyPI に出るまでは（COMMIT: a commit of the repository）
-pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format@COMMIT#subdirectory=python"
 ```
 
 ```python

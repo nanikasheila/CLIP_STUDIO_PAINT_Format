@@ -47,16 +47,15 @@ render, some layer effects, 3D) is listed in [the specification](docs/spec/READM
 
 ## Getting it
 
-The first version (0.1.0) is not published yet: there is nothing on
-crates.io or PyPI and no GitHub release. Until then, point at a commit or
-build locally.
-
-| Use | Now | Once 0.1.0 is published |
-|---|---|---|
-| Rust library | `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format", rev = "COMMIT" }` (`csp-assets` the same) | `cargo add csp-format` / `cargo add csp-assets` |
-| CLI | clone and `cargo build --release -p cspf` (or `cargo install --git https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format cspf`) | a binary from the [releases](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases) (Windows, macOS, Linux) or `cargo install cspf` |
-| Python (reading) | `pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format@COMMIT#subdirectory=python"` | `pip install csp-format` |
+| Use | How |
+|---|---|
+| Rust library | `cargo add csp-format` (and `cargo add csp-assets`) |
+| CLI | a binary from the [releases](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases) (Windows, macOS, Linux) or `cargo install cspf` |
+| Python (reading) | `pip install csp-format` |
 | Other languages | the JSON of `cspf inspect` / `layers` / `anim` and the PNGs of `extract` / `render` |
+
+For the latest main: `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format" }`, or clone and
+`cargo build --release -p cspf`.
 
 Building needs a C compiler: SQLite and zlib are compiled in (the reference
 C zlib is needed to reproduce CSP's compressed bytes). Minimum Rust: 1.88.
