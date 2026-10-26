@@ -198,10 +198,10 @@ DualThicknessEffector	ブラシ先端（デュアルブラシ）	厚さの影響
 DualUsePatternImage	ブラシ先端（デュアルブラシ）	先端形状: 素材	0 円形, 1 素材	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 DualUseSpray	散布効果（デュアルブラシ）	散布効果	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 DualVerticalThicknes	ブラシ先端（デュアルブラシ）	厚さの適用方向	0 水平, 1 垂直	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DustMode	ゴミ取り	モード		推測	INTEGER	17	vectorEdit,?	0	2	
-DustModeForSelect	ゴミ取り	選択範囲のモード		推測	INTEGER	9	selection,?	0	0	
-DustSize	ゴミ取り	ゴミサイズ		推測	REAL	26	vectorEdit,selection,?	4.0	10.0	
-DustSizeUnit	ゴミ取り	ゴミサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	26	vectorEdit,selection,?	0	0	
+DustMode	ごみ取り	モード	一覧の並び順 0 不透明の点を消す, 1 白地の中の点を消す, 2 透明の穴を周囲の色で埋める, 3 透明の穴を描画色で埋める	確認済み（W4: 0・1・3）	INTEGER	17	vectorEdit,?	0	2	
+DustModeForSelect	ごみ選択	モード	0 不透明の点を選択, 1 白地の中の点を選択, 3 透明の穴を選択（DustMode と同じ番号で 2 は無い）	確認済み（W4: 3 つとも）	INTEGER	9	selection,?	0	0	
+DustSize	ごみ取り / ごみ選択	ごみのサイズ	数値（単位は DustSizeUnit）	確認済み（W4: ごみ取り）	REAL	26	vectorEdit,selection,?	4.0	10.0	
+DustSizeUnit	ごみ取り / ごみ選択	ごみのサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	26	vectorEdit,selection,?	0	0	
 EnableSnapSymmetry	ツール共通	対称定規にスナップ	0/1	確認済み（W4: 塗りつぶし）	INTEGER	72	selection,gradient,fill,vectorEdit	1	1	
 FillAntiAlias	塗りつぶし	アンチエイリアス	0/1（塗りつぶしではチェックだけ）	確認済み（W4）	INTEGER	192	gradient,fill,selection	0	1	
 FillCloseGap	塗りつぶし	隙間閉じの大きさ	段階のバー（2 段目 3、4 段目 10）	確認済み（W4）	REAL	96	fill,selection,gradient	1.0	50.0	
@@ -265,9 +265,9 @@ LayerMoveRemainOriginal	レイヤー移動	元画像を残す	0/1	確認済み�
 LayerMoveSelectLayer	レイヤー移動	移動対象を選択状態に変更	0/1	確認済み（W4: 単独で）	INTEGER	24	operation	0	0	
 LayerMoveTarget	レイヤー移動	移動対象	0 レイヤー, 1 トーンの網点, 2 グリッド・ルーラー	確認済み（W4: 3 つとも）	INTEGER	56	operation,eyedropper	0	2	
 LayerMoveTone	レイヤー移動	トーン	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
-LightTableClickOperation	ライトテーブル	クリック 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
-LightTableDragOperation	ライトテーブル	ドラッグ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
-LightTableTouchOperation	ライトテーブル	タッチ 操作	名前からの直訳	推測（直訳）	INTEGER	8	operation	0	0	
+LightTableClickOperation	ライトテーブル	クリック	0 なし, 1 中心を指定（ツールチップの前半からの推測）	確認済み（W4: 2 つとも）	INTEGER	8	operation	1	1	
+LightTableDragOperation	ライトテーブル	ドラッグ	0 移動, 1 回転	確認済み（W4: 2 つとも）	INTEGER	8	operation	0	0	
+LightTableTouchOperation	ライトテーブル	タッチ	ビット 1 2 本指で移動, 2 2 本指で拡大縮小, 4 2 本指で回転	確認済み（W4: 1・3・4）	INTEGER	8	operation	0	0	
 LineCurveKind	線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER	43	shape,brush,ruler	0	1	
 LineLockAngle	グラデーション / 連続曲線	角度の刻み	0/1	確認済み（W4: グラデーション、連続曲線）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	0	0	
 LineLockAngleStep	グラデーション / 連続曲線	角度の刻みの角度	度	確認済み（W4）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	42	45	
@@ -337,9 +337,9 @@ PolylineCurveKind	折れ線	曲線 種類	名前からの直訳	推測（直訳�
 PolylineCurveKindWithoutCubic	連続曲線	曲線	ボタンの並び順 0 1 番目, 1 2 番目, 2 3 番目（1 と 2 を確認）	確認済み（W4: 2 番目 1、3 番目 2）	INTEGER	42	effectLines	1	1	
 PolylineDesignationType	折れ線	指定 方式	名前からの直訳	推測（直訳）	INTEGER	122	effectLines,shape,brush,selection,frame,ruler,balloon	1	1	
 PolylineShowPrediction	折れ線	表示 予測	名前からの直訳	推測（直訳）	INTEGER	54	shape,brush,effectLines,frame,selection,ruler,balloon	1	1	
-RotateDoubleClick	回転	2 本指 クリック	名前からの直訳	推測（直訳）	INTEGER	12	view	1	1	
-RotateLockAngle	回転	固定 角度	名前からの直訳	推測（直訳）	INTEGER	12	view	0	0	
-RotateLockAngleStep	回転	固定 角度 刻み	名前からの直訳	推測（直訳）	INTEGER	12	view	45	45	
+RotateDoubleClick	回転	ダブルクリックで水平に戻す	0/1	確認済み（W4）	INTEGER	12	view	1	1	
+RotateLockAngle	回転	角度の刻み	0/1	確認済み（W4: 初期ツールを追加した回転）	INTEGER	12	view	0	0	
+RotateLockAngleStep	回転	角度の刻みの角度	度	確認済み（W4）	INTEGER	12	view	45	45	
 RotateShape	図形操作	確定後に角度を調整	0/1	確認済み（W4）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	1	
 RulerCurrentLayer	定規	編集レイヤーに作成	0/1	確認済み（W4: 特殊定規）	INTEGER	64	ruler	0	1	
 RulerGraduationNumber	定規	目盛り 数	名前からの直訳	推測（直訳）	INTEGER	32	ruler	4	4	
@@ -496,36 +496,36 @@ TextureRotate	紙質	回転角	度	確認済み（W4）	REAL	1942	brush,effectLi
 TextureScale	紙質	拡大率（旧形式）	%	推測	REAL	718	brush,shape,eraser,vectorEdit,balloon,frame,?,selection,ruler,fill,blend	100.0	200.0	
 TextureScale2	紙質	拡大率	%	確認済み（W4）	REAL	1914	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	9.0	112.0	
 TextureStressDensity	紙質	濃度強調	0/1	推測	INTEGER	1921	brush,effectLines,eraser,shape,balloon,frame,?,vectorEdit,selection,ruler,blend,fill	0	1	
-TimeLineDragType	タイムライン	ドラッグ 方式	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
-TimeLineNext	タイムライン	次	名前からの直訳	推測（直訳）	INTEGER	8	operation	1	1	
+TimeLineDragType	タイムライン編集	ドラッグ	0 なし, 1 左で前へ・右で次へ	確認済み（W4: 2 つとも）	INTEGER	8	operation	1	1	
+TimeLineNext	タイムライン編集	クリック	1 次へ, 0 前へ	確認済み（W4: 2 つとも）	INTEGER	8	operation	1	1	
 UseDualBrush	2-ブラシ形状	2-ブラシ形状（デュアルブラシを使う）	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 VariantID	（内部）	設定行の ID	Node.NodeVariantID / NodeInitVariantID から参照	推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	2	1606	
 VariantShowParam	（内部）	ツールプロパティに表示する項目	項目 ID の列、subtool-items.tsv	推測	BLOB	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common			records:2515
 VariantShowSeparator	（内部）	ツールプロパティの区切り線		推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	0	0	
-VectorAddVeretexByPinch	ベクター線	加算 頂点 で つまむ	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	1	
+VectorAddVeretexByPinch	ベクター線つまみ	制御点を追加	0/1	確認済み（W4）	INTEGER	8	vectorEdit	0	1	
 VectorAddVertexByLineWidth	ベクター線	制御点を追加して修正	0/1	確認済み（W4: 線幅修正）	INTEGER	20	brush,vectorEdit	1	1	
-VectorAllLayer	ベクター線	すべての レイヤー	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	1	1	
-VectorChangeCurveKind	ベクター線	変更 曲線 種類	名前からの直訳	推測（直訳）	INTEGER	2	vectorEdit	0	0	
-VectorConnectByPinch	ベクター線	連結 で つまむ	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
-VectorConnectDifferent	ベクター線	連結 異なる	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
-VectorConnectLevel	ベクター線	連結 レベル	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	10	10	
-VectorCurveKindToChange	ベクター線	曲線 種類 へ 変更	名前からの直訳	推測（直訳）	INTEGER	2	vectorEdit	1	1	
-VectorDustSize	ベクター線	ゴミ サイズ	名前からの直訳	推測（直訳）	REAL	16	vectorEdit	5.0	5.0	
-VectorDustSizeUnit	ベクター線	ゴミ サイズ 単位	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
-VectorPinchArea	ベクター線	つまむ 範囲	名前からの直訳	推測（直訳）	REAL	8	vectorEdit	30.0	85.0	
-VectorPinchAreaUnit	ベクター線	つまむ 範囲 単位	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	0	
-VectorPinchLevel	ベクター線	つまむ レベル	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	10	50	
-VectorPinchOperation	ベクター線	つまむ 操作	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	2	
-VectorPointOperation	ベクター線	点 操作	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	0	1	
+VectorAllLayer	ベクター線	すべてのレイヤーを対象	0/1	確認済み（W4: 線つまみ、制御点）	INTEGER	24	vectorEdit	1	1	
+VectorChangeCurveKind	ベクター線単純化 / つなぎ	曲線を変換	0/1	確認済み（W4）	INTEGER	2	vectorEdit	0	0	
+VectorConnectByPinch	ベクター線つまみ	線をつなぐ	0/1（制御点を追加がオフだと使えない）	確認済み（W4: 単独で）	INTEGER	16	vectorEdit	0	1	
+VectorConnectDifferent	ベクター線単純化 / つなぎ	属性の異なる線もつなぐ	0/1	確認済み（W4）	INTEGER	16	vectorEdit	0	0	
+VectorConnectLevel	ベクター線単純化 / つなぎ	線つなぎの段階	段階のバー（1 段目 10、3 段目 40）	確認済み（W4: 1・3 段目）	INTEGER	16	vectorEdit	10	10	
+VectorCurveKindToChange	ベクター線単純化 / つなぎ	変換後の曲線	0 折れ線, 1 スプライン, 2 2 次ベジェ, 3 3 次ベジェ	確認済み（W4: 1・3、名前はツールチップ）	INTEGER	2	vectorEdit	1	1	
+VectorDustSize	ベクター線単純化 / つなぎ	短い線の消去の長さ	数値（単位は VectorDustSizeUnit）	確認済み（W4）	REAL	16	vectorEdit	5.0	5.0	
+VectorDustSizeUnit	ベクター線単純化 / つなぎ	短い線の消去の長さの単位	0 px, 2 mm（推測）	推測	INTEGER	16	vectorEdit	0	0	
+VectorPinchArea	ベクター線つまみ	効果範囲	数値（単位は VectorPinchAreaUnit）	確認済み（W4）	REAL	8	vectorEdit	30.0	85.0	
+VectorPinchAreaUnit	ベクター線つまみ	効果範囲の単位	0 px, 2 mm（推測）	推測	INTEGER	8	vectorEdit	0	0	
+VectorPinchLevel	ベクター線つまみ	つまみ加減	段階のバー（2 段目 10、4 段目 25、5 段目 50）	確認済み（W4: 2・4・5 段目）	INTEGER	8	vectorEdit	10	50	
+VectorPinchOperation	ベクター線つまみ	端の固定	0 端を固定しない（推測）, 1 一方の端を固定, 2 両端を固定	確認済み（W4: 3 つとも）	INTEGER	16	vectorEdit	0	2	
+VectorPointOperation	制御点	処理内容	一覧の並び順 0 制御点の移動, 1 制御点の追加, 2 制御点の削除, 3 角の切り替え, 4 線幅修正, 5 濃度修正, 6 線の切断	確認済み（W4: 0・1・3・6）	INTEGER	8	vectorEdit	0	1	
 VectorPointSavedAsRadio	ベクター線	点 保存 As ラジオボタン	名前からの直訳	推測（直訳）	INTEGER	1	vectorEdit	1	1	
-VectorPressureForPinchLevel	ベクター線	筆圧 の つまむ レベル	名前からの直訳	推測（直訳）	INTEGER	8	vectorEdit	1	1	
-VectorSmoothCorner	ベクター線	滑らか 角	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
-VectorSmoothLevel	ベクター線	滑らか レベル	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	5	10	
-VectorUseConnect	ベクター線	使う 連結	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	1	
-VectorUseDust	ベクター線	使う ゴミ	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
-VectorUseSmooth	ベクター線	使う 滑らか	名前からの直訳	推測（直訳）	INTEGER	24	vectorEdit	0	1	
+VectorPressureForPinchLevel	ベクター線つまみ	つまみ加減の筆圧	0/1	確認済み（W4）	INTEGER	8	vectorEdit	1	1	
+VectorSmoothCorner	ベクター線単純化 / つなぎ	角を丸める	0/1	確認済み（W4）	INTEGER	16	vectorEdit	0	1	
+VectorSmoothLevel	ベクター線単純化 / つなぎ	単純化の段階	段階のバー（初期 10、5 段目 40）	確認済み（W4）	INTEGER	24	vectorEdit	5	10	
+VectorUseConnect	ベクター線単純化 / つなぎ	線つなぎ	0/1	確認済み（W4: 単独で）	INTEGER	16	vectorEdit	0	1	
+VectorUseDust	ベクター線単純化 / つなぎ	短い線の消去	0/1	確認済み（W4）	INTEGER	16	vectorEdit	0	0	
+VectorUseSmooth	ベクター線単純化 / つなぎ	単純化	0/1	確認済み（W4）	INTEGER	24	vectorEdit	0	1	
 VectorWhole	ベクター線	線全体に処理	0/1	確認済み（W4: 線幅修正）	INTEGER	40	vectorEdit,brush	0	1	
-VectorWholeForSmooth	ベクター線	線全体 の 滑らか	名前からの直訳	推測（直訳）	INTEGER	16	vectorEdit	0	0	
-ZoomDragType	虫めがね	ドラッグ 方式	名前からの直訳	推測（直訳）	INTEGER	32	view	1	1	
-ZoomExpand	虫めがね	拡大	名前からの直訳	推測（直訳）	INTEGER	32	view	0	1	
+VectorWholeForSmooth	ベクター線単純化 / つなぎ	線全体に処理（単純化）	0/1	確認済み（W4）	INTEGER	16	vectorEdit	0	0	
+ZoomDragType	虫めがね	ドラッグ	0 なし, 1 左で縮小・右で拡大, 2 矩形で指定（画面の並びは 1, 2, 0）	確認済み（W4: 3 つとも）	INTEGER	32	view	1	1	
+ZoomExpand	虫めがね	クリック	1 拡大, 0 縮小	確認済み（W4: 2 つとも）	INTEGER	32	view	0	1	
 _PW_ID	（内部）	行番号		推測	INTEGER	2515	brush,gradient,effectLines,selection,eraser,shape,vectorEdit,ruler,operation,balloon,view,fill,frame,eyedropper,?,text,liquify,blend,common	1	694	
