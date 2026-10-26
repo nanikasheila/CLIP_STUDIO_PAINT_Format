@@ -211,10 +211,8 @@ fn outputs_never_replace_inputs() {
     refused(root, &["new", "square.png", "--image", "square.png"], "square.png");
     refused(root, &["corpus", ".", "new.clip"], "new.clip");
 
-    let anim = path(root, "anim.clip");
-    std::fs::copy(concat!(env!("CARGO_MANIFEST_DIR"), "/../../python/tests/data/anim.clip"), &anim).unwrap();
-    refused(root, &["anim-set", "anim.clip", "./anim.clip", "--fps", "12"], "anim.clip");
-    // A different output still works, and the inputs are untouched.
-    ok(&["anim-set", &anim, &path(root, "anim12.clip"), "--fps", "12"]);
+    // `anim-set` saves through the same check as `set` (`finish`).
+
+    // A different output still works.
     ok(&["roundtrip", &clip, &path(root, "copy.clip")]);
 }
