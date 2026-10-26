@@ -197,7 +197,7 @@ fn color_word(value: u8) -> i64 {
 }
 
 /// A `LayerUuid`: 32 hex digits grouped 10-4-4-4-10, as CSP writes them.
-fn layer_uuid() -> String {
+pub(crate) fn layer_uuid() -> String {
     let hex: String = new_uuid().iter().map(|b| format!("{b:02x}")).collect();
     format!("{}-{}-{}-{}-{}", &hex[..10], &hex[10..14], &hex[14..18], &hex[18..22], &hex[22..])
 }
@@ -278,8 +278,20 @@ impl ClipFile {
     /// stores blocks (all empty): CSP reports an empty raster layer whose base
     /// offscreen has no block data as damaged, while folders, paper and the
     /// smaller levels go without.
-    fn new_mipmap(&mut self, layer_id: i64, init: Option<&InitColor>, store_base: bool) -> Result<i64> {
-        let sizes = mipmap_sizes(self.canvas.width_px, self.canvas.height_px);
+    pub(crate) fn new_mipmap(&mut self, layer_id: i64, init: Option<&InitColor>, store_base: bool) -> Result<i64> {
+        self.new_mipmap_sized(layer_id, (self.canvas.width_px, self.canvas.height_px), init, store_base)
+    }
+
+    /// [`ClipFile::new_mipmap`] with a base level of `size` instead of the
+    /// canvas size.
+    pub(crate) fn new_mipmap_sized(
+        &mut self,
+        layer_id: i64,
+        size: (u32, u32),
+        init: Option<&InitColor>,
+        store_base: bool,
+    ) -> Result<i64> {
+        let sizes = mipmap_sizes(size.0, size.1);
         let mipmap = self.next_main_id("Mipmap")?;
         let infos = sizes.iter().map(|_| self.next_main_id("MipmapInfo")).collect::<Result<Vec<_>>>()?;
         for (level, size) in sizes.iter().enumerate() {
@@ -310,7 +322,7 @@ impl ClipFile {
     }
 
     /// A layer thumbnail that CSP redraws when it opens the file.
-    fn new_thumbnail(&mut self, layer_id: i64) -> Result<i64> {
+    pub(crate) fn new_thumbnail(&mut self, layer_id: i64) -> Result<i64> {
         let id = self.next_main_id("LayerThumbnail")?;
         let offscreen = self.new_offscreen(layer_id, (THUMBNAIL_SIZE, THUMBNAIL_SIZE), None, true)?;
         let int = Value::Integer;
@@ -470,7 +482,7 @@ impl ClipFile {
     }
 
     /// Make `id` the last (top) child of `parent`.
-    fn link_on_top(&mut self, parent: i64, id: i64) -> Result<()> {
+    pub(crate) fn link_on_top(&mut self, parent: i64, id: i64) -> Result<()> {
         let database = self.database();
         let first: i64 = database
             .query_row("SELECT LayerFirstChildIndex FROM Layer WHERE MainId = ?1", [parent], |row| row.get(0))

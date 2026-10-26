@@ -99,8 +99,8 @@ impl CmcProject {
 /// An open .cmc. Changes stay in memory until [`CmcFile::save`].
 pub struct CmcFile {
     original: Vec<u8>,
-    connection: Connection,
-    modified: bool,
+    pub(crate) connection: Connection,
+    pub(crate) modified: bool,
     pub project: CmcProject,
     pub nodes: Vec<CanvasNode>,
 }
@@ -121,7 +121,7 @@ impl CmcFile {
         Ok(file)
     }
 
-    fn reload(&mut self) -> Result<()> {
+    pub(crate) fn reload(&mut self) -> Result<()> {
         let project = select_all(&self.connection, "Project")?;
         let Some(project) = project.first() else { bail!(".cmc has no Project row") };
         self.project = CmcProject::from_row(project);

@@ -7,3 +7,6 @@ __pycache__/
 *.sut
 # Synthetic test files made by the tools (see python/tests/test_reader.py).
 !python/tests/data/*.clip
+# The empty pages CSP made for blank::blank_page (no artwork; also in name-studio).
+!crates/csp-format/assets/blank-*.clip
+!crates/csp-format/assets/blank-*.cmc

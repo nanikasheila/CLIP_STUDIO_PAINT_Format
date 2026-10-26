@@ -7,10 +7,13 @@
 
 pub mod animation;
 pub mod binary;
+pub mod blank;
 pub mod clip;
 pub mod cmc;
+pub mod cmc_pages;
 pub mod cmt;
 pub mod container;
+pub mod copy;
 pub mod correction;
 pub mod create;
 pub mod curve;
@@ -25,10 +28,12 @@ pub mod model;
 pub mod offscreen;
 pub mod render;
 pub mod schema;
+pub mod story;
 pub mod stroke;
 pub mod text;
 pub mod tone;
 pub mod vector;
+pub mod vector_build;
 pub mod verify;
 pub mod version;
 pub mod work;
