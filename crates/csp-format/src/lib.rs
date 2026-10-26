@@ -7,6 +7,7 @@
 
 pub mod animation;
 pub mod binary;
+pub mod blank;
 pub mod clip;
 pub mod cmc;
 pub mod cmc_pages;
@@ -27,6 +28,7 @@ pub mod model;
 pub mod offscreen;
 pub mod render;
 pub mod schema;
+pub mod story;
 pub mod stroke;
 pub mod text;
 pub mod tone;

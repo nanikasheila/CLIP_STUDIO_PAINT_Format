@@ -78,6 +78,11 @@ pip install "csp-format @ git+https://github.com/nanikasheila/CLIP_STUDIO_PAINT_
 | `transform_vector_data` | `VectorObject::transform(scale, dx, dy)` | 点・外接矩形・ブラシサイズ・104 バイト点の制御点も動かす |
 | `transform_text_attributes` | `Attributes::transform` | |
 | `write_cmc(template, pages, ...)` | `CmcFile::open(template)` → `set_project_value` → `save_with_pages(output, pages)` | ページ一覧だけを作り直し、作品の設定はひな形のまま。`PageLink` / `set_pages` で一覧を直接渡すこともできる。`work_canvas_values` は `page_canvas_values`。`Link*` の保存時刻は UTC（CSP は PC の時刻だが、読み手は使わない） |
+| `blank::PageSetup`（`check`, `canvas_px`, `story_line`） | `blank::PageSetup` | serde の形（camelCase）も同じ。`check` のメッセージは英語 |
+| `blank_page(setup)` / `apply_setup(editor, setup)` | `blank::blank_page(setup)` → `ClipFile` / `blank::apply_setup(&mut file, setup)` | 作品情報・ノンブルのレイヤーを持つ白紙ページ。CSP で作ったページ（`assets/blank-page.clip`）を大きさ・枠・作品情報・ノンブルに合わせて直す。clip-core と同じ設定 8 通りで DB の行・オフスクリーン・プレビューが一致 |
+| `write_builtin_template(setup, folder)` | `blank::blank_page` / `blank::blank_parts()` / `blank::blank_work(setup)` をそれぞれ保存 | ファイル名とフォルダーの作り方はアプリ側に残す |
+| `write_blank_work(setup, output)` | `blank::blank_work(setup)` → `CmcFile` | |
+| `story::update_page_number` / `page::update_nombre`（crate 内） | `file.update_story_numbers(first_right)` | ページの位置（`ComicPageIndex`, `ComicIsLeftPage`）を変えたあとに呼ぶ。部品は `story` モジュール（`story_layers`, `StoryPart`, `ATTR_STORY_PART` …） |
 | （ページの追加・並べ替え・削除） | `CmcFile::add_page` / `reorder` / `remove_page` / `save` | |
 | `verify::check_clip` | `verify::check_clip(data, options)` / `cspf check` | コンテナ・DB・画素の再符号化・ベクター・テキスト・参照まで調べる |
 | `verify::verify_work` | `verify::check_cmc(data, Some(folder))` | |
@@ -144,7 +149,6 @@ csp-format に移すと次が読める。clip-core（と元の Python 実装）�
 
 移行の途中で必要になったら、ここに足してから各リポジトリで使う。
 
-- Rust: 作品情報・ノンブルのレイヤーを持つ白紙ページ（clip-core の `write/blank.rs`、`write/story.rs` のうち形式の部分）
 - Python: 書き込み
 
 ## 6. 確かめ方
