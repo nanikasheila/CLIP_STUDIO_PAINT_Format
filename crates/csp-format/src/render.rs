@@ -32,7 +32,9 @@ use crate::image::{GrayImage, RgbaImage, luma};
 use crate::material::Placement;
 use crate::model::{Layer, LayerKind, LayerNode};
 use crate::offscreen::Offscreen;
-use crate::stroke::{draw_balloons, draw_layer, frame_mask, layer_vectors};
+use crate::stroke::{
+    draw_balloons, draw_balloons_at_canvas_size, draw_layer, draw_layer_at_canvas_size, frame_mask, layer_vectors,
+};
 use crate::text::read_blocks;
 use crate::tone::Tone;
 
@@ -729,6 +731,17 @@ impl Renderer<'_> {
             self.report.material_layers += 1;
             return Ok(Some(Content { buffer: self.place(image, origin, 1.0), mode: Some(mode), masked: false }));
         }
+        // Vector layers likewise: CSP draws the lines at canvas size, so
+        // drawing them at the preview's size makes thin lines too faint
+        // and thick ones too sharp (V3 section 6).
+        if layer.kind == LayerKind::Vector
+            && !full
+            && self.scale < 1.0
+            && let Some((image, origin)) = draw_layer_at_canvas_size(self.file, layer)?
+        {
+            self.report.vector_layers += 1;
+            return Ok(Some(Content { buffer: self.place(image, origin, 1.0), mode: Some(mode), masked: false }));
+        }
         let drawn = if layer.kind == LayerKind::ImageMaterial {
             self.material(layer, full)?.inspect(|_| self.report.material_layers += 1)
         } else if layer.kind == LayerKind::Vector {
@@ -763,7 +776,11 @@ impl Renderer<'_> {
         // Blocks name their balloon by its number among the objects that
         // are not tails.
         let balloons: Vec<_> = objects.iter().filter(|object| !object.is_balloon_tail()).collect();
-        if !objects.is_empty() {
+        if !objects.is_empty() && !full && self.scale < 1.0 {
+            if let Some((image, origin)) = draw_balloons_at_canvas_size(self.file, layer)? {
+                result = Some(TextImage::Placed(self.place(image, origin, 1.0)));
+            }
+        } else if !objects.is_empty() {
             let (w, h, scale) = if full {
                 (self.file.canvas.width_px, self.file.canvas.height_px, 1.0)
             } else {
@@ -826,6 +843,11 @@ impl Renderer<'_> {
         let stored = layer.row.int("ComicFrameLineMipmap");
         if stored != 0 && self.level(stored, self.scale)?.is_some_and(|(offscreen, _)| offscreen.data.is_some()) {
             return Ok(None);
+        }
+        if self.scale < 1.0 {
+            return Ok(
+                draw_layer_at_canvas_size(self.file, layer)?.map(|(image, origin)| self.place(image, origin, 1.0))
+            );
         }
         let image = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?;
         Ok(image.map(|image| self.place(image, (0, 0), self.scale)))
