@@ -115,6 +115,18 @@ impl VectorObject {
         (72..end).step_by(4).map(|offset| be_u32_at(&self.header, offset)).collect()
     }
 
+    /// The first settings word of a header-96 object (balloons and frames),
+    /// which names the kind of shape: 0x130 a balloon, 0x111 or 0x311 a
+    /// balloon's tail, 0x410 a frame (values seen in the corpus).
+    pub fn shape_kind(&self) -> Option<u32> {
+        (self.header.len() == 96).then(|| be_u32_at(&self.header, 72))
+    }
+
+    /// A balloon's tail (drawn with the line of the balloon before it).
+    pub fn is_balloon_tail(&self) -> bool {
+        self.shape_kind().is_some_and(|kind| kind & 0xff == 0x11)
+    }
+
     pub fn point(&self, index: usize) -> Option<Point> {
         let raw = self.points.get(index)?;
         let mut values = [0f32; 13];

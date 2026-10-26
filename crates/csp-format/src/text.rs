@@ -18,6 +18,10 @@ pub mod ids {
     pub const FONT_SIZE: u32 = 32;
     /// Text block bounding box, layer pixels (i32 × 4: x0, y0, x1, y1).
     pub const BBOX: u32 = 42;
+    /// The balloon the block sits in: 1-based index of the layer's vector
+    /// objects, whose bbox centre the block's bbox is relative to (0 = none,
+    /// the bbox is in layer pixels).
+    pub const BALLOON: u32 = 45;
     /// Id of the offscreen CSP rendered the text into (u32; 0 = render again).
     pub const RENDER_OFFSCREEN: u32 = 50;
     /// Font (u16 ?, u16 length, UTF-8 name, u16 length, PostScript name).
@@ -111,6 +115,11 @@ impl Attributes {
 
     pub fn quad(&self) -> Option<[i32; 8]> {
         self.i32s(ids::QUAD)?.try_into().ok()
+    }
+
+    /// The 1-based index of the balloon object the block sits in (record 45).
+    pub fn balloon(&self) -> Option<u32> {
+        self.i32s(ids::BALLOON)?.first().map(|value| *value as u32).filter(|value| *value > 0)
     }
 
     pub fn render_offscreen(&self) -> Option<u32> {

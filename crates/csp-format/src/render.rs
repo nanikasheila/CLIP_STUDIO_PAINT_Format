@@ -32,7 +32,7 @@ use crate::image::{GrayImage, RgbaImage, luma};
 use crate::material::Placement;
 use crate::model::{Layer, LayerKind, LayerNode};
 use crate::offscreen::Offscreen;
-use crate::stroke::draw_layer;
+use crate::stroke::{draw_balloons, draw_layer, frame_mask, layer_vectors};
 use crate::text::read_blocks;
 use crate::tone::Tone;
 
@@ -530,6 +530,17 @@ impl Renderer<'_> {
                         Group::Backdrop { alpha }
                     }
                 });
+                // A frame folder's frame lines are drawn over its masked
+                // content (layers clipped to the folder are not supported).
+                if layer.kind == LayerKind::FrameFolder
+                    && let Some(lines) = self.frame_lines(layer)?
+                {
+                    if let Some(done) = group.take() {
+                        done.flush(target);
+                    }
+                    target.composite(&lines, BlendMode::Normal, |_| opacity as f32);
+                    group = Some(Group::Empty);
+                }
                 continue;
             }
             self.report.clipped += 1;
@@ -747,6 +758,25 @@ impl Renderer<'_> {
     /// an output buffer.
     fn text(&self, layer: &Layer, full: bool) -> Result<Option<TextImage>> {
         let mut result: Option<TextImage> = None;
+        // The balloons under the text, drawn from the layer's vector objects.
+        let objects: Vec<_> = layer_vectors(self.file, layer)?.into_iter().flat_map(|data| data.objects).collect();
+        // Blocks name their balloon by its number among the objects that
+        // are not tails.
+        let balloons: Vec<_> = objects.iter().filter(|object| !object.is_balloon_tail()).collect();
+        if !objects.is_empty() {
+            let (w, h, scale) = if full {
+                (self.file.canvas.width_px, self.file.canvas.height_px, 1.0)
+            } else {
+                (self.width as u32, self.height as u32, self.scale)
+            };
+            if let Some(image) = draw_balloons(self.file, layer, w, h, scale)? {
+                result = Some(if full {
+                    TextImage::Full(image)
+                } else {
+                    TextImage::Placed(self.place(image, (0, 0), self.scale))
+                });
+            }
+        }
         let mut seen = Vec::new();
         for block in read_blocks(&layer.row)? {
             let (Some(id), Some(bbox)) = (block.attributes.render_offscreen(), block.attributes.bbox()) else {
@@ -760,7 +790,19 @@ impl Renderer<'_> {
             if offscreen.data.is_none() {
                 continue;
             }
-            let origin = (layer.offset.0 + bbox[0] as i64, layer.offset.1 + bbox[1] as i64);
+            // A block in a balloon is placed from the centre of the balloon's
+            // bbox (V3 section 5).
+            let anchor = match block.attributes.balloon() {
+                Some(index) => match balloons.get(index as usize - 1) {
+                    Some(object) => {
+                        let b = object.bbox();
+                        ((b[0] as i64 + b[2] as i64).div_euclid(2), (b[1] as i64 + b[3] as i64).div_euclid(2))
+                    }
+                    None => continue,
+                },
+                None => (0, 0),
+            };
+            let origin = (layer.offset.0 + anchor.0 + bbox[0] as i64, layer.offset.1 + anchor.1 + bbox[1] as i64);
             let image = offscreen.to_rgba()?;
             match &mut result {
                 None if full => {
@@ -776,6 +818,17 @@ impl Renderer<'_> {
             }
         }
         Ok(result)
+    }
+
+    /// A frame folder's frame lines, drawn from its frames like a vector
+    /// layer when CSP has not stored them (`ComicFrameLineMipmap`).
+    fn frame_lines(&self, layer: &Layer) -> Result<Option<Buffer>> {
+        let stored = layer.row.int("ComicFrameLineMipmap");
+        if stored != 0 && self.level(stored, self.scale)?.is_some_and(|(offscreen, _)| offscreen.data.is_some()) {
+            return Ok(None);
+        }
+        let image = draw_layer(self.file, layer, self.width as u32, self.height as u32, self.scale)?;
+        Ok(image.map(|image| self.place(image, (0, 0), self.scale)))
     }
 
     /// An image material drawn from its original image and placement, at
@@ -1071,6 +1124,13 @@ impl Renderer<'_> {
             return Ok(None);
         }
         let Some((offscreen, level_scale)) = self.level(layer.mask_mipmap, self.scale)? else { return Ok(None) };
+        // CSP does not store a frame folder's mask: it is drawn from the frames.
+        if layer.kind == LayerKind::FrameFolder
+            && offscreen.data.is_none()
+            && let Some(mask) = frame_mask(self.file, layer, self.width as u32, self.height as u32, self.scale)?
+        {
+            return Ok(Some(mask));
+        }
         let outside = offscreen.attribute.init_color().map(|init| (init.alpha & 0xff) as f32 / 255.0).unwrap_or(0.0);
         let halvings = exact_halvings(self.scale / level_scale);
         let (image, level_scale) = if halvings > 0 {

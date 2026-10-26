@@ -534,10 +534,13 @@ fn smooth(points: &[Stamp], closed: bool) -> Vec<Stamp> {
     out
 }
 
-fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: Placement) {
+/// The stamps of an object along its path, in target pixels: joined by a
+/// spline for freehand strokes (see [`smooth`]), and back to the first
+/// point when `closed`.
+fn stamps_of(object: &VectorObject, brush: &Brush, at: Placement, closed: bool) -> Vec<Stamp> {
     let size = object.brush_size().unwrap_or(1.0).max(0.0) * at.scale;
     let opacity = object.opacity().clamp(0.0, 1.0);
-    let freehand = object.header.len() == 88;
+    let freehand = is_freehand(object);
     let mut stamps: Vec<Stamp> = (0..object.points.len())
         .filter_map(|index| object.point(index))
         .map(|point| {
@@ -555,21 +558,78 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
         })
         .collect();
     if stamps.is_empty() {
-        return;
+        return stamps;
     }
-    if object.is_closed() && stamps.len() > 2 {
+    if closed && stamps.len() > 2 {
         stamps.push(stamps[0]);
     }
-    let stamps = if freehand { smooth(&stamps, object.is_closed() && stamps.len() > 3) } else { stamps };
+    if freehand { smooth(&stamps, closed && stamps.len() > 3) } else { stamps }
+}
+
+/// Freehand strokes: header 88 objects, and the balloons drawn by hand
+/// (header 96 with flag 0x80, as the freehand strokes have).
+fn is_freehand(object: &VectorObject) -> bool {
+    object.header.len() == 88 || object.header.len() == 96 && object.flags() & 0x80 != 0
+}
+
+fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: Placement) {
+    if let Some(coverage) = stroke_coverage(object, brush, at, (image.width, image.height), object.is_closed()) {
+        coverage.paint(image, object.main_color());
+    }
+}
+
+/// How much of each pixel of a box of the target a shape covers (0..1).
+struct Coverage {
+    x0: i64,
+    y0: i64,
+    w: usize,
+    h: usize,
+    data: Vec<f32>,
+}
+
+impl Coverage {
+    /// Blend `color` over `image` by the coverage (straight alpha).
+    fn paint(&self, image: &mut RgbaImage, color: [u8; 3]) {
+        let color = color.map(|c| c as f32 / 255.0);
+        for y in 0..self.h {
+            for x in 0..self.w {
+                let k = self.data[y * self.w + x].min(1.0);
+                if k <= 0.0 {
+                    continue;
+                }
+                let (ix, iy) = ((self.x0 + x as i64) as u32, (self.y0 + y as i64) as u32);
+                let p = image.pixel(ix, iy);
+                let ba = p[3] as f32 / 255.0;
+                let oa = k + ba * (1.0 - k);
+                let mix = |c: usize| (color[c] * k + p[c] as f32 / 255.0 * ba * (1.0 - k)) / oa.max(1e-6);
+                let out = [mix(0), mix(1), mix(2), oa].map(|v| (v * 255.0).round().clamp(0.0, 255.0) as u8);
+                image.set_pixel(ix, iy, out);
+            }
+        }
+    }
+}
+
+/// The coverage of a stroke along an object's path in a target of `size`.
+fn stroke_coverage(
+    object: &VectorObject,
+    brush: &Brush,
+    at: Placement,
+    size: (u32, u32),
+    closed: bool,
+) -> Option<Coverage> {
+    let stamps = stamps_of(object, brush, at, closed);
+    if stamps.is_empty() {
+        return None;
+    }
     // Coverage of the whole object (the union of its segments), then one
     // blend: a pen stroke does not darken where it overlaps itself.
     let margin = stamps.iter().map(|s| s.radius).fold(0.0, f64::max) + 2.0;
     let x0 = (stamps.iter().map(|s| s.x).fold(f64::MAX, f64::min) - margin).floor().max(0.0) as i64;
     let y0 = (stamps.iter().map(|s| s.y).fold(f64::MAX, f64::min) - margin).floor().max(0.0) as i64;
-    let x1 = ((stamps.iter().map(|s| s.x).fold(f64::MIN, f64::max) + margin).ceil() as i64).min(image.width as i64);
-    let y1 = ((stamps.iter().map(|s| s.y).fold(f64::MIN, f64::max) + margin).ceil() as i64).min(image.height as i64);
+    let x1 = ((stamps.iter().map(|s| s.x).fold(f64::MIN, f64::max) + margin).ceil() as i64).min(size.0 as i64);
+    let y1 = ((stamps.iter().map(|s| s.y).fold(f64::MIN, f64::max) + margin).ceil() as i64).min(size.1 as i64);
     if x1 <= x0 || y1 <= y0 {
-        return;
+        return None;
     }
     let (w, h) = ((x1 - x0) as usize, (y1 - y0) as usize);
     let mut coverage = vec![0f32; w * h];
@@ -638,22 +698,7 @@ fn draw_object(image: &mut RgbaImage, object: &VectorObject, brush: &Brush, at: 
             }
         }
     }
-    let color = object.main_color().map(|c| c as f32 / 255.0);
-    for y in 0..h {
-        for x in 0..w {
-            let k = coverage[y * w + x];
-            if k <= 0.0 {
-                continue;
-            }
-            let (ix, iy) = ((x0 + x as i64) as u32, (y0 + y as i64) as u32);
-            let p = image.pixel(ix, iy);
-            let ba = p[3] as f32 / 255.0;
-            let oa = k + ba * (1.0 - k);
-            let mix = |c: usize| (color[c] * k + p[c] as f32 / 255.0 * ba * (1.0 - k)) / oa.max(1e-6);
-            let out = [mix(0), mix(1), mix(2), oa].map(|v| (v * 255.0).round().clamp(0.0, 255.0) as u8);
-            image.set_pixel(ix, iy, out);
-        }
-    }
+    Some(Coverage { x0, y0, w, h, data: coverage })
 }
 
 /// Draw a vector layer at `scale` into an image of `width × height` (canvas
@@ -670,6 +715,184 @@ pub fn draw_layer(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale
         draw_objects(&mut image, &data.objects, &brushes, at);
     }
     Ok(Some(image))
+}
+
+/// Draw the balloons of a text layer (its `VectorObjectList` objects) at
+/// `scale` into an image of `width × height`, as CSP merges the balloons
+/// of one layer: every object is a closed shape, filled with its sub colour inside
+/// its path, and each object's line (main colour, its brush) shows only
+/// outside the other objects' fills, so overlapping balloons and their
+/// tails make one outline (V3 section 5). None when there are no balloons.
+pub fn draw_balloons(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale: f64) -> Result<Option<RgbaImage>> {
+    let mut objects: Vec<VectorObject> =
+        layer_vectors(file, layer)?.into_iter().flat_map(|data| data.objects).collect();
+    if objects.is_empty() {
+        return Ok(None);
+    }
+    // A tail has no line of its own (size 0, no brush): it takes the line
+    // settings and colours of the balloon before it.
+    let mut balloon: Option<Vec<u8>> = None;
+    for object in &mut objects {
+        if !object.is_balloon_tail() {
+            balloon = Some(object.header.clone());
+        } else if let Some(header) = &balloon
+            && header.len() == object.header.len()
+        {
+            object.header[40..64].copy_from_slice(&header[40..64]);
+            object.header[76..].copy_from_slice(&header[76..]);
+        }
+    }
+    let brushes = brushes(file)?;
+    let fallback = Brush::default();
+    let at = Placement { offset: (layer.offset.0 as f64, layer.offset.1 as f64), scale };
+    let size = (width, height);
+    let brush_of = |object: &VectorObject| {
+        object.brush_styles().iter().find_map(|id| brushes.get(&(*id as i64))).unwrap_or(&fallback)
+    };
+    // Without flag 0x2000 CSP shows a black line on white whatever colours
+    // the object holds (ellipse balloons with both colours white, V3 5).
+    let colors = |object: &VectorObject| {
+        if object.flags() & 0x2000 != 0 { (object.main_color(), object.sub_color()) } else { ([0; 3], [255; 3]) }
+    };
+    // Every balloon object is a shape, also those without the closed flag
+    // (the ellipse balloons, flags 0x188).
+    let fills: Vec<Option<Coverage>> = objects
+        .iter()
+        .map(|object| {
+            let path: Vec<(f64, f64)> =
+                stamps_of(object, brush_of(object), at, true).iter().map(|s| (s.x, s.y)).collect();
+            fill_coverage(&path, size)
+        })
+        .collect();
+    let mut image = RgbaImage::new(width, height);
+    for (object, fill) in objects.iter().zip(&fills) {
+        if let Some(fill) = fill {
+            fill.paint(&mut image, colors(object).1);
+        }
+    }
+    // The two largest fill coverages at each pixel (and whose the largest
+    // is), so the cover of "the other objects" is found in constant time.
+    let (x0, y0) = fills.iter().flatten().fold((i64::MAX, i64::MAX), |(x, y), f| (x.min(f.x0), y.min(f.y0)));
+    let (x1, y1) = fills
+        .iter()
+        .flatten()
+        .fold((i64::MIN, i64::MIN), |(x, y), f| (x.max(f.x0 + f.w as i64), y.max(f.y0 + f.h as i64)));
+    let w = (x1 - x0).max(0) as usize;
+    let h = (y1 - y0).max(0) as usize;
+    let mut top = vec![(0f32, usize::MAX, 0f32); w * h];
+    for (i, fill) in fills.iter().enumerate() {
+        let Some(fill) = fill else { continue };
+        for y in 0..fill.h {
+            for x in 0..fill.w {
+                let k = fill.data[y * fill.w + x].min(1.0);
+                if k <= 0.0 {
+                    continue;
+                }
+                let cell = &mut top[(fill.y0 - y0) as usize * w + y * w + (fill.x0 - x0) as usize + x];
+                if k > cell.0 {
+                    *cell = (k, i, cell.0);
+                } else if k > cell.2 {
+                    cell.2 = k;
+                }
+            }
+        }
+    }
+    let others = |i: usize, px: i64, py: i64| -> f32 {
+        let (cx, cy) = (px - x0, py - y0);
+        if cx < 0 || cy < 0 || cx as usize >= w || cy as usize >= h {
+            return 0.0;
+        }
+        let cell = top[cy as usize * w + cx as usize];
+        if cell.1 == i { cell.2 } else { cell.0 }
+    };
+    for (i, object) in objects.iter().enumerate() {
+        let Some(mut line) = stroke_coverage(object, brush_of(object), at, size, true) else { continue };
+        for y in 0..line.h {
+            for x in 0..line.w {
+                let hidden = others(i, line.x0 + x as i64, line.y0 + y as i64);
+                line.data[y * line.w + x] *= 1.0 - hidden;
+            }
+        }
+        line.paint(&mut image, colors(object).0);
+    }
+    Ok(Some(image))
+}
+
+/// The mask of a frame folder (コマ枠フォルダー) drawn from its frames, the
+/// closed shapes of its `VectorObjectList`: 1 inside a frame's path, at
+/// `scale` in a `width × height` target, row by row. CSP stores neither this
+/// mask nor the frame lines and draws both from the frames when it opens a
+/// file. None when the folder has no frames.
+pub fn frame_mask(file: &ClipFile, layer: &Layer, width: u32, height: u32, scale: f64) -> Result<Option<Vec<f32>>> {
+    let objects: Vec<VectorObject> = layer_vectors(file, layer)?.into_iter().flat_map(|data| data.objects).collect();
+    if !objects.iter().any(VectorObject::is_closed) {
+        return Ok(None);
+    }
+    let brushes = brushes(file)?;
+    let fallback = Brush::default();
+    let at = Placement { offset: (layer.offset.0 as f64, layer.offset.1 as f64), scale };
+    let mut mask = vec![0f32; width as usize * height as usize];
+    for object in objects.iter().filter(|o| o.is_closed()) {
+        let brush = object.brush_styles().iter().find_map(|id| brushes.get(&(*id as i64))).unwrap_or(&fallback);
+        let path: Vec<(f64, f64)> = stamps_of(object, brush, at, true).iter().map(|s| (s.x, s.y)).collect();
+        let Some(fill) = fill_coverage(&path, (width, height)) else { continue };
+        for y in 0..fill.h {
+            for x in 0..fill.w {
+                let cell = &mut mask[(fill.y0 as usize + y) * width as usize + fill.x0 as usize + x];
+                *cell = cell.max(fill.data[y * fill.w + x].min(1.0));
+            }
+        }
+    }
+    Ok(Some(mask))
+}
+
+/// The coverage of a closed path (target pixels, non-zero winding) in a
+/// target of `size`, by 4 × 4 samples per pixel.
+fn fill_coverage(path: &[(f64, f64)], size: (u32, u32)) -> Option<Coverage> {
+    if path.len() < 3 {
+        return None;
+    }
+    const SUB: usize = 4;
+    let y_min = path.iter().map(|p| p.1).fold(f64::MAX, f64::min).floor().max(0.0) as i64;
+    let y_max = (path.iter().map(|p| p.1).fold(f64::MIN, f64::max).ceil() as i64).min(size.1 as i64);
+    let x_min = path.iter().map(|p| p.0).fold(f64::MAX, f64::min).floor().max(0.0) as i64;
+    let x_max = (path.iter().map(|p| p.0).fold(f64::MIN, f64::max).ceil() as i64).min(size.0 as i64);
+    if y_max <= y_min || x_max <= x_min {
+        return None;
+    }
+    let (w, h) = ((x_max - x_min) as usize, (y_max - y_min) as usize);
+    let mut data = vec![0f32; w * h];
+    let mut crossings: Vec<(f64, i32)> = Vec::new();
+    let n = path.len();
+    for row in 0..h {
+        for sub in 0..SUB {
+            let y = (y_min + row as i64) as f64 + (sub as f64 + 0.5) / SUB as f64;
+            crossings.clear();
+            for i in 0..n {
+                let (a, b) = (path[i], path[(i + 1) % n]);
+                if (a.1 <= y) != (b.1 <= y) {
+                    let x = a.0 + (y - a.1) / (b.1 - a.1) * (b.0 - a.0);
+                    crossings.push((x, if b.1 > a.1 { 1 } else { -1 }));
+                }
+            }
+            crossings.sort_by(|a, b| a.0.total_cmp(&b.0));
+            let mut winding = 0;
+            for pair in crossings.windows(2) {
+                winding += pair[0].1;
+                if winding == 0 {
+                    continue;
+                }
+                // Samples at the quarter pixels inside [x0, x1).
+                let (x0, x1) = (pair[0].0 - x_min as f64, pair[1].0 - x_min as f64);
+                let first = ((x0 * SUB as f64 - 0.5).ceil().max(0.0)) as i64;
+                let last = ((x1 * SUB as f64 - 0.5).ceil() as i64).min((w * SUB) as i64);
+                for k in first..last {
+                    data[row * w + k as usize / SUB] += 1.0 / (SUB * SUB) as f32;
+                }
+            }
+        }
+    }
+    Some(Coverage { x0: x_min, y0: y_min, w, h, data })
 }
 
 #[cfg(test)]
@@ -816,5 +1039,21 @@ mod tests {
             |minimum: f32| Effector::parse(&[0x81u32, minimum.to_bits()].map(u32::to_be_bytes).concat(), &curves);
         assert!((random(0.89).factor(1.0, 0.0) - 0.954).abs() < 0.005);
         assert!((random(0.51).opacity_factor(1.0, 0.0) - 0.796).abs() < 0.005);
+    }
+
+    #[test]
+    fn polygon_fill_covers_the_inside_by_area() {
+        let mut image = RgbaImage::new(10, 10);
+        // A square from 2.5 to 7.5: half-covered edge pixels, full inside.
+        let square = [(2.5, 2.5), (7.5, 2.5), (7.5, 7.5), (2.5, 7.5)];
+        fill_coverage(&square, (10, 10)).unwrap().paint(&mut image, [255, 255, 255]);
+        assert_eq!(image.pixel(5, 5)[3], 255);
+        assert_eq!(image.pixel(0, 0)[3], 0);
+        assert_eq!(image.pixel(2, 5)[3], 128);
+        assert_eq!(image.pixel(2, 2)[3], 64);
+        // Non-zero winding: a loop drawn twice stays filled once.
+        let mut twice = RgbaImage::new(10, 10);
+        fill_coverage(&[square, square].concat(), (10, 10)).unwrap().paint(&mut twice, [255, 255, 255]);
+        assert_eq!(twice.pixel(5, 5)[3], 255);
     }
 }
