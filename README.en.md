@@ -1,4 +1,4 @@
-# CLIP STUDIO PAINT Format
+# csp-format
 
 [日本語](README.md)
 
@@ -50,11 +50,11 @@ render, some layer effects, 3D) is listed in [the specification](docs/spec/READM
 | Use | How |
 |---|---|
 | Rust library | `cargo add csp-format` (and `cargo add csp-assets`) |
-| CLI | a binary from the [releases](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases) (Windows, macOS, Linux) or `cargo install cspf` |
+| CLI | a binary from the [releases](https://github.com/nanikasheila/csp-format/releases) (Windows, macOS, Linux) or `cargo install cspf` |
 | Python (reading) | `pip install csp-format` |
 | Other languages | the JSON of `cspf inspect` / `layers` / `anim` and the PNGs of `extract` / `render` |
 
-For the latest main: `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format" }`, or clone and
+For the latest main: `csp-format = { git = "https://github.com/nanikasheila/csp-format" }`, or clone and
 `cargo build --release -p cspf`.
 
 Building needs a C compiler: SQLite and zlib are compiled in (the reference

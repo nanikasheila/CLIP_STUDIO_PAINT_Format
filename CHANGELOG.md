@@ -8,6 +8,14 @@ raise the minor version).
 
 ## [Unreleased]
 
+### Changed
+
+- The repository moved from `nanikasheila/CLIP_STUDIO_PAINT_Format` to
+  `nanikasheila/csp-format`, so that its name matches the packages and does
+  not carry the product name. GitHub forwards the old URLs. The repository
+  and homepage links in the crate and PyPI metadata change with the next
+  release; the 0.1.0 pages keep the old links, which still work.
+
 ## [0.1.0] - 2026-10-26
 
 First release.
@@ -48,5 +56,5 @@ First release.
   crate; `csp_format.assets` for the files of `csp-assets`.
 - The sdist carries the tests and their synthetic files.
 
-[Unreleased]: https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases/tag/v0.1.0
+[Unreleased]: https://github.com/nanikasheila/csp-format/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/nanikasheila/csp-format/releases/tag/v0.1.0

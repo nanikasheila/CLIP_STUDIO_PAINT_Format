@@ -7,7 +7,7 @@ The format is not published. This crate was written from observing real
 files, and every rule in it was checked against them (719 files from CSP
 versions of 2017 to 2026, and files made in CLIP STUDIO PAINT EX for each
 feature). The specification and the validation records are in the
-[repository](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format).
+[repository](https://github.com/nanikasheila/csp-format).
 
 Not made or endorsed by CELSYS. CLIP STUDIO PAINT is a trademark of CELSYS, Inc.
 
@@ -29,8 +29,8 @@ Not made or endorsed by CELSYS. CLIP STUDIO PAINT is a trademark of CELSYS, Inc.
 
 What is approximate or not drawn (vector line shapes, text CSP did not
 render, some effects, 3D) is listed in the
-[specification](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/spec/README.md#未解明の項目).
-Validation records: [docs/validation/](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/docs/validation/).
+[specification](https://github.com/nanikasheila/csp-format/blob/main/docs/spec/README.md#未解明の項目).
+Validation records: [docs/validation/](https://github.com/nanikasheila/csp-format/blob/main/docs/validation/).
 
 ## Example
 
@@ -48,7 +48,7 @@ file.save("copy.clip")?; // byte-identical while nothing was changed
 ```
 
 More in the [API documentation](https://docs.rs/csp-format) and in
-[`examples/`](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/crates/csp-format/examples/). The `cspf` crate is a command line tool built on
+[`examples/`](https://github.com/nanikasheila/csp-format/blob/main/crates/csp-format/examples/). The `cspf` crate is a command line tool built on
 this one; `csp-assets` reads CSP's other files (sub tools, auto actions,
 colour and gradient sets, materials).
 

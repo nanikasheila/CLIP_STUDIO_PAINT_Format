@@ -1,4 +1,4 @@
-# CLIP STUDIO PAINT Format
+# csp-format
 
 [English](README.en.md)
 
@@ -40,11 +40,11 @@ CELSYS の公式のものではなく、CELSYS の承認も受けていない。
 | 使い方 | 入れ方 |
 |---|---|
 | Rust のライブラリ | `cargo add csp-format`（サブツールなどは `cargo add csp-assets`） |
-| CLI | [リリース](https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/releases)の実行ファイル（Windows / macOS / Linux）か `cargo install cspf` |
+| CLI | [リリース](https://github.com/nanikasheila/csp-format/releases)の実行ファイル（Windows / macOS / Linux）か `cargo install cspf` |
 | Python（読み取りだけ） | `pip install csp-format` |
 | ほかの言語 | `cspf inspect` / `layers` / `anim` などの JSON 出力、`extract` / `render` の PNG 出力を使う |
 
-main の最新を使うときは `csp-format = { git = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format" }`、または clone して `cargo build --release -p cspf`。
+main の最新を使うときは `csp-format = { git = "https://github.com/nanikasheila/csp-format" }`、または clone して `cargo build --release -p cspf`。
 
 Rust のビルドには C コンパイラが要る（SQLite と zlib を組み込む。CSP と同じ圧縮結果を出すには zlib の C 実装が要るため）。
 最低 Rust 版は 1.88。

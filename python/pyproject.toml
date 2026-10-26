@@ -23,9 +23,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format"
-Documentation = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/python/README.md"
-Changelog = "https://github.com/nanikasheila/CLIP_STUDIO_PAINT_Format/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/nanikasheila/csp-format"
+Documentation = "https://github.com/nanikasheila/csp-format/blob/main/python/README.md"
+Changelog = "https://github.com/nanikasheila/csp-format/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 include = ["csp_format", "csp_format.*"]
