@@ -587,6 +587,48 @@ fn set_nombre(db: &Connection, layer_id: i64, number: &str, centred: bool) -> Re
 }
 
 impl crate::ClipFile {
+    /// Make this page page `index` (from 0) of a work: `ComicPageIndex`, and
+    /// for a single page its side (`ComicIsLeftPage`, the 仕上がり's side
+    /// flag, the ノンブル mirrored to the other edge when the side changes).
+    /// The side alternates with the index: `zero_left` (page 0 is a left
+    /// page) gives the parity, else the page's own index and side do. A
+    /// 見開き page keeps its sides. Returns whether the page is a left page
+    /// (None: a spread, or a canvas without these columns).
+    pub fn set_comic_page(&mut self, index: i64, zero_left: Option<bool>) -> Result<Option<bool>> {
+        let db = self.database();
+        if !has_column(db, "Canvas", "ComicPageIndex")? {
+            return Ok(None);
+        }
+        if is_spread(db)? || !has_column(db, "Canvas", "ComicIsLeftPage")? {
+            db.execute("UPDATE Canvas SET ComicPageIndex = ?1", [index])?;
+            self.reload()?;
+            return Ok(None);
+        }
+        let (own_index, own_left): (Option<i64>, Option<i64>) =
+            db.query_row("SELECT ComicPageIndex, ComicIsLeftPage FROM Canvas", [], |row| {
+                Ok((row.get(0)?, row.get(1)?))
+            })?;
+        let left = match zero_left {
+            Some(zero_left) => zero_left == (index.rem_euclid(2) == 0),
+            None => (own_left.unwrap_or(0) != 0) == (index - own_index.unwrap_or(0)).rem_euclid(2).eq(&0),
+        };
+        db.execute("UPDATE Canvas SET ComicPageIndex = ?1, ComicIsLeftPage = ?2", (index, left as i64))?;
+        if let Some(Value::Integer(flag)) = canvas_value(db, "CropFrameOptionFlag")?
+            && flag & (LEFT_PAGE_FLAG | RIGHT_PAGE_FLAG) != 0
+        {
+            let side = if left { LEFT_PAGE_FLAG } else { RIGHT_PAGE_FLAG };
+            db.execute(
+                "UPDATE Canvas SET CropFrameOptionFlag = ?1",
+                [(flag & !(LEFT_PAGE_FLAG | RIGHT_PAGE_FLAG)) | side],
+            )?;
+        }
+        if (own_left.unwrap_or(0) != 0) != left {
+            mirror_nombre(db)?;
+        }
+        self.reload()?;
+        Ok(Some(left))
+    }
+
     /// Write the page's own ページ番号 and ノンブル into its story info texts
     /// ([`update_page_number`], [`update_nombre`]), after its
     /// `ComicPageIndex` or the work's story settings changed.
