@@ -109,12 +109,23 @@ impl ClipFile {
 
     /// Set one `Layer` column.
     pub fn set_layer_value(&mut self, layer_id: i64, column: &str, value: Value) -> Result<()> {
-        if !crate::database::has_column(self.database(), "Layer", column)? {
-            bail!("Layer has no column {column}");
-        }
-        let sql = format!("UPDATE Layer SET {} = ?1 WHERE MainId = ?2", crate::database::quote(column));
-        if self.database().execute(&sql, (value, layer_id))? == 0 {
-            bail!("No layer {layer_id}");
+        self.set_layer_values(layer_id, [(column, value)])
+    }
+
+    /// Set several `Layer` columns of one layer (reading the layers once after).
+    pub fn set_layer_values<'a>(
+        &mut self,
+        layer_id: i64,
+        values: impl IntoIterator<Item = (&'a str, Value)>,
+    ) -> Result<()> {
+        for (column, value) in values {
+            if !crate::database::has_column(self.database(), "Layer", column)? {
+                bail!("Layer has no column {column}");
+            }
+            let sql = format!("UPDATE Layer SET {} = ?1 WHERE MainId = ?2", crate::database::quote(column));
+            if self.database().execute(&sql, (value, layer_id))? == 0 {
+                bail!("No layer {layer_id}");
+            }
         }
         self.reload()
     }
@@ -140,6 +151,16 @@ impl ClipFile {
         let layer = self.layers.get(layer_id).ok_or_else(|| Error::format(format!("No layer {layer_id}")))?;
         let value = (layer.row.int("LayerVisibility") & !1) | visible as i64;
         self.set_layer_value(layer_id, "LayerVisibility", Value::Integer(value))
+    }
+
+    /// Makes a layer a 下描き layer or not (`DraftLayer`: CSP leaves it out of
+    /// exports and fills). False (and nothing changed) on a file without the column.
+    pub fn set_layer_draft(&mut self, layer_id: i64, draft: bool) -> Result<bool> {
+        if !has_column(self.database(), "Layer", "DraftLayer")? {
+            return Ok(false);
+        }
+        self.set_layer_value(layer_id, "DraftLayer", Value::Integer(draft as i64))?;
+        Ok(true)
     }
 
     /// Clips the layer to the layer below, or not (`LayerClip`).
@@ -723,6 +744,21 @@ mod tests {
         let after = uuids(&file);
         assert_eq!(after.len(), before.len());
         assert!(after.iter().all(|uuid| !before.contains(uuid) && uuid.len() == 36), "{after:?}");
+    }
+
+    #[test]
+    fn a_layer_becomes_a_draft_layer() {
+        let mut file = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        let id = file.add_layer(file.canvas.root_folder, NewLayer::Raster, "a").unwrap();
+        let draft = |file: &ClipFile| file.layers.get(id).unwrap().row.int("DraftLayer");
+        assert!(file.set_layer_draft(id, true).unwrap());
+        assert_eq!(draft(&file), 1);
+        file.set_layer_draft(id, false).unwrap();
+        assert_eq!(draft(&file), 0);
+        // A file from before 下描き layers has no column: nothing to set.
+        let mut old = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        old.database().execute_batch("ALTER TABLE Layer DROP COLUMN DraftLayer").unwrap();
+        assert!(!old.set_layer_draft(id, true).unwrap());
     }
 
     #[test]

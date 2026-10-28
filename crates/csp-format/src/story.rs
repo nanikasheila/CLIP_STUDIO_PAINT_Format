@@ -599,9 +599,12 @@ impl crate::ClipFile {
         if !has_column(db, "Canvas", "ComicPageIndex")? {
             return Ok(None);
         }
-        if is_spread(db)? || !has_column(db, "Canvas", "ComicIsLeftPage")? {
+        if is_spread(db)? {
             db.execute("UPDATE Canvas SET ComicPageIndex = ?1", [index])?;
             self.reload()?;
+            return Ok(None);
+        }
+        if !has_column(db, "Canvas", "ComicIsLeftPage")? {
             return Ok(None);
         }
         let (own_index, own_left): (Option<i64>, Option<i64>) =
