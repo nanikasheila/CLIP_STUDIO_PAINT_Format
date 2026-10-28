@@ -1102,6 +1102,25 @@ mod tests {
     }
 
     #[test]
+    fn a_page_of_a_work_takes_its_side_from_its_number() {
+        let nombre_x = |page: &ClipFile| story_parts(page, NOMBRE_INFO)[0].2[0];
+        let page = reopened(blank_page(&commercial()).unwrap());
+        let left_x = nombre_x(&page);
+        // Page 0 is a left page in this right-bound book: page 1 is a right page.
+        let mut next = reopened(blank_page(&commercial()).unwrap());
+        assert_eq!(next.set_comic_page(1, Some(true)).unwrap(), Some(false));
+        assert_eq!(canvas_ints(&next, &["ComicPageIndex", "ComicIsLeftPage", "CropFrameOptionFlag"]), [1, 0, 4]);
+        // The ノンブル goes to the other edge, by the gutter of the right page.
+        assert!(nombre_x(&next) < left_x, "{} {left_x}", nombre_x(&next));
+        // Without being told, the side follows from the page's own number and side.
+        assert_eq!(next.set_comic_page(4, None).unwrap(), Some(true));
+        assert_eq!(next.set_comic_page(2, Some(false)).unwrap(), Some(false));
+        assert_eq!(next.set_comic_page(5, None).unwrap(), Some(true));
+        assert_eq!(canvas_ints(&next, &["ComicPageIndex", "ComicIsLeftPage", "CropFrameOptionFlag"]), [5, 1, 2]);
+        assert_eq!(nombre_x(&reopened(next)), left_x);
+    }
+
+    #[test]
     fn keeps_csp_layout_for_the_settings_it_was_saved_with() {
         let page = reopened(blank_page(&commercial()).unwrap());
         assert_eq!((page.canvas.width_px, page.canvas.height_px), (7016, 9921));

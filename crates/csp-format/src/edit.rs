@@ -109,12 +109,23 @@ impl ClipFile {
 
     /// Set one `Layer` column.
     pub fn set_layer_value(&mut self, layer_id: i64, column: &str, value: Value) -> Result<()> {
-        if !crate::database::has_column(self.database(), "Layer", column)? {
-            bail!("Layer has no column {column}");
-        }
-        let sql = format!("UPDATE Layer SET {} = ?1 WHERE MainId = ?2", crate::database::quote(column));
-        if self.database().execute(&sql, (value, layer_id))? == 0 {
-            bail!("No layer {layer_id}");
+        self.set_layer_values(layer_id, [(column, value)])
+    }
+
+    /// Set several `Layer` columns of one layer (reading the layers once after).
+    pub fn set_layer_values<'a>(
+        &mut self,
+        layer_id: i64,
+        values: impl IntoIterator<Item = (&'a str, Value)>,
+    ) -> Result<()> {
+        for (column, value) in values {
+            if !crate::database::has_column(self.database(), "Layer", column)? {
+                bail!("Layer has no column {column}");
+            }
+            let sql = format!("UPDATE Layer SET {} = ?1 WHERE MainId = ?2", crate::database::quote(column));
+            if self.database().execute(&sql, (value, layer_id))? == 0 {
+                bail!("No layer {layer_id}");
+            }
         }
         self.reload()
     }
@@ -140,6 +151,16 @@ impl ClipFile {
         let layer = self.layers.get(layer_id).ok_or_else(|| Error::format(format!("No layer {layer_id}")))?;
         let value = (layer.row.int("LayerVisibility") & !1) | visible as i64;
         self.set_layer_value(layer_id, "LayerVisibility", Value::Integer(value))
+    }
+
+    /// Makes a layer a 下描き layer or not (`DraftLayer`: CSP leaves it out of
+    /// exports and fills). False (and nothing changed) on a file without the column.
+    pub fn set_layer_draft(&mut self, layer_id: i64, draft: bool) -> Result<bool> {
+        if !has_column(self.database(), "Layer", "DraftLayer")? {
+            return Ok(false);
+        }
+        self.set_layer_value(layer_id, "DraftLayer", Value::Integer(draft as i64))?;
+        Ok(true)
     }
 
     /// Clips the layer to the layer below, or not (`LayerClip`).
@@ -511,6 +532,106 @@ impl ClipFile {
         Ok(())
     }
 
+    /// The layers in folder `folder`, bottom first, as the file holds them
+    /// now (also between edits that have not reloaded the typed view).
+    pub fn layer_children(&self, folder: i64) -> Result<Vec<i64>> {
+        let database = self.database();
+        let link = |column: &str, id: i64| -> Result<i64> {
+            let sql = format!("SELECT {} FROM Layer WHERE MainId = ?1", quote(column));
+            let value: Option<Option<i64>> = database.query_row(&sql, [id], |row| row.get(0)).optional()?;
+            Ok(value.flatten().unwrap_or(0))
+        };
+        let mut children = Vec::new();
+        let mut child = link("LayerFirstChildIndex", folder)?;
+        while child != 0 && !children.contains(&child) {
+            children.push(child);
+            child = link("LayerNextIndex", child)?;
+        }
+        Ok(children)
+    }
+
+    /// The folder layer `layer_id` is in; the root folder for a layer in no folder.
+    pub fn layer_parent(&self, layer_id: i64) -> Result<i64> {
+        let folders: Vec<i64> = {
+            let mut statement = self.database().prepare(
+                "SELECT MainId FROM Layer WHERE LayerFirstChildIndex IS NOT NULL AND LayerFirstChildIndex != 0",
+            )?;
+            statement.query_map([], |row| row.get(0))?.collect::<std::result::Result<_, _>>()?
+        };
+        for folder in folders {
+            if self.layer_children(folder)?.contains(&layer_id) {
+                return Ok(folder);
+            }
+        }
+        Ok(self.canvas.root_folder)
+    }
+
+    /// Move layer `layer_id` (with what is in it) into folder `folder`: right
+    /// below its child `below`, or on top when `below` is None or not there.
+    pub fn move_layer(&mut self, layer_id: i64, folder: i64, below: Option<i64>) -> Result<()> {
+        if layer_id == folder || layer_id == self.canvas.root_folder {
+            bail!("Layer {layer_id} cannot go into {folder}");
+        }
+        let old = self.layer_parent(layer_id)?;
+        let mut old_siblings = self.layer_children(old)?;
+        if old_siblings.contains(&layer_id) {
+            old_siblings.retain(|id| *id != layer_id);
+            self.relink(old, &old_siblings)?;
+        }
+        let mut siblings = self.layer_children(folder)?;
+        let position = below.and_then(|below| siblings.iter().position(|id| *id == below)).unwrap_or(siblings.len());
+        siblings.insert(position, layer_id);
+        self.relink(folder, &siblings)?;
+        self.reload()
+    }
+
+    /// Link `children` (bottom first) as the whole content of `folder`.
+    fn relink(&self, folder: i64, children: &[i64]) -> Result<()> {
+        let database = self.database();
+        database.execute(
+            "UPDATE Layer SET LayerFirstChildIndex = ?1 WHERE MainId = ?2",
+            (children.first().copied().unwrap_or(0), folder),
+        )?;
+        for (index, child) in children.iter().enumerate() {
+            let next = children.get(index + 1).copied().unwrap_or(0);
+            database.execute("UPDATE Layer SET LayerNextIndex = ?1 WHERE MainId = ?2", (next, child))?;
+        }
+        Ok(())
+    }
+
+    /// Give every layer that has a `LayerUuid` a new one. CSP gives each page
+    /// file its own; pages written from one template would otherwise share
+    /// them (with [`ClipFile::renew_file_id`] for the file's own id).
+    pub fn renew_layer_uuids(&mut self) -> Result<()> {
+        if !has_column(self.database(), "Layer", "LayerUuid")? {
+            return Ok(());
+        }
+        let ids: Vec<i64> = {
+            let mut statement = self.database().prepare("SELECT MainId FROM Layer WHERE LayerUuid IS NOT NULL")?;
+            statement.query_map([], |row| row.get(0))?.collect::<std::result::Result<_, _>>()?
+        };
+        for id in ids {
+            self.database().execute("UPDATE Layer SET LayerUuid = ?1 WHERE MainId = ?2", (layer_uuid(), id))?;
+        }
+        self.reload()
+    }
+
+    /// One `Canvas` column; None when the canvas has no such column.
+    pub fn canvas_value(&self, column: &str) -> Result<Option<Value>> {
+        crate::story::canvas_value(self.database(), column)
+    }
+
+    /// Set one `Canvas` column. False (and nothing changed) when the canvas
+    /// has no such column, as older files lack some.
+    pub fn set_canvas_value(&mut self, column: &str, value: Value) -> Result<bool> {
+        if !has_column(self.database(), "Canvas", column)? {
+            return Ok(false);
+        }
+        self.database().execute(&format!("UPDATE Canvas SET {} = ?1", quote(column)), [value])?;
+        self.reload()?;
+        Ok(true)
+    }
+
     /// Remove a layer (a folder with everything in it): its rows, mipmaps,
     /// thumbnails, offscreens and their external chunks. The root folder
     /// cannot be removed.
@@ -578,6 +699,76 @@ impl ClipFile {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn names_in(file: &ClipFile, folder: i64) -> Vec<String> {
+        file.layer_children(folder).unwrap().iter().map(|id| file.layers.get(*id).unwrap().name.clone()).collect()
+    }
+
+    #[test]
+    fn layers_move_between_folders_and_keep_the_order_asked_for() {
+        let mut file = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        let root = file.canvas.root_folder;
+        let folder = file.add_layer(root, NewLayer::Folder, "folder").unwrap();
+        let a = file.add_layer(root, NewLayer::Raster, "a").unwrap();
+        let b = file.add_layer(root, NewLayer::Raster, "b").unwrap();
+        let before = names_in(&file, root);
+        assert_eq!(before[before.len() - 3..], ["folder", "a", "b"]);
+
+        file.move_layer(a, folder, None).unwrap();
+        file.move_layer(b, folder, Some(a)).unwrap();
+        assert_eq!(names_in(&file, folder), ["b", "a"]);
+        assert_eq!(file.layer_parent(b).unwrap(), folder);
+        assert_eq!(*names_in(&file, root).last().unwrap(), "folder");
+        // Out again, on top of the root's children.
+        file.move_layer(b, root, None).unwrap();
+        assert_eq!(names_in(&file, folder), ["a"]);
+        assert_eq!(file.layer_parent(b).unwrap(), root);
+        assert_eq!(*names_in(&file, root).last().unwrap(), "b");
+        assert!(file.move_layer(folder, folder, None).is_err());
+
+        let file = ClipFile::from_bytes(file.to_bytes().unwrap()).unwrap();
+        assert_eq!(names_in(&file, folder), ["a"]);
+        let report = crate::verify::check_clip(file.to_bytes().unwrap(), Default::default());
+        assert!(report.ok(), "{:?}", report.errors);
+    }
+
+    #[test]
+    fn every_layer_gets_a_new_uuid() {
+        let mut file = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        file.add_layer(file.canvas.root_folder, NewLayer::Raster, "a").unwrap();
+        let uuids =
+            |file: &ClipFile| file.layers.layers.iter().filter_map(|layer| layer.uuid.clone()).collect::<Vec<_>>();
+        let before = uuids(&file);
+        assert!(before.len() >= 2);
+        file.renew_layer_uuids().unwrap();
+        let after = uuids(&file);
+        assert_eq!(after.len(), before.len());
+        assert!(after.iter().all(|uuid| !before.contains(uuid) && uuid.len() == 36), "{after:?}");
+    }
+
+    #[test]
+    fn a_layer_becomes_a_draft_layer() {
+        let mut file = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        let id = file.add_layer(file.canvas.root_folder, NewLayer::Raster, "a").unwrap();
+        let draft = |file: &ClipFile| file.layers.get(id).unwrap().row.int("DraftLayer");
+        assert!(file.set_layer_draft(id, true).unwrap());
+        assert_eq!(draft(&file), 1);
+        file.set_layer_draft(id, false).unwrap();
+        assert_eq!(draft(&file), 0);
+        // A file from before 下描き layers has no column: nothing to set.
+        let mut old = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        old.database().execute_batch("ALTER TABLE Layer DROP COLUMN DraftLayer").unwrap();
+        assert!(!old.set_layer_draft(id, true).unwrap());
+    }
+
+    #[test]
+    fn canvas_values_are_set_only_where_the_canvas_has_the_column() {
+        let mut file = ClipFile::create(&crate::NewCanvas { width: 8, height: 8, ..Default::default() }).unwrap();
+        assert!(file.set_canvas_value("CanvasResolution", Value::Real(600.0)).unwrap());
+        assert_eq!(file.canvas_value("CanvasResolution").unwrap(), Some(Value::Real(600.0)));
+        assert!(!file.set_canvas_value("NoSuchColumn", Value::Integer(1)).unwrap());
+        assert_eq!(file.canvas_value("NoSuchColumn").unwrap(), None);
+    }
 
     #[test]
     fn external_ids_have_csp_shape() {
