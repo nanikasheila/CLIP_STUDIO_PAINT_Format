@@ -132,7 +132,10 @@ fn element_of(start: &quick_xml::events::BytesStart) -> Result<Element> {
     for attribute in start.attributes() {
         let attribute = attribute.map_err(|e| Error::format(format!("XML attribute: {e}")))?;
         let key = String::from_utf8_lossy(attribute.key.as_ref()).into_owned();
-        let value = attribute.unescape_value().map_err(|e| Error::format(format!("XML attribute: {e}")))?.into_owned();
+        let value = attribute
+            .normalized_value(quick_xml::XmlVersion::default())
+            .map_err(|e| Error::format(format!("XML attribute: {e}")))?
+            .into_owned();
         attributes.push((key, value));
     }
     Ok(Element { name, attributes, ..Element::default() })
