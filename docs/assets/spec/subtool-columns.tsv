@@ -5,7 +5,7 @@ BalloonInsertType	フキダシ作成	追加方法	一覧の並び順 0 レイヤ
 BalloonTailCurveKind	フキダシのしっぽ	曲げ方	0 直線, 1 折れ線, 2 スプライン	確認済み（W4: 3 つとも）	INTEGER	16	balloon	0	2	
 BalloonTailType	フキダシのしっぽ	しっぽの種類	0 通常, 1 丸	確認済み（W4: 2 つとも）	INTEGER	16	balloon	0	1	
 BalloonTailWidth	フキダシのしっぽ	しっぽの幅	数値（単位は BalloonTailWidthUnit）	確認済み（W4）	REAL	16	balloon	20.0	94.10000000000001	
-BalloonTailWidthUnit	フキダシのしっぽ	しっぽの幅の単位	0 px, 2 mm（推測）	推測	INTEGER	16	balloon	0	0	
+BalloonTailWidthUnit	フキダシのしっぽ	しっぽの幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	16	balloon	0	0	
 BalloonTone	フキダシ作成 / 流線 / 集中線	トーン化	0/1（フキダシ・流線・集中線で共通の列）	確認済み（W4: フキダシ、流線）	INTEGER	180	effectLines,balloon,brush,?	0	1	
 BalloonUniteText	フキダシ作成	描画位置のテキストに結合	0/1	確認済み（W4）	INTEGER	61	balloon,brush	1	1	
 BrushAdjustFlowByInterval	ブラシ先端	間隔によるブラシ濃度調整	0/1	確認済み（W4）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	1	
@@ -17,7 +17,7 @@ BrushBlur	水彩	ぼかし幅		推測	REAL	1578	brush,eraser,?	0.0	200.0
 BrushBlurEffector	水彩	ぼかし幅の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1578	brush,eraser,?			effector:1578
 BrushBlurKind	インク	にじみ品質	0 通常, 1 高品質	確認済み（W4）	INTEGER	106	brush,eraser	0	1	
 BrushBlurLinkSize	インク	にじむ強さ	0 自動設定, 1 固定値	確認済み（W4）	INTEGER	1578	brush,eraser,?	0	1	
-BrushBlurUnit	水彩	ぼかし幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushBlurUnit	水彩	ぼかし幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1578	brush,eraser,?	0	2	
 BrushChangeColorTarget	色の変化	変化対象	0 メイン描画色とサブ描画色, 1 メイン描画色, 2 サブ描画色（0 は並び順から推測）	確認済み（W4: メイン描画色 1、サブ描画色 2）	INTEGER	1231	brush,eraser	0	2	
 BrushChangePatternColor	色の変化	ブラシ先端色の変化	0/1	確認済み（W4）	INTEGER	1271	brush,eraser	0	1	
 BrushChangeStrokeColor	色の変化	ストロークごとのランダム変化	0/1	確認済み（W4）	INTEGER	1271	brush,eraser	0	1	
@@ -31,7 +31,7 @@ BrushHardness	ブラシ先端	硬さ	1–100（円形の先端）	確認済み�
 BrushHueChange	色の変化	色相（ブラシ先端色の変化）		確認済み（W4）	INTEGER	1271	brush,eraser	-5	200	
 BrushHueChangeEffector	色の変化	色相（ブラシ先端色の変化）の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	確認済み（W4: 筆圧 16 を足して inputs 128→144、ランダムの最小値）	BLOB	1271	brush,eraser			effector:1271
 BrushInLength	入り抜き	入り（長さ指定）		確認済み（W4）	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	1.0	5000.0	
-BrushInLengthUnit	入り抜き	入り（長さ指定）の単位	0 px, 2 mm（推測）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
+BrushInLengthUnit	入り抜き	入り（長さ指定）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
 BrushInOutBySpeed	入り抜き	速度による入り抜き	0/1	確認済み（W4）	INTEGER	1668	brush,eraser,vectorEdit,?,selection,fill,ruler,balloon,blend,frame,common	0	1	
 BrushInOutTarget	入り抜き	入り抜き（影響先設定）	(項目 ID, 有効, 最小値 %) の列。112 紙質濃度, 1001 ブラシサイズ, 1021 ブラシ濃度, 1041 間隔, 1051 厚さ, 1082 絵の具量, 1084 絵の具濃度, 1100 サブ描画色混合率, 1104 色相, 1132 粒子サイズ（確認）。1106 彩度, 1108 明度, 1134 粒子密度（並びから推測）、1093 は画面にない。50000 + ID が 2-ブラシの項目（51001 2-ブラシサイズ, 51132 2-粒子サイズを確認）	確認済み（W4: 項目 ID 10 個と 2-ブラシの 2 個、最小値）	BLOB	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common			records:1847
 BrushInOutType	入り抜き	指定方法	0 長さ指定, 1 パーセント指定, 2 フェード（2 は推測）	確認済み（W4: 長さ指定 0、パーセント指定 1）	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	1	
@@ -47,7 +47,7 @@ BrushMixColorExtension	インク	色延び	%	確認済み（W4）	INTEGER	1578	b
 BrushNotUseCommonInOut	入り抜き	共通の入り抜きを使わない		推測	INTEGER	28	brush,eraser	0	0	
 BrushOpacityEffector	インク	不透明度の影響元設定		確認済み（W4: 傾き）	BLOB	1624	brush,eraser,effectLines,shape,balloon,frame,vectorEdit,selection,blend,fill,ruler			effector:1624
 BrushOutLength	入り抜き	抜き（長さ指定）		確認済み（W4）	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	1.0	5000.0	
-BrushOutLengthUnit	入り抜き	抜き（長さ指定）の単位	0 px, 2 mm（推測）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
+BrushOutLengthUnit	入り抜き	抜き（長さ指定）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0	2	
 BrushOutRatio	入り抜き	抜き（パーセント指定）	%	確認済み（W4 表示）	REAL	1847	brush,effectLines,eraser,shape,vectorEdit,?,selection,ruler,fill,balloon,blend,frame,common	0.1	100.0	
 BrushPatternImageArray	ブラシ先端	先端の素材	素材の参照の列	推測	BLOB	1150	brush,?,eraser,frame,balloon			materials:1150
 BrushPatternNameVersion	ブラシ先端	素材名の形式の版	未解明	未解明	INTEGER	1122	brush,eraser,shape,balloon,frame,effectLines,fill,liquify,blend,selection,common,vectorEdit	0	1	
@@ -74,7 +74,7 @@ BrushSharpenCorner	補正	角をとがらせる	0/1	確認済み（W4）	INTEGER
 BrushSize	ブラシサイズ	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	確認済み（W3 表示、W4）	REAL	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0.5	2000.0	
 BrushSizeEffector	ブラシサイズ	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	確認済み（W4: 入力のビット、入力ごとの最小値、傾きの最大値、筆圧のグラフ）	BLOB	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend			effector:1962
 BrushSizeSyncViewScale	ブラシサイズ	画面上のサイズで指定	0/1	確認済み（W4）	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	1	
-BrushSizeUnit	ブラシサイズ	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	2	
+BrushSizeUnit	ブラシサイズ	ブラシサイズの単位	0 px, 2 ×10 px（W3c: 1.2 を 12.0 px と表示し、600・1200 dpi のどちらでも 12 px と同じ太さで描く。mm ではない）	確認済み（W3c）	INTEGER	1962	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,liquify,fill,blend	0	2	
 BrushSprayBias	散布効果	散布偏向	-100–100	確認済み（W4）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	-100	100	
 BrushSprayDensity	散布効果	粒子密度	1–16	確認済み（W4）	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	1	16	
 BrushSprayDensityEffector	散布効果	粒子密度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
@@ -82,7 +82,7 @@ BrushSprayFixedPointArray	散布効果	固定の散布位置	点の列（標本�
 BrushSpraySize	散布効果	粒子サイズ		確認済み（W4）	REAL	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0.78	1150.0	
 BrushSpraySizeEffector	散布効果	粒子サイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend			effector:1942
 BrushSpraySizeSyncBrushSize	散布効果	ブラシサイズに連動（粒子サイズ）	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-BrushSpraySizeUnit	散布効果	粒子サイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	2	
+BrushSpraySizeUnit	散布効果	粒子サイズの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	2	
 BrushSprayUseFixedPoint	散布効果	固定の散布位置を使う	0/1	推測	INTEGER	1942	brush,effectLines,eraser,shape,balloon,vectorEdit,frame,?,selection,ruler,fill,blend	0	0	
 BrushStrokeHueChange	色の変化	色相（ストロークごとのランダム変化）		確認済み（W4）	INTEGER	1271	brush,eraser	0	10	
 BrushStrokeSaturationChange	色の変化	彩度（ストロークごとのランダム変化）		確認済み（W4）	INTEGER	1271	brush,eraser	0	3	
@@ -113,9 +113,9 @@ BrushWaterColor	インク	下地混色の方式	0 色混ぜ, 1 にじみ, 2 色�
 BrushWaterEdgeAfterDrag	水彩境界	ドラッグ後に処理	0/1	確認済み（W4）	INTEGER	1578	brush,eraser,?	0	1	
 BrushWaterEdgeAlphaPower	水彩境界	透明度影響	0–100（バー）	確認済み（W4）	INTEGER	1578	brush,eraser,?	3	50	
 BrushWaterEdgeBlur	水彩境界	ぼかし幅		確認済み（W4）	REAL	1548	brush,eraser,?	0.0	5.0	
-BrushWaterEdgeBlurUnit	水彩境界	ぼかし幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1548	brush,eraser,?	0	0	
+BrushWaterEdgeBlurUnit	水彩境界	ぼかし幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1548	brush,eraser,?	0	0	
 BrushWaterEdgeRadius	水彩境界	水彩境界（範囲）		確認済み（W4）	REAL	1578	brush,eraser,?	0.1	8.5	
-BrushWaterEdgeRadiusUnit	水彩境界	水彩境界（範囲）の単位	0 px, 2 mm（推測）	推測	INTEGER	1578	brush,eraser,?	0	2	
+BrushWaterEdgeRadiusUnit	水彩境界	水彩境界（範囲）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1578	brush,eraser,?	0	2	
 BrushWaterEdgeStrength	水彩境界	強さ（フチの表現 ビビッド）	0–100（バー）	確認済み（W4）	INTEGER	12	brush	40	100	
 BrushWaterEdgeStyle	水彩境界	フチの表現	0 通常, 1 ビビッド	確認済み（W4）	INTEGER	12	brush	0	1	
 BrushWaterEdgeValuePower	水彩境界	明度影響	0–100（バー）	確認済み（W4）	INTEGER	1578	brush,eraser,?	0	70	
@@ -132,7 +132,7 @@ ConcentrateStreamBasePointType	描画位置（集中線）	基準位置	一覧�
 ConcentrateStreamFillOpacity	集中線	塗りの不透明度	0–100 %	確認済み（W4）	INTEGER	85	effectLines,?	100	100	
 ConcentrateStreamIntervalAngle	描画間隔（集中線）	線の間隔（角度）	度	確認済み（W4）	REAL	85	effectLines,?	2.0	30.0	
 ConcentrateStreamIntervalDistance	描画間隔（集中線）	線の間隔（距離）	数値（単位は ConcentrateStreamIntervalDistanceUnit）	推測	REAL	85	effectLines,?	5.0	60.0	
-ConcentrateStreamIntervalDistanceUnit	描画間隔（集中線）	線の間隔（距離）の単位	0 px, 2 mm（推測）	推測	INTEGER	85	effectLines,?	0	0	
+ConcentrateStreamIntervalDistanceUnit	描画間隔（集中線）	線の間隔（距離）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	85	effectLines,?	0	0	
 ConcentrateStreamIntervalType	描画間隔（集中線）	線の間隔の方式	0 角度, 1 距離	確認済み（W4: 角度 0、距離 1）	INTEGER	85	effectLines,?	0	1	
 ConcentrateStreamMakeLayer	集中線	描画先	一覧の値（推測）	推測	INTEGER	85	effectLines,?	1	2	
 ConcentrateStreamUseFill	集中線	下地を塗りつぶす	0/1	確認済み（W4）	INTEGER	85	effectLines,?	0	1	
@@ -143,10 +143,10 @@ ContourFillUseTrans	等高線塗り	透明を使う		推測	INTEGER	24	gradient	
 CutFrameCurveKind	コマ枠カット	分割形状	0 直線, 1 折れ線, 2 スプライン	確認済み（W4: 3 つとも）	INTEGER	16	frame	0	0	
 CutFrameCutFolderType	コマ枠カット	分割方法	0 中のレイヤーを複製, 1 空のフォルダーを作成, 2 フォルダーを分けずコマ枠のみ分割	確認済み（W4: 3 つとも）	INTEGER	16	frame	0	2	
 CutFrameHorizontalGap	コマ枠カット	左右の間隔（直線以外は「間隔」）	数値（単位は CutFrameHorizontalGapUnit）	確認済み（W4）	REAL	16	frame	8.0	80.0	
-CutFrameHorizontalGapUnit	コマ枠カット	左右の間隔（直線以外は「間隔」）の単位	0 px, 2 mm（推測）	推測	INTEGER	16	frame	0	0	
+CutFrameHorizontalGapUnit	コマ枠カット	左右の間隔（直線以外は「間隔」）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	16	frame	0	0	
 CutFrameUsePreferenceGap	コマ枠カット	環境設定の枠線間隔	0/1	確認済み（W4）	INTEGER	16	frame	0	1	
 CutFrameVerticalGap	コマ枠カット	上下の間隔（直線のときだけ）	数値（単位は CutFrameVerticalGapUnit）	確認済み（W4）	REAL	16	frame	15.0	180.0	
-CutFrameVerticalGapUnit	コマ枠カット	上下の間隔（直線のときだけ）の単位	0 px, 2 mm（推測）	推測	INTEGER	16	frame	0	0	
+CutFrameVerticalGapUnit	コマ枠カット	上下の間隔（直線のときだけ）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	16	frame	0	0	
 DualAdjustFlowByInterval	ブラシ先端（デュアルブラシ）	間隔によるブラシ濃度調整	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
 DualAntiAlias	アンチエイリアス（デュアルブラシ）	アンチエイリアス	0 なし, 1 弱, 2 中, 3 強	確認済み（W4: 中 2、強 3）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
 DualAutoIntervalType	ストローク（デュアルブラシ）	間隔	0 固定, 1 広い（推測）, 2 普通, 3 狭い	確認済み（W4: 普通 2、狭い 3）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	3	
@@ -172,7 +172,7 @@ DualRotationRandomInSpray	散布効果（デュアルブラシ）	粒子の向�
 DualRotationRandomScale	ブラシ先端（デュアルブラシ）	向きのランダムの幅	%	確認済み（W4: ランダムの影響度）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	2	100	
 DualSize	ブラシサイズ（デュアルブラシ）	ブラシサイズ	半径ではなく直径の値（px は BrushSizeUnit 0）	確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	6.0	800.0000000000001	
 DualSizeEffector	ブラシサイズ（デュアルブラシ）	ブラシサイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	推測	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
-DualSizeUnit	ブラシサイズ（デュアルブラシ）	ブラシサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
+DualSizeUnit	ブラシサイズ（デュアルブラシ）	ブラシサイズの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
 DualSprayBias	散布効果（デュアルブラシ）	散布偏向	-100–100	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	100	
 DualSprayDensity	散布効果（デュアルブラシ）	粒子密度	1–16	確認済み（W4）	INTEGER	1272	brush,eraser,balloon,effectLines,shape,frame,blend,selection	1	16	
 DualSprayDensityEffector	散布効果（デュアルブラシ）	粒子密度の影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	確認済み（W4: 傾き 32）	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
@@ -180,7 +180,7 @@ DualSprayFixedPointArray	散布効果（デュアルブラシ）	固定の散布
 DualSpraySize	散布効果（デュアルブラシ）	粒子サイズ		確認済み（W4）	REAL	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	1.0	450.0	
 DualSpraySizeEffector	散布効果（デュアルブラシ）	粒子サイズの影響元設定	Effector（影響元: 筆圧・傾き・速度・ランダム）	確認済み（W4: 筆圧 16）	BLOB	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection			effector:1341
 DualSpraySizeSyncBrushSize	散布効果（デュアルブラシ）	ブラシサイズに連動（粒子サイズ）	0/1	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	1	
-DualSpraySizeUnit	散布効果（デュアルブラシ）	粒子サイズの単位	0 px, 2 mm（推測）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
+DualSpraySizeUnit	散布効果（デュアルブラシ）	粒子サイズの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
 DualSprayUseFixedPoint	散布効果（デュアルブラシ）	固定の散布位置を使う	0/1	推測	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	0	
 DualTextureBrightness	紙質（デュアルブラシ）	明るさ	-100–100	確認済み（W4）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	-100	50	
 DualTextureCompositeMode	紙質（デュアルブラシ）	紙質適用方法	CSP の並び順 0 通常, 1 乗算, 2 減算, 3 比較, 4 輪郭, 5 オーバーレイ, 6 覆い焼きカラー, 7 焼き込みカラー, 8 ハードミックス, 9 高さ（0、1、3 を確認）	確認済み（W4: 通常 0、乗算 1）	INTEGER	1341	brush,eraser,shape,balloon,effectLines,frame,blend,fill,vectorEdit,selection	0	6	
@@ -201,15 +201,15 @@ DualVerticalThicknes	ブラシ先端（デュアルブラシ）	厚さの適用�
 DustMode	ごみ取り	モード	一覧の並び順 0 不透明の点を消す, 1 白地の中の点を消す, 2 透明の穴を周囲の色で埋める, 3 透明の穴を描画色で埋める	確認済み（W4: 0・1・3）	INTEGER	17	vectorEdit,?	0	2	
 DustModeForSelect	ごみ選択	モード	0 不透明の点を選択, 1 白地の中の点を選択, 3 透明の穴を選択（DustMode と同じ番号で 2 は無い）	確認済み（W4: 3 つとも）	INTEGER	9	selection,?	0	0	
 DustSize	ごみ取り / ごみ選択	ごみのサイズ	数値（単位は DustSizeUnit）	確認済み（W4: ごみ取り）	REAL	26	vectorEdit,selection,?	4.0	10.0	
-DustSizeUnit	ごみ取り / ごみ選択	ごみのサイズの単位	0 px, 2 mm（推測）	推測	INTEGER	26	vectorEdit,selection,?	0	0	
+DustSizeUnit	ごみ取り / ごみ選択	ごみのサイズの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	26	vectorEdit,selection,?	0	0	
 EnableSnapSymmetry	ツール共通	対称定規にスナップ	0/1	確認済み（W4: 塗りつぶし）	INTEGER	72	selection,gradient,fill,vectorEdit	1	1	
 FillAntiAlias	塗りつぶし	アンチエイリアス	0/1（塗りつぶしではチェックだけ）	確認済み（W4）	INTEGER	192	gradient,fill,selection	0	1	
 FillCloseGap	塗りつぶし	隙間閉じの大きさ	段階のバー（2 段目 3、4 段目 10）	確認済み（W4）	REAL	96	fill,selection,gradient	1.0	50.0	
-FillCloseGapUnit	塗りつぶし	隙間閉じの大きさの単位	0 px, 2 mm（推測）	推測	INTEGER	96	fill,selection,gradient	0	0	
+FillCloseGapUnit	塗りつぶし	隙間閉じの大きさの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	96	fill,selection,gradient	0	0	
 FillColorMargin	塗りつぶし	色の誤差	%	確認済み（W4）	REAL	1652	brush,eraser,fill,selection,gradient,?,blend	0.0	80.0	
 FillContinuousPixel	塗りつぶし	隣接ピクセルをたどる	0/1	確認済み（W4）	INTEGER	68	selection,gradient,fill	1	1	
 FillExpandLength	塗りつぶし	領域拡縮の幅		確認済み（W4）	REAL	1652	brush,eraser,fill,selection,gradient,?,blend	0.0	10.0	
-FillExpandLengthUnit	塗りつぶし	領域拡縮の幅の単位	0 px, 2 mm（推測）	推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	0	0	
+FillExpandLengthUnit	塗りつぶし	領域拡縮の幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	0	0	
 FillExpandType	塗りつぶし	拡縮方法	ボタンの並び順 0 1 番目, 1 2 番目, 2 3 番目（0 と 2 を確認）	確認済み（W4: 1 番目 0、3 番目 2）	INTEGER	1652	brush,eraser,fill,selection,gradient,?,blend	2	2	
 FillIncludeVectorCenter	参照先	中心線も含める	0/1	確認済み（W4）	INTEGER	58	fill,selection,gradient	0	1	
 FillNotReferBalloon	参照先	参照しないレイヤー: フキダシ	0/1（3 番目のボタン、推測）	推測	INTEGER	1	fill	1	1	
@@ -233,18 +233,18 @@ FillUseNotStartColor	参照先	塗りを開始しない色	0/1	確認済み（W4
 FixedShapeAspectType	図形	縦横指定の方法	0 比率指定, 1 長さ指定	確認済み（W4: 長さ指定 1）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
 FixedShapeHeight	図形	縦（長さ指定）	数値（単位は FixedShapeHeightUnit）	確認済み（W4）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	100.0	100.0	
 FixedShapeHeightRate	図形	縦（比率指定）	数値	推測	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	1.0	1.0	
-FixedShapeHeightUnit	図形	縦（長さ指定）の単位	0 px, 2 mm（推測）	推測	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
+FixedShapeHeightUnit	図形	縦（長さ指定）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
 FixedShapeKind	図形	図形	0 長方形, 1 楕円, 2 多角形	確認済み（W4: 長方形 0、楕円 1、多角形 2）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	2	
 FixedShapeRoundRate	図形	角の丸さ（比率指定）	数値	確認済み（W4）	REAL	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	10.0	100.0	
 FixedShapeRoundSize	図形	角の丸さ（長さ指定）	数値（単位は FixedShapeRoundSizeUnit）	確認済み（W4）	REAL	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	5.0	60.0	
-FixedShapeRoundSizeUnit	図形	角の丸さ（長さ指定）の単位	0 px, 2 mm（推測）	推測	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	2	
+FixedShapeRoundSizeUnit	図形	角の丸さ（長さ指定）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	2	
 FixedShapeRoundValueType	図形	角の丸さの指定方法	0 比率指定, 1 長さ指定	確認済み（W4: 長さ指定 1）	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	1	
 FixedShapeUseAspect	図形	縦横指定	0/1	確認済み（W4）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	1	
 FixedShapeUseRoundCorner	図形	角の丸さ	0/1	確認済み（W4）	INTEGER	195	effectLines,shape,balloon,selection,frame,ruler,?,vectorEdit	0	1	
 FixedShapeVertexNumber	図形	多角形の頂点数	個	確認済み（W4）	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	6	7	
 FixedShapeWidth	図形	横（長さ指定）	数値（単位は FixedShapeWidthUnit）	推測	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	100.0	100.0	
 FixedShapeWidthRate	図形	横（比率指定）	数値	確認済み（W4）	REAL	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	1.0	1.0	
-FixedShapeWidthUnit	図形	横（長さ指定）の単位	0 px, 2 mm（推測）	推測	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
+FixedShapeWidthUnit	図形	横（長さ指定）の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	199	effectLines,shape,balloon,selection,frame,ruler,vectorEdit,?	0	0	
 FlickerReduction	補正	手ブレ補正	0–100	確認済み（W4）	INTEGER	1745	brush,eraser,selection,vectorEdit,fill,?,liquify,ruler,balloon,blend,frame,common	0	100	
 FlickerReductionBySpeed	補正	速度による手ブレ補正	0/1	推測	INTEGER	1745	brush,eraser,selection,vectorEdit,fill,?,liquify,ruler,balloon,blend,frame,common	0	1	
 FlickerReductionBySpeedType	補正	補正タイプ（速度による手ブレ補正）	1 左のボタン（既定）, 0 右のボタン	確認済み（W4）	INTEGER	1430	brush,eraser,fill,selection,liquify,blend,vectorEdit,common,ruler,balloon,frame	0	1	
@@ -272,9 +272,9 @@ LineCurveKind	線	曲線 種類	名前からの直訳	推測（直訳）	INTEGER
 LineLockAngle	グラデーション / 連続曲線	角度の刻み	0/1	確認済み（W4: グラデーション、連続曲線）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	0	0	
 LineLockAngleStep	グラデーション / 連続曲線	角度の刻みの角度	度	確認済み（W4）	INTEGER	262	gradient,shape,effectLines,frame,brush,ruler,selection,balloon	42	45	
 LineWidthAddValue	線幅修正	指定幅で太らせるの幅	数値（単位は LineWidthAddValueUnit）	確認済み（W4）	REAL	24	brush,vectorEdit	1.0	6.5	
-LineWidthAddValueUnit	線幅修正	指定幅で太らせるの幅の単位	0 px, 2 mm（推測）	推測	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthAddValueUnit	線幅修正	指定幅で太らせるの幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	24	brush,vectorEdit	0	0	
 LineWidthConstantValue	線幅修正	一定の太さ	数値（単位は LineWidthConstantValueUnit）	確認済み（W4）	REAL	24	brush,vectorEdit	4.0	20.0	
-LineWidthConstantValueUnit	線幅修正	一定の太さの単位	0 px, 2 mm（推測）	推測	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthConstantValueUnit	線幅修正	一定の太さの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	24	brush,vectorEdit	0	0	
 LineWidthDivideValue	線幅修正	指定倍に縮小の倍率	倍	確認済み（W4）	REAL	24	brush,vectorEdit	0.8	0.9	
 LineWidthMultiplyValue	線幅修正	指定倍に拡大の倍率	倍	確認済み（W4）	REAL	24	brush,vectorEdit	1.1	1.2	
 LineWidthOperation	線幅修正	処理の方法	0 指定幅で太らせる, 1 指定幅で細らせる, 2 指定倍に拡大, 3 指定倍に縮小, 4 一定の太さにする	確認済み（W4: 5 つとも）	INTEGER	24	brush,vectorEdit	0	3	
@@ -282,7 +282,7 @@ LineWidthRemainCoreLine	線幅修正	1 ピクセルの線を残す	0/1	確認済
 LineWidthSmoothLengthUnit	線	幅 滑らか 長さ 単位	名前からの直訳	推測（直訳）	INTEGER	20	brush,vectorEdit	0	0	
 LineWidthSmoothLengthValue	線幅修正	滑らかにする範囲	段階のバー（3 段目 70、5 段目 200）	確認済み（W4: 3 段目 70、5 段目 200）	REAL	20	brush,vectorEdit	70.0	70.0	
 LineWidthSubtractValue	線幅修正	指定幅で細らせるの幅	数値（単位は LineWidthSubtractValueUnit）	確認済み（W4）	REAL	24	brush,vectorEdit	1.0	10.0	
-LineWidthSubtractValueUnit	線幅修正	指定幅で細らせるの幅の単位	0 px, 2 mm（推測）	推測	INTEGER	24	brush,vectorEdit	0	0	
+LineWidthSubtractValueUnit	線幅修正	指定幅で細らせるの幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	24	brush,vectorEdit	0	0	
 LiquifyDensity	ゆがみ	硬さ	0–100	確認済み（W4）	INTEGER	12	liquify	20	50	
 LiquifyOperation	ゆがみ	ゆがませ方	0 進行方向, 1 膨張, 2 収縮, 3 進行方向の左, 4 進行方向の右, 5 時計回り, 6 反時計回り	確認済み（W4: 0・1・3・6、ほかはツールチップの並び）	INTEGER	12	liquify	0	0	
 LiquifyReferDraggedArea	ゆがみ	操作した箇所の画像のみを参照	0/1	確認済み（W4）	INTEGER	12	liquify	0	0	
@@ -324,7 +324,7 @@ ObjectVectorOperation	操作	ベクター 操作	名前からの直訳	推測（
 Opacity	不透明度	不透明度	0–100 %	確認済み（W3 表示・書き出し、W4）	INTEGER	1951	brush,effectLines,gradient,eraser,shape,fill,?,blend	49	100	
 ParallelStreamBasePointType	描画位置（流線）	基準位置	一覧の並び順 0 始点, 1 中点, 2 終点（1 と 2 を確認）	確認済み（W4: 中点 1、終点 2）	INTEGER	34	effectLines	1	2	
 ParallelStreamInterval	描画間隔（流線）	線の間隔	数値（単位は ParallelStreamIntervalUnit）	確認済み（W4）	REAL	34	effectLines	0.3	30.0	
-ParallelStreamIntervalUnit	描画間隔（流線）	線の間隔の単位	0 px, 2 mm（推測）	推測	INTEGER	34	effectLines	0	2	
+ParallelStreamIntervalUnit	描画間隔（流線）	線の間隔の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	34	effectLines	0	2	
 ParallelStreamLineAngle	流線	角度	度	確認済み（W4）	REAL	34	effectLines	-180.0	90.0	
 ParallelStreamMakeLayer	流線	描画先	一覧の値（推測）	推測	INTEGER	34	effectLines	1	2	
 ParallelStreamMaxLineNumber	描画間隔（流線）	最大本数	本	確認済み（W4）	INTEGER	34	effectLines	200	300	
@@ -381,7 +381,7 @@ SpecialRulerLockAngleStep	特殊定規 / 対称定規	角度の刻みの角度	�
 SpecialRulerRotate	特殊定規	確定後に角度を調整	0/1	確認済み（W4）	INTEGER	16	ruler	1	1	
 SpecialRulerWidthRate	特殊定規	縦横比の横	比	確認済み（W4）	REAL	16	ruler	1.0	1.0	
 SpuitAroundPixel	スポイト	周囲の色の範囲	数値（単位は SpuitAroundPixelUnit）	確認済み（W4）	REAL	28	eyedropper	5.0	5.0	
-SpuitAroundPixelUnit	スポイト	周囲の色の範囲の単位	0 px, 2 mm（推測）	推測	INTEGER	28	eyedropper	0	0	
+SpuitAroundPixelUnit	スポイト	周囲の色の範囲の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	28	eyedropper	0	0	
 SpuitNotReferDraft	スポイト	参照しないレイヤー: 下描き	0/1	確認済み（W4: 単独で）	INTEGER	28	eyedropper	0	0	
 SpuitNotReferLocked	スポイト	参照しないレイヤー: ロック	0/1	確認済み（W4: アイコンで対応）	INTEGER	28	eyedropper	0	0	
 SpuitNotReferPaper	スポイト	参照しないレイヤー: 用紙	0/1	確認済み（W4: アイコンで対応）	INTEGER	28	eyedropper	0	0	
@@ -401,14 +401,14 @@ StreamGroupGap	描画間隔	まとまりの隙間	数値	推測	INTEGER	119	effe
 StreamGroupSize	描画間隔	まとまりの本数	本	確認済み（W4）	INTEGER	119	effectLines,?	3	10	
 StreamIntervalDisturb	描画間隔	線の間隔の乱れの段階	段階のバー（3 段目で 50、元の 10 は 1 段目）	確認済み（W4: 3 段目 50）	INTEGER	119	effectLines,?	10	75	
 StreamJagLength	描画位置（集中線）	ギザギザの高さ	数値（単位は StreamJagLengthUnit）	確認済み（W4）	REAL	85	effectLines,?	20.0	300.0	
-StreamJagLengthUnit	描画位置（集中線）	ギザギザの高さの単位	0 px, 2 mm（推測）	推測	INTEGER	85	effectLines,?	0	0	
+StreamJagLengthUnit	描画位置（集中線）	ギザギザの高さの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	85	effectLines,?	0	0	
 StreamJagNumber	描画位置（集中線）	ギザギザの数	個	確認済み（W4）	INTEGER	85	effectLines,?	24	36	
 StreamLineLength	描画位置	長さ	数値（単位は StreamLineLengthUnit）	確認済み（W4）	REAL	119	effectLines,?	30.0	2000.0	
 StreamLineLengthDisturb	描画位置	長さの乱れの段階	段階のバー（推測）	推測	INTEGER	119	effectLines,?	10	50	
-StreamLineLengthUnit	描画位置	長さの単位	0 px, 2 mm（推測）	推測	INTEGER	119	effectLines,?	0	0	
+StreamLineLengthUnit	描画位置	長さの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	119	effectLines,?	0	0	
 StreamMakeCurve	流線 / 集中線	曲線化	0/1	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
 StreamStartGapDisturb	描画位置	基準位置のずれの幅	数値（単位は StreamStartGapDisturbUnit）	確認済み（W4）	REAL	119	effectLines,?	10.0	1000.0	
-StreamStartGapDisturbUnit	描画位置	基準位置のずれの幅の単位	0 px, 2 mm（推測）	推測	INTEGER	119	effectLines,?	0	2	
+StreamStartGapDisturbUnit	描画位置	基準位置のずれの幅の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	119	effectLines,?	0	2	
 StreamUseBrushSizeDisturb	効果線	使う Brush サイズ 乱れ	名前からの直訳	推測（直訳）	INTEGER	119	effectLines,?	0	1	
 StreamUseGroup	描画間隔	まとまり	0/1	確認済み（W4）	INTEGER	119	effectLines,?	0	1	
 StreamUseGroupDisturb	描画間隔	まとまりの乱れ	0/1	推測	INTEGER	119	effectLines,?	1	1	
@@ -439,7 +439,7 @@ TextEdgeColorGreen	テキスト	フチ 色 G	名前からの直訳	推測（直�
 TextEdgeColorRed	テキスト	フチ 色 R	名前からの直訳	推測（直訳）	INTEGER	20	text	4294967295	4294967295	
 TextEdgeEnabled	テキスト	フチ	0/1	確認済み（W4）	INTEGER	20	text	0	0	
 TextEdgeWidth	テキスト	フチの太さ	数値（単位は TextEdgeWidthUnit）	確認済み（W4）	REAL	20	text	1.0	1.0	
-TextEdgeWidthUnit	テキスト	フチの太さの単位	0 px, 2 mm（推測）	推測	INTEGER	20	text	0	0	
+TextEdgeWidthUnit	テキスト	フチの太さの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	20	text	0	0	
 TextEnableHandle	変形設定	リサイズハンドルを表示	0/1	確認済み（W4）	INTEGER	21	text,operation	1	1	
 TextFastPreview	テキスト	高速 プレビュー	名前からの直訳	推測（直訳）	INTEGER	20	text	0	0	
 TextFixAspect	変形設定	縦横比固定	0/1	確認済み（W4）	INTEGER	31	text,operation	0	1	
@@ -511,9 +511,9 @@ VectorConnectDifferent	ベクター線単純化 / つなぎ	属性の異なる�
 VectorConnectLevel	ベクター線単純化 / つなぎ	線つなぎの段階	段階のバー（1 段目 10、3 段目 40）	確認済み（W4: 1・3 段目）	INTEGER	16	vectorEdit	10	10	
 VectorCurveKindToChange	ベクター線単純化 / つなぎ	変換後の曲線	0 折れ線, 1 スプライン, 2 2 次ベジェ, 3 3 次ベジェ	確認済み（W4: 1・3、名前はツールチップ）	INTEGER	2	vectorEdit	1	1	
 VectorDustSize	ベクター線単純化 / つなぎ	短い線の消去の長さ	数値（単位は VectorDustSizeUnit）	確認済み（W4）	REAL	16	vectorEdit	5.0	5.0	
-VectorDustSizeUnit	ベクター線単純化 / つなぎ	短い線の消去の長さの単位	0 px, 2 mm（推測）	推測	INTEGER	16	vectorEdit	0	0	
+VectorDustSizeUnit	ベクター線単純化 / つなぎ	短い線の消去の長さの単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	16	vectorEdit	0	0	
 VectorPinchArea	ベクター線つまみ	効果範囲	数値（単位は VectorPinchAreaUnit）	確認済み（W4）	REAL	8	vectorEdit	30.0	85.0	
-VectorPinchAreaUnit	ベクター線つまみ	効果範囲の単位	0 px, 2 mm（推測）	推測	INTEGER	8	vectorEdit	0	0	
+VectorPinchAreaUnit	ベクター線つまみ	効果範囲の単位	0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）	推測	INTEGER	8	vectorEdit	0	0	
 VectorPinchLevel	ベクター線つまみ	つまみ加減	段階のバー（2 段目 10、4 段目 25、5 段目 50）	確認済み（W4: 2・4・5 段目）	INTEGER	8	vectorEdit	10	50	
 VectorPinchOperation	ベクター線つまみ	端の固定	0 端を固定しない（推測）, 1 一方の端を固定, 2 両端を固定	確認済み（W4: 3 つとも）	INTEGER	16	vectorEdit	0	2	
 VectorPointOperation	制御点	処理内容	一覧の並び順 0 制御点の移動, 1 制御点の追加, 2 制御点の削除, 3 角の切り替え, 4 線幅修正, 5 濃度修正, 6 線の切断	確認済み（W4: 0・1・3・6）	INTEGER	8	vectorEdit	0	1	
