@@ -8,6 +8,15 @@ raise the minor version).
 
 ## [Unreleased]
 
+### Added
+
+- `csp-assets`: write a sub tool from its settings. `SubToolDb::sut_parts`
+  gives one sub tool's manager, node, settings rows and packed materials, and
+  `build_sut` writes such parts as a `.sut` for CSP's サブツールの読み込み, each
+  `Variant` column declared with the type CSP uses (`variant_column_type`,
+  generated from `docs/assets/spec/subtool-columns.tsv` by
+  `tools/assets/subtool_column_types.py`), so a value is stored as CSP stores it.
+
 ### Changed
 
 - The repository moved from `nanikasheila/CLIP_STUDIO_PAINT_Format` to

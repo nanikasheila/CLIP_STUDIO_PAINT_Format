@@ -83,3 +83,70 @@ fn extracts_one_sub_tool() {
     assert_eq!(sut.materials[0].entries().unwrap()[0].name, "catalog.xml");
     assert!(db.extract_sut(db.find("ペン").map(|_| 1).unwrap(), &|_| None).is_err());
 }
+
+#[test]
+fn sut_parts_build_back_into_a_sut() {
+    let db = SubToolDb::from_bytes(&tool_db()).unwrap();
+    let pen = db.find("G-ペン").unwrap().node;
+    let mut parts = db.sut_parts(pen).unwrap();
+    assert_eq!(parts.variants.len(), 2);
+    assert!(parts.node.iter().all(|(name, _)| !name.starts_with("NodeMaterial")));
+    // Change a setting, given as an integer where CSP keeps a real.
+    for (name, value) in parts.variants.iter_mut().flatten() {
+        if name == "BrushSize" {
+            *value = Value::Integer(12);
+        }
+    }
+    let sut = SubToolDb::from_bytes(&build_sut(&parts).unwrap()).unwrap();
+    assert_eq!(sut.kind, DbKind::SubTool);
+    let tools = sut.sub_tools();
+    assert_eq!(tools.len(), 1);
+    let node = &sut.nodes[tools[0].node];
+    assert_eq!(node.name, "G-ペン");
+    assert_eq!(sut.root_uuid().unwrap(), node.uuid);
+    assert!(node.next.is_none() && node.first_child.is_none());
+    let settings = sut.variant(node.variant_id).unwrap();
+    assert_eq!(settings.get("BrushSize"), Some(&Value::Real(12.0)));
+    assert_eq!(settings.get("Opacity"), db.variant(1).unwrap().get("Opacity"));
+    assert_eq!(settings.blob("BrushPatternImageArray"), db.variant(1).unwrap().blob("BrushPatternImageArray"));
+    assert_eq!(sut.manager.int("MaxVariantID"), 101);
+    assert_eq!(variant_column_type("BrushSize"), "REAL");
+    assert_eq!(variant_column_type("NoSuchColumn"), "");
+}
+
+#[test]
+fn build_sut_needs_a_node_and_its_settings() {
+    let parts = SutParts::default();
+    assert!(build_sut(&parts).is_err());
+    let parts = SutParts {
+        node: vec![("NodeUuid".into(), Value::Blob(vec![7; 16])), ("NodeVariantID".into(), Value::Integer(3))],
+        variants: vec![vec![("VariantID".into(), Value::Integer(1))]],
+        ..SutParts::default()
+    };
+    assert!(build_sut(&parts).is_err());
+}
+
+/// Every sub tool of a real tool database (`CSP_TOOL_DB=…/EditImageTool.todb`)
+/// built back from its parts keeps every setting.
+#[test]
+fn real_tool_db_parts_round_trip() {
+    let Some(path) = std::env::var_os("CSP_TOOL_DB") else { return };
+    let db = SubToolDb::open(path).unwrap();
+    let mut count = 0;
+    for entry in db.sub_tools() {
+        let parts = db.sut_parts(entry.node).unwrap();
+        let sut = SubToolDb::from_bytes(&build_sut(&parts).unwrap()).unwrap();
+        let node = &db.nodes[entry.node];
+        for id in [node.variant_id, node.init_variant_id] {
+            let Some(original) = db.variant(id) else { continue };
+            let written = sut.variant(id).unwrap();
+            for (column, value) in original.iter() {
+                if column != "_PW_ID" && !matches!(value, Value::Null) {
+                    assert_eq!(written.get(column), Some(value), "{} {column}", node.name);
+                }
+            }
+        }
+        count += 1;
+    }
+    assert!(count > 0);
+}

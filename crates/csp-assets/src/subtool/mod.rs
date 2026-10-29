@@ -27,6 +27,10 @@
 //! database open, and nothing is written back to the input.
 
 pub mod blob;
+mod build;
+mod columns;
+
+pub use build::{Cells, SutParts, build_sut, variant_column_type};
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -472,6 +476,49 @@ impl SubToolDb {
             }
         }
         refs
+    }
+
+    /// One sub tool as the parts of a `.sut` ([`build_sut`] writes them
+    /// back): the manager row, its node row and its settings and initial
+    /// settings rows, every set column (`_PW_ID` left out), and the
+    /// materials this file carries that its settings name.
+    pub fn sut_parts(&self, node: usize) -> Result<SutParts> {
+        let node = self.nodes.get(node).ok_or_else(|| Error::format("no such node"))?;
+        if node.variant_id == 0 {
+            return Err(Error::format(format!("{} is a folder, not a sub tool", node.name)));
+        }
+        let cells = |row: &Row| -> Cells {
+            row.iter()
+                .filter(|(name, value)| *name != "_PW_ID" && !matches!(value, Value::Null))
+                .map(|(name, value)| (name.to_owned(), value.clone()))
+                .collect()
+        };
+        let ids: Vec<i64> = [node.variant_id, node.init_variant_id]
+            .into_iter()
+            .filter(|id| self.variants.contains_key(id))
+            .fold(Vec::new(), |mut ids, id| {
+                if !ids.contains(&id) {
+                    ids.push(id);
+                }
+                ids
+            });
+        let paths: HashSet<String> = ids
+            .iter()
+            .flat_map(|id| self.material_refs(*id))
+            .map(|(_, material)| material.path.trim_end_matches('\0').to_owned())
+            .collect();
+        Ok(SutParts {
+            manager: cells(&self.manager),
+            // The tool database's material columns are not part of a .sut.
+            node: cells(&node.row).into_iter().filter(|(name, _)| !name.starts_with("NodeMaterial")).collect(),
+            variants: ids.iter().map(|id| cells(&self.variants[id])).collect(),
+            materials: self
+                .materials
+                .iter()
+                .filter(|m| paths.contains(m.original_path.trim_end_matches('\0')))
+                .cloned()
+                .collect(),
+        })
     }
 
     /// Write one sub tool as a `.sut`: its node (unlinked), its settings
