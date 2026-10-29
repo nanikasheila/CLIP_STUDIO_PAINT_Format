@@ -151,11 +151,6 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 （`BrushPatternNameVersion` 0 → 1、`BrushPatternReverse` と `TextureScale` の削除、ヘッダー 48 バイト）も出た。結果は `tools/assets/subtool_columns.py` の `CONFIRMED` に入れ、
 [`subtool-columns.tsv`](../spec/subtool-columns.tsv) では「確認済み」と示す（530 列のうち 338 列）。
 
-## 残り
-
-- W4 の続き（まだ確かめていないツール: 3D の操作、ペン・ブラシ以外のツールの単位の列など）。3D の操作はキャンバスと 3D 素材が要る
-- 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
-
 ## W3b: 設定から組み立てた `.sut`（2026-10-29）
 
 CLIP STUDIO PAINT EX 5.1.4（Windows）の「ツールの読み込み」で、`build_sut` が書いたファイルを読み込んだ。読み込んだ試しのツールは確認後に削除した。
@@ -177,3 +172,8 @@ CLIP STUDIO PAINT EX 5.1.4（Windows）の「ツールの読み込み」で、`b
   項目 ID の意味は「Gペン」の `[1000, 10, 20, 40, 1241]` と、読み込んだツールのツールプロパティの並び（ブラシサイズ・不透明度・アンチエイリアス・手ブレ補正・ベクター吸着）から。
 - `Node` は `NodeUuid`・`NodeName`・`NodeIcon`・`NodeInputOp`・`NodeOutputOp`・`NodeRangeOp`・`NodeVariantID`・`NodeInitVariantID` だけでよい。
 - このときはページを開いたままでもサブツールを削除できた（W3 では「開いているページがあるため実行できません」と出た）。
+
+## 残り
+
+- W4 の続き（まだ確かめていないツール: 3D の操作、ペン・ブラシ以外のツールの単位の列など）。3D の操作はキャンバスと 3D 素材が要る
+- 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
