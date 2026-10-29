@@ -30,7 +30,7 @@ pub mod blob;
 mod build;
 mod columns;
 
-pub use build::{Cells, SutParts, build_sut, variant_column_type};
+pub use build::{Cells, DEFAULT_SHOWN_ITEMS, SutParts, build_sut, variant_column_type};
 
 use std::collections::{BTreeMap, HashMap, HashSet};
 

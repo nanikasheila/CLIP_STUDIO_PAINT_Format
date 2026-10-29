@@ -155,3 +155,25 @@ CLIP STUDIO PAINT EX（Windows、2026-10-25）で、`csp-assets` が書いたフ
 
 - W4 の続き（まだ確かめていないツール: 3D の操作、ペン・ブラシ以外のツールの単位の列など）。3D の操作はキャンバスと 3D 素材が要る
 - 影響元設定の入力ビット 0x100（CSP の画面に出ないため、確かめる方法がまだない）
+
+## W3b: 設定から組み立てた `.sut`（2026-10-29）
+
+CLIP STUDIO PAINT EX 5.1.4（Windows）の「ツールの読み込み」で、`build_sut` が書いたファイルを読み込んだ。読み込んだ試しのツールは確認後に削除した。
+
+| ファイル | 作り方 | CSP の結果 |
+|---|---|---|
+| `NS検査Gペン改.sut` | 同梱の「Gペン」を `sut_parts` で取り出し、`BrushSize` を整数 37、`Opacity` 61、`FlickerReduction` 17 にして `build_sut` | 読み込めた。ブラシサイズ 37.0、不透明度 61 |
+| `NS検査最小.sut` | `Variant` を 12 列（`VariantID`・`Opacity`・`CompositeMode`・`AntiAlias`・`FlickerReduction`・`BrushSize`・`BrushSizeUnit`・`BrushSizeEffector`・`BrushHardness`・`BrushInterval`・`BrushThickness`・`BrushRotation`）、`Node` を 8 列だけ | **何も表示されずに読み込まれなかった** |
+| `NS検査T1.sut` | 「Gペン」の `Node` と `Manager`、`Variant` は上の 12 列 | 読み込まれなかった |
+| `NS検査T2.sut` | 8 列の `Node`、「Gペン」の `Variant` 全列 | 読み込めた |
+| `NS検査T3.sut` | 12 列に `VariantShowSeparator`・`VariantShowParam` を足した | 読み込めた。サイズ 23.0、不透明度 80 |
+| `NS検査T4.sut` | 「Gペン」の全列から、`VariantShowParam` と `BrushSizeEffector` 以外の BLOB を除いた | 読み込めた |
+| `NS検査T5.sut` | 「Gペン」の列の前半だけ | 読み込めた |
+
+わかったこと:
+
+- **`VariantShowParam`（ツールプロパティに出す項目）がない `.sut` は、CSP が何も言わずに読み飛ばす**。ほかの列は少なくてよい（足りない列は既定値になる）。
+  `build_sut` は、設定行にこの列がなければ `DEFAULT_SHOWN_ITEMS`（1000 ブラシサイズ、10 不透明度、20 アンチエイリアス、40 手ブレ補正）を入れる。
+  項目 ID の意味は「Gペン」の `[1000, 10, 20, 40, 1241]` と、読み込んだツールのツールプロパティの並び（ブラシサイズ・不透明度・アンチエイリアス・手ブレ補正・ベクター吸着）から。
+- `Node` は `NodeUuid`・`NodeName`・`NodeIcon`・`NodeInputOp`・`NodeOutputOp`・`NodeRangeOp`・`NodeVariantID`・`NodeInitVariantID` だけでよい。
+- このときはページを開いたままでもサブツールを削除できた（W3 では「開いているページがあるため実行できません」と出た）。

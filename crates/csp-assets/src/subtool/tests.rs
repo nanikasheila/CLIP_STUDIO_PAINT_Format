@@ -124,6 +124,16 @@ fn build_sut_needs_a_node_and_its_settings() {
         ..SutParts::default()
     };
     assert!(build_sut(&parts).is_err());
+    // A row without shown items gets the default ones (CSP skips the file otherwise).
+    let parts = SutParts {
+        node: vec![("NodeUuid".into(), Value::Blob(vec![7; 16])), ("NodeVariantID".into(), Value::Integer(1))],
+        variants: vec![vec![("VariantID".into(), Value::Integer(1)), ("BrushSize".into(), Value::Real(4.0))]],
+        ..SutParts::default()
+    };
+    let sut = SubToolDb::from_bytes(&build_sut(&parts).unwrap()).unwrap();
+    let shown = sut.variant(1).unwrap().blob("VariantShowParam").unwrap();
+    assert_eq!(blob::show_items(shown).unwrap(), DEFAULT_SHOWN_ITEMS);
+    assert_eq!(sut.nodes[0].init_variant_id, 1);
 }
 
 /// Every sub tool of a real tool database (`CSP_TOOL_DB=…/EditImageTool.todb`)

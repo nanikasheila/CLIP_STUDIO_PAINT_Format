@@ -8,6 +8,10 @@
 //! when it reads the file (W3), and declares each column with the type it
 //! uses itself, so a value is stored as CSP stores it whatever number type it
 //! came as.
+//!
+//! CSP skips a `.sut` whose settings have no `VariantShowParam` (the items
+//! shown in the tool property palette) without a word (W3b), so rows
+//! without one get [`DEFAULT_SHOWN_ITEMS`].
 
 use rusqlite::Connection;
 use rusqlite::types::Value;
@@ -39,6 +43,10 @@ pub struct SutParts {
     /// settings' material lists name.
     pub materials: Vec<MaterialFile>,
 }
+
+/// Items shown in the tool property palette when the settings name none:
+/// ブラシサイズ (1000), 不透明度 (10), アンチエイリアス (20), 手ブレ補正 (40).
+pub const DEFAULT_SHOWN_ITEMS: &[u32] = &[1000, 10, 20, 40];
 
 /// `Manager` columns of CSP's `.sut` files and their types.
 const MANAGER_COLUMNS: &[(&str, &str)] = &[
@@ -178,10 +186,24 @@ pub fn build_sut(parts: &SutParts) -> Result<Vec<u8>> {
     let node_names = column_order(NODE_COLUMNS.iter().map(|(n, _)| *n), &[&node]);
     create(&out, "Node", &node_names, |name| known_type(NODE_COLUMNS, name))?;
     insert(&out, "Node", &node_names, &node)?;
-    let rows: Vec<&Cells> = parts.variants.iter().collect();
+    let variants: Vec<Cells> = parts
+        .variants
+        .iter()
+        .map(|row| {
+            let mut row = row.clone();
+            if !matches!(get(&row, "VariantShowParam"), Some(Value::Blob(_))) {
+                set(&mut row, "VariantShowParam", Value::Blob(super::blob::show_items_bytes(DEFAULT_SHOWN_ITEMS)));
+            }
+            if get(&row, "VariantShowSeparator").is_none() {
+                set(&mut row, "VariantShowSeparator", Value::Integer(0));
+            }
+            row
+        })
+        .collect();
+    let rows: Vec<&Cells> = variants.iter().collect();
     let variant_names = column_order(["VariantID", "VariantShowSeparator", "VariantShowParam"], &rows);
     create(&out, "Variant", &variant_names, variant_column_type)?;
-    for row in &parts.variants {
+    for row in &variants {
         insert(&out, "Variant", &variant_names, row)?;
     }
     out.execute_batch(
