@@ -19,6 +19,11 @@ raise the minor version).
 
 ### Changed
 
+- `docs/assets/spec/subtool-columns.tsv`: the value 2 of the length unit
+  columns (`BrushSizeUnit`, `BrushInLengthUnit`...) is tens of pixels, not
+  millimetres: CSP shows `BrushSize` 1.2 with unit 2 as 12.0 px and draws it
+  as wide as 12 px on 600 and 1200 dpi canvases alike (W3c, checked for
+  `BrushSizeUnit`).
 - The repository moved from `nanikasheila/CLIP_STUDIO_PAINT_Format` to
   `nanikasheila/csp-format`, so that its name matches the packages and does
   not carry the product name. GitHub forwards the old URLs. The repository

@@ -7,7 +7,7 @@ how sure that is, and what the samples hold (from subtool_census.py).
 Meanings come from LABELS below (one entry per base name) and the naming
 rules of CSP's columns: ``Dual*`` is the same item of the dual brush (2つ目のブラシ先端),
 ``*Effector`` its 影響元設定, ``*Unit`` the unit of the value before it
-(0 px, 2 mm, see the spec), ``Use*`` the check box that turns it on.
+(0 px, 2 tens of pixels: W3c), ``Use*`` the check box that turns it on.
 CONFIRMED lists the items checked in CSP (W3/W4); everything else is
 "推測" (inferred from the name and the palettes) unless marked "未解明".
 """
@@ -407,6 +407,7 @@ PREFIX_GROUPS = [
 # Checked in CSP (column → evidence); see docs/assets/validation/W3-csp.md.
 CONFIRMED: dict[str, str] = {
     "BrushSize": "確認済み（W3 表示、W4）",
+    "BrushSizeUnit": "確認済み（W3c）",
     "Opacity": "確認済み（W3 表示・書き出し、W4）",
     "AntiAlias": "確認済み（W3 表示: 1 弱、2 中）",
     "CompositeMode": "確認済み（W4: ハードミックス 20）",
@@ -800,13 +801,19 @@ def literal(name: str) -> str:
     return " ".join(WORDS.get(p, p) for p in parts if WORDS.get(p, p))
 
 
+# The value 2 of a unit column is tens of pixels, checked for BrushSizeUnit (W3c).
+UNIT_VALUES = {
+    "BrushSizeUnit": "0 px, 2 ×10 px（W3c: 1.2 を 12.0 px と表示し、600・1200 dpi のどちらでも 12 px と同じ太さで描く。mm ではない）",
+}
+
+
 def lookup(base: str):
     """(group, label, values, suffix words) for a base name, or None."""
     if base in LABELS:
         return (*LABELS[base], "")
     for suffix, words in (("Effector", "の影響元設定"), ("Unit", "の単位")):
         if base.endswith(suffix) and base[:-len(suffix)] in LABELS:
-            values = "Effector（影響元: 筆圧・傾き・速度・ランダム）" if suffix == "Effector" else "0 px, 2 mm（推測）"
+            values = "Effector（影響元: 筆圧・傾き・速度・ランダム）" if suffix == "Effector" else UNIT_VALUES.get(base, "0 px, 2 ×10 px（推測: BrushSizeUnit と同じ）")
             group, label, _ = LABELS[base[:-len(suffix)]]
             return group, label, values, words
     return None
